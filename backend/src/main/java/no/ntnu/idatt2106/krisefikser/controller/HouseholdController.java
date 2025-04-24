@@ -4,11 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -63,7 +59,7 @@ public class HouseholdController {
             @ApiResponse(responseCode = "201", description = "Household successfully created"),
             @ApiResponse(responseCode = "400", description = "Invalid household information")
     })
-    @PutMapping("/")
+    @PostMapping
     public ResponseEntity<Household> createHousehold(@RequestBody Household household) throws Exception {
         Household newHouseholdEntry = householdService.save(household);
         return ResponseEntity.ok(newHouseholdEntry);

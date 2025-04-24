@@ -50,8 +50,7 @@ public class HouseholdService {
      * @return The saved household entity.
      */
     public Household save(Household newHousehold) throws Exception {
-        // TODO make checks to see if household is valid
-        if (newHousehold.getMemberCount() != null || newHousehold.getName() != null || newHousehold.getAddress() != null) {
+        if (newHousehold.getMemberCount() == null || newHousehold.getName() == null || newHousehold.getAddress() == null) {
             throw new IllegalArgumentException("Household has to contain member count, name of household, and an address");
         }
         return householdRepository.save(newHousehold);
