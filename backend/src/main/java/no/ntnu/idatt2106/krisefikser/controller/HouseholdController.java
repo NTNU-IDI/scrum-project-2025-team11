@@ -21,8 +21,19 @@ import no.ntnu.idatt2106.krisefikser.service.HouseholdService;
 @Tag(name = "Household", description = "Operations related to household management")
 public class HouseholdController {
 
+    /**
+     * Service for handling household-related business logic.
+     */
     private final HouseholdService householdService;
 
+    /**
+     * Updates an existing household with new data.
+     *
+     * @param id        The ID of the household to update.
+     * @param household The new household data to update with.
+     * @return A {@link ResponseEntity} containing the updated household entity if successful,
+     *         or a 404 Not Found response if the household with the given ID does not exist.
+     */
     @PutMapping("/{id}")
     public ResponseEntity<Household> updateHousehold(@PathVariable int id, @RequestBody Household household) {
         if (!householdService.existsById(id)) {
