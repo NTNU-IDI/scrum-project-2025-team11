@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -101,6 +101,7 @@ public class AddressController {
     @Parameter (description = "Address object to be created", required = true)
     @RequestBody Address address) {
     try {
+      
       Address createdAddress = addressService.save(address);
       return ResponseEntity.status(HttpStatus.CREATED).body(createdAddress);
     } catch (Exception e) {
