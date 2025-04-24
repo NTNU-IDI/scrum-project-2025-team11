@@ -9,10 +9,10 @@ INSERT INTO `HOUSEHOLD` (id, name, member_count, address_id) VALUES
   (2, 'Familien Solbakken', 3, 2);
 
 -- Users (Brukere)
-INSERT INTO `USER_ACCOUNT` (id, email, password, role, household_id) VALUES
-  (1, 'super@beredskap.no',      'passordhash1', 'super_admin', 1),
-  (2, 'admin@nordberg.no',       'passordhash2', 'admin',       1),
-  (3, 'bruker@solbakken.no',     'passordhash3', 'normal',      2);
+INSERT INTO `USER_ACCOUNT` (id, email, first_name, last_name, password, role, household_id) VALUES
+  (1, 'super@beredskap.no', 'Trond', 'Bakke',      'passordhash1', 'super_admin', 1),
+  (2, 'admin@nordberg.no', 'Ida', 'Tulliong',      'passordhash2', 'admin',       1),
+  (3, 'bruker@solbakken.no', 'Jon', 'Solbakken',     'passordhash3', 'normal',      2);
 
 -- Networks (Nettverk)
 INSERT INTO `NETWORK` (id, name, description) VALUES
