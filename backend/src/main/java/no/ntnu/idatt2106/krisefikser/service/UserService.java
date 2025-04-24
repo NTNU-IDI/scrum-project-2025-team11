@@ -17,24 +17,56 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Finds a user by their ID.
+     * @param id
+     * @return Optional<User> object containing the user if found, otherwise empty
+     */
     public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
     }
 
+    /**
+     * Finds a user by their username.
+     * @param username
+     * @return User object if found, otherwise null
+     */
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
+    /**
+     * Finds a user by their email.
+     * @param email
+     * @return User object if found, otherwise null
+     */
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
+
+    /**
+     * Saves a user to the database.
+     * @param user
+     * @return User object that was saved
+     */
     public User save(User user) {
         return userRepository.save(user);
     }
+
+    /**
+     * Deletes a user by their ID.
+     * @param id
+     */
     public void deleteAllUsers() {
         userRepository.deleteAll();
     }
 
+    /**
+     * Updates a user by their ID.
+     * @param id
+     * @param updatedUser
+     * @return User object that was updated
+     */
     public User updateUser(Long id, User updatedUser) {
         return userRepository.findById(id).map(existingUser -> {
           // Update fields based on the values in the updatedUser object

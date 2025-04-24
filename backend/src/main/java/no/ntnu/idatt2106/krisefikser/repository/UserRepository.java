@@ -7,8 +7,18 @@ import no.ntnu.idatt2106.krisefikser.model.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
+    /**
+     * Finds a user by their username.
+     * @param username
+     * @return User object if found, otherwise null
+     */
     User findByUsername(String username);
 
+    /**
+     * Finds a user by their email.
+     * @param email
+     * @return User object if found, otherwise null
+     */
     User findByEmail(String email);
     
     
