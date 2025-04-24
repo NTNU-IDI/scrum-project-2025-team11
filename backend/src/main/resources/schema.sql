@@ -1,3 +1,30 @@
+CREATE TYPE role_enum AS ENUM (
+  'normal',
+  'admin',
+  'super_admin'
+);
+
+CREATE TYPE poi_icon_enum AS ENUM (
+  'none',
+  'point',
+  'normal',
+  'danger',
+  'assembly_point',
+  'medical',
+  'shelter'
+);
+
+CREATE TYPE evt_icon_enum AS ENUM (
+  'none',
+  'point',
+  'normal',
+  'danger',
+  'assembly_point',
+  'medical',
+  'shelter'
+);
+
+
 -- ADDRESS
 CREATE TABLE ADDRESS (
   id          INT PRIMARY KEY AUTO_INCREMENT,
@@ -19,15 +46,14 @@ CREATE TABLE HOUSEHOLD (
 
 -- USER_ACCOUNT
 CREATE TABLE USER_ACCOUNT (
-  id           INT PRIMARY KEY AUTO_INCREMENT,
-  email        VARCHAR(255) NOT NULL UNIQUE,
-  first_name   VARCHAR(255) NOT NULL,
-    last_name    VARCHAR(255) NOT NULL,
-  password     VARCHAR(255) NOT NULL,
-  role         VARCHAR(20)  NOT NULL DEFAULT 'normal',
-  household_id INT,
-  CONSTRAINT FK_USER_HH FOREIGN KEY (household_id) REFERENCES HOUSEHOLD(id),
-  CONSTRAINT CHK_USER_ROLE CHECK (role IN ('normal','admin','super_admin'))
+  id            INT PRIMARY KEY AUTO_INCREMENT,
+  email         VARCHAR(255) NOT NULL UNIQUE,
+  first_name    VARCHAR(255) NOT NULL,
+  last_name     VARCHAR(255) NOT NULL,
+  password      VARCHAR(255) NOT NULL,
+  role          role_enum    NOT NULL DEFAULT 'normal',
+  household_id  INT,
+  CONSTRAINT FK_USER_HH FOREIGN KEY (household_id) REFERENCES HOUSEHOLD(id)
 );
 
 -- NETWORK
@@ -68,31 +94,25 @@ CREATE TABLE HOUSEHOLD_ITEMS (
 
 -- POINT_OF_INTEREST
 CREATE TABLE POINT_OF_INTEREST (
-  id          INT PRIMARY KEY AUTO_INCREMENT,
-  name        VARCHAR(255) NOT NULL,
-  icon_type   VARCHAR(20)  NOT NULL DEFAULT 'point',
-  description TEXT,
-  latitude    DECIMAL(9,6),
-  longitude   DECIMAL(9,6),
-  CONSTRAINT CHK_POI_ICON CHECK (icon_type IN (
-    'none','point','normal','danger','assembly_point','medical','shelter'
-  ))
+  id           INT            PRIMARY KEY AUTO_INCREMENT,
+  name         VARCHAR(255)   NOT NULL,
+  icon_type    poi_icon_enum  NOT NULL DEFAULT 'point',
+  description  TEXT,
+  latitude     DECIMAL(9,6),
+  longitude    DECIMAL(9,6)
 );
 
 -- EVENT
 CREATE TABLE EVENT (
-  id          INT PRIMARY KEY AUTO_INCREMENT,
-  name        TEXT    NOT NULL,
-  description TEXT,
-  icon_type   VARCHAR(20) NOT NULL DEFAULT 'none',
-  time_start  DATE,
-  time_end    DATE,
-  latitude    DECIMAL(9,6),
-  longtitude  DECIMAL(9,6),
-  radius      INT,
-  CONSTRAINT CHK_EVT_ICON CHECK (icon_type IN (
-    'none','point','normal','danger','assembly_point','medical','shelter'
-  ))
+  id           INT            PRIMARY KEY AUTO_INCREMENT,
+  name         TEXT           NOT NULL,
+  description  TEXT,
+  icon_type    evt_icon_enum  NOT NULL DEFAULT 'none',
+  time_start   DATE,
+  time_end     DATE,
+  latitude     DECIMAL(9,6),
+  longitude    DECIMAL(9,6),
+  radius       INT
 );
 
 -- Now create the indexes that were inline in MySQL:
