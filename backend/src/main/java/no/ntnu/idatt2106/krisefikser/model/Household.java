@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.amqp.RabbitConnectionDetails.Addre
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -16,6 +17,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
+@RequiredArgsConstructor
 @Table(name = "household")
 public class Household {
 
@@ -42,7 +44,7 @@ public class Household {
    */
   @Schema(description = "Count of how many people exist in a household", example = "4")
   @Column(nullable = false)
-  private int member_count;
+  private Integer memberCount;
 
   /**
    * Reference to the address associated with the household.
