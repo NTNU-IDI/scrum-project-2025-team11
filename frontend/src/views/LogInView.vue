@@ -1,75 +1,44 @@
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
-
-    <!-- Login Card -->
-    <div class="w-full max-w-md bg-white rounded-lg shadow-md p-8">
-      <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">Logg inn</h1>
-
-      <form @submit.prevent="handleLogin" class="space-y-6">
-        <div>
-          <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Brukernavn</label>
-          <input
-            id="username"
-            v-model="username"
-            type="text"
-            required
-            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Skriv inn brukernavn"
-          />
-        </div>
-
-        <div>
-          <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Passord</label>
-          <input
-            id="password"
-            v-model="password"
-            type="password"
-            required
-            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Skriv inn passord"
-          />
-        </div>
-
+  <div class="min-h-screen bg-dark-blue flex items-center justify-center font-Roboto">
+    <div class="bg-white px-10 py-12 rounded-md shadow-md w-[400px]">
+      <div class="mb-6">
+        <h1 class="text-2xl font-semibold text-dark-blue">Logg inn</h1>
+      </div>
+      <form @submit.prevent="handleLogin" class="flex flex-col space-y-4">
+        <input
+          v-model="username"
+          type="text"
+          placeholder="Brukernavn"
+          class="px-4 py-2 bg-grey rounded focus:outline-none text-dark-blue"
+        />
+        <input
+          v-model="password"
+          type="password"
+          placeholder="Passord"
+          class="px-4 py-2 bg-grey rounded focus:outline-none text-dark-blue"
+        />
         <button
           type="submit"
-          class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          class="bg-good-green hover:bg-green-700 text-white py-2 rounded transition duration-200"
         >
           Logg inn
         </button>
       </form>
-
-      <div class="mt-6 text-center">
-        <p class="text-sm text-gray-600">
-          Har du ikke en bruker?
-          <router-link to="/register" class="text-blue-600 hover:text-blue-800 hover:underline">
-            Registrer deg her
-          </router-link>
-        </p>
-      </div>
+      <p class="mt-6 text-sm text-center text-dark-blue">
+        Har du ikke en bruker? <a href="#" class="text-bad-red">Registrer deg her</a>
+      </p>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue';
-import { useRouter } from 'vue-router';
+<script lang="ts" setup>
+import { ref } from 'vue'
 
-export default defineComponent({
-  name: 'LoginPage',
-  setup() {
-    const router = useRouter();
-    const username = ref('');
-    const password = ref('');
+const username = ref('')
+const password = ref('')
 
-    const handleLogin = () => {
-      // TODO: API call
-    };
-
-    return {
-      username,
-      password,
-      handleLogin,
-    };
-  },
-});
+const handleLogin = () => {
+  console.log('Login attempt with:', username.value, password.value)
+  // TODO: implement actual auth logic
+}
 </script>

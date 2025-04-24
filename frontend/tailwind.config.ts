@@ -5,18 +5,18 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        "Darkest-blue": "#0D1B2A",
-        "Dark-blue": "#1B263B",
-        "Light-blue": "#415A77",
-        "Lightest-blue": "#778DA9",
-        Grey: "#E0E1DD",
-        Orange: "#EB5E28",
-        "Good-green": "#3D9C5A",
-        "Bad-red": "#BF0603",
+        "darkest-blue": "#0D1B2A",
+        "dark-blue": "#1B263B",
+        "light-blue": "#415A77",
+        "lightest-blue": "#778DA9",
+        grey: "#E0E1DD",
+        orange: "#EB5E28",
+        "good-green": "#3D9C5A",
+        "bad-red": "#BF0603",
       },
     },
     fontFamily: {
-      Roboto: ["Inter, sans-serif"],
+      Roboto: ["Inter", "sans-serif"],
     },
     container: {
       padding: "2rem",
