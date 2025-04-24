@@ -49,8 +49,8 @@ public class Household {
    * Reference to the address associated with the household.
    * This field establishes a many-to-one relationship with the Address entity.
    */
-  /*@Schema(description = "Identifier to connect the column with the Address table", example = "1")
+  @Schema(description = "Identifier to connect the column with the Address table", example = "1")
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "address_id")
-  private Address address;*/
+  private Address address;
 }
