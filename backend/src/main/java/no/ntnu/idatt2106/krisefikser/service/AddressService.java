@@ -21,15 +21,24 @@ public class AddressService {
 
   // Add methods for creating, updating, deleting, and retrieving addresses here.
 
-  public Optional<Address> findById(Long id) {
+  public Optional<Address> findById(int id) {
     return addressRepository.findById(id);
   }
 
-  public Address save(Address address) {
+  /**
+   * Saves a new address to the database.
+   * @param address the address to save.
+   * @return the saved address.
+   * @throws Exception if the address is invalid or cannot be saved.
+   */
+  public Address save(Address address) throws Exception {
+    if (address.getStreet() == null || address.getPostalCode() == null || address.getCity() == null) {
+      throw new IllegalArgumentException("Street, postal code, and city cannot be null");
+    }
     return addressRepository.save(address);
   }
 
-  public Address updateAddress(Long id, Address updatedAddress) {
+  public Address updateAddress(int id, Address updatedAddress) {
     Address existingAddress = addressRepository.findById(id).orElseThrow(() -> new RuntimeException("Address not found"));
     if (updatedAddress.getStreet() != null) {
       existingAddress.setStreet(updatedAddress.getStreet());
@@ -49,11 +58,11 @@ public class AddressService {
     return addressRepository.save(existingAddress);
   }
 
-  public void deleteById(Long id) {
+  public void deleteById(int id) {
     addressRepository.deleteById(id);
   }
 
-  public boolean existsById(Long id) {
+  public boolean existsById(int id) {
     return addressRepository.existsById(id);
   }
 

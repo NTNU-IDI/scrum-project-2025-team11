@@ -24,7 +24,7 @@ public class Address {
   @Schema(description = "Unique identifier for the address.", example = "1")
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private int id;
 
   /**
    * The street address of the location.
