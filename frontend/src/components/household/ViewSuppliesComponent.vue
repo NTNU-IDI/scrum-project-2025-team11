@@ -39,7 +39,7 @@ const toggleEditMode = () => {
 
     <div class="grey-container">
         <div v-for="item in items" :key="item.id" class="item-card">
-            <div v-if="!isEditMode" class="delete-button">X</div>
+            <div v-if="isEditMode" class="delete-button">X</div>
             <div :class="['article-card', { active: item.id === selectedTypeId }]" @click="chooseItemType(item.id)">
                 <div class="quantity">{{ item.quantity }} {{ item.unit }}</div>
                 <div class="info">
@@ -57,18 +57,6 @@ const toggleEditMode = () => {
     .quantity {
         display: flex;
         align-items: center;
-    }
-
-    .edit-input {
-        background-color: transparent;
-        border: none;
-        color: var(--darkest-blue);
-        font-size: var(--font-size-medium);
-        width: 100%;
-    }
-
-    #quantity-input {
-        max-width: 1.5rem;
     }
 
     .dark-button.active {
