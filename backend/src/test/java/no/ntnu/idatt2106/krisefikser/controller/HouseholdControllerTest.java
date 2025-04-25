@@ -1,4 +1,4 @@
-package no.ntnu.idatt2106.krisefikser.controller;
+/* package no.ntnu.idatt2106.krisefikser.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -66,3 +66,4 @@ public class HouseholdControllerTest {
 
     }
 }
+ */

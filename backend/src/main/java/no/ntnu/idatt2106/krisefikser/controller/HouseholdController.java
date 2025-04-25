@@ -8,11 +8,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
+import no.ntnu.idatt2106.krisefikser.dto.HouseholdRequestDTO;
+import no.ntnu.idatt2106.krisefikser.dto.HouseholdResponseDTO;
 import no.ntnu.idatt2106.krisefikser.model.Household;
 import no.ntnu.idatt2106.krisefikser.service.HouseholdService;
 
@@ -63,9 +63,11 @@ public class HouseholdController {
             @ApiResponse(responseCode = "400", description = "Invalid household information")
     })
     @PostMapping
-    public ResponseEntity<Household> createHousehold(@Valid @RequestBody Household household) throws Exception {
+    public ResponseEntity<HouseholdResponseDTO> createHousehold(@RequestBody HouseholdRequestDTO household) throws Exception {
         System.out.println("Recieved Household: " + household);
-        Household newHouseholdEntry = householdService.save(household);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newHouseholdEntry);
+        System.out.println("Raw JSON payload: " + household);
+        HouseholdResponseDTO createdHousehold = householdService.save(household);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdHousehold);
+
     }
 }

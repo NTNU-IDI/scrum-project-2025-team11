@@ -2,6 +2,9 @@ package no.ntnu.idatt2106.krisefikser.service;
 
 import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.repository.HouseholdRepository;
+import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
+import no.ntnu.idatt2106.krisefikser.dto.HouseholdRequestDTO;
+import no.ntnu.idatt2106.krisefikser.dto.HouseholdResponseDTO;
 import no.ntnu.idatt2106.krisefikser.model.Address;
 import no.ntnu.idatt2106.krisefikser.model.Household;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,25 @@ public class HouseholdService {
      */
     private final HouseholdRepository householdRepository;
     private final AddressService addressService;
+
+    private HouseholdResponseDTO mapToResponseDTO(Household household) {
+        HouseholdResponseDTO dto = new HouseholdResponseDTO();
+        dto.setId(household.getId());
+        dto.setName(household.getName());
+        dto.setMemberCount(household.getMemberCount());
+        Address address = household.getAddress();
+        if (address != null) {
+            AddressResponseDTO addressDto = new AddressResponseDTO();
+            addressDto.setId(address.getId());
+            addressDto.setStreet(address.getStreet());
+            addressDto.setPostalCode(address.getPostalCode());
+            addressDto.setCity(address.getCity());
+            addressDto.setLatitude(address.getLatitude());
+            addressDto.setLongitude(address.getLongitude());
+            dto.setAddress(addressDto);
+        }
+        return dto;
+    }
 
     public Optional<Household> findById(int id) {
         return householdRepository.findById(id);
@@ -51,18 +73,20 @@ public class HouseholdService {
      * @param newHousehold The household entity to save.
      * @return The saved household entity.
      */
-    public Household save(Household newHousehold) throws Exception {
+    public HouseholdResponseDTO save(HouseholdRequestDTO newHousehold) throws Exception {
+        Household household = new Household();
         if (newHousehold.getName() == null) {
             throw new IllegalArgumentException("Name is missing");
         }
-        if (newHousehold.getMemberCount() == null) {
+        if (newHousehold.getMemberCount() == 0) {
             throw new IllegalArgumentException("Member count is missing");
         }
-        if (newHousehold.getAddress() == null) {
-            throw new IllegalArgumentException("Address is missing");
-        }
-        Address address = addressService.save(newHousehold.getAddress());
-        return householdRepository.save(newHousehold);
+        Address address = addressService.findById(newHousehold.getAddressId()).orElseThrow(() -> new IllegalArgumentException("Address id not found"));
+        household.setName(newHousehold.getName());
+        household.setMemberCount(newHousehold.getMemberCount());
+        household.setAddress(address);
+        Household savedHousehold = householdRepository.save(household);
+        return mapToResponseDTO(savedHousehold);
     }
 
     /**
