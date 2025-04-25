@@ -31,7 +31,7 @@ public class User {
      * This field cannot be null and must be unique.
      */
     @Column(nullable = false)
-    @Schema(description = "Email address of the user.")
+    @Schema(description = "Email address of the user.", example = "dontru@gmail.com")
     private String email;
 
     /**
@@ -39,14 +39,14 @@ public class User {
      * This field cannot be null and must be unique.
      */
     @Column(nullable = false, unique = true)
-    @Schema(description = "Username of the user.")
+    @Schema(description = "Username of the user.", example = "maga123")
     private String username;
 
     /**
      * First name of the User.
      * This field cannot be null and has a maximum length of 50 characters.
      */
-    @Schema(description = "First name of the user.", example = "Jonny")
+    @Schema(description = "First name of the user.", example = "Donald")
     @Column(nullable = false, length = 50)
     private String firstName;
 
@@ -54,7 +54,7 @@ public class User {
      * Last name of the User.
      * This field cannot be null and has a maximum length of 50 characters.
      */
-    @Schema(description = "Last name of the user.", example = "Doe")
+    @Schema(description = "Last name of the user.", example = "Trump")
     @Column(nullable = false, length = 50)
     private String lastName;
 
@@ -64,16 +64,16 @@ public class User {
      */
     @Column(nullable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Schema(description = "Password of the user.")
+    @Schema(description = "Password of the user.", example = "password123")
     private String password;
 
     /**
      * Enum with roles for the User.
      */
     public enum Role {
-        SUPERADMIN,
-        ADMIN,
-        USER
+        super_admin,
+        admin,
+        normal
     }
 
     /**
@@ -82,9 +82,9 @@ public class User {
      * This field cannot be null and has a default value of USER.
      */
     @Enumerated(EnumType.STRING)
-    @Schema(description = "Role of the user.", example = "USER")
+    @Schema(description = "Role of the user.", example = "normal")
     @Column(nullable = false)
-    private Role role = Role.USER;
+    private Role role = Role.normal;
 
     /**
      * Houshold of the User.
