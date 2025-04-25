@@ -81,21 +81,45 @@ const testEvents = [
 export default defineComponent({
   name: 'CrisisMap',
   setup() {
+    const getUserLocation = (map: L.Map) => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const userLatitude = position.coords.latitude;
+            const userLongitude = position.coords.longitude;
+
+            // Add marker
+            const userLocationMarker = L.marker([userLatitude, userLongitude])
+              .addTo(map)
+              .bindPopup("<strong>Din posisjon</strong>")
+              .openPopup();
+            map.setView([userLatitude, userLongitude], 13);
+          },
+          (error) => {
+            console.error("Error getting location: ", error);
+          }
+        );
+      } else {
+        console.warn("Geolocation is not supported by this browser.");
+      }
+    };
+
     onMounted(() => {
       // Init map
       const map = L.map('map', {
         zoomControl: false
       }).setView([63.4305, 10.3951], 12);
       L.control.zoom({ position: 'topright' }).addTo(map);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(map);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
       // Add points of interest
       addPointsOfInterest(map);
 
       // Add events
       addEvents(map);
+
+      // Get user location
+      getUserLocation(map);
     });
   }
 });
