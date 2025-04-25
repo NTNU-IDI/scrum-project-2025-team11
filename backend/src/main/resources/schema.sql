@@ -88,7 +88,7 @@ CREATE TABLE EVENT (
   time_start  DATE,
   time_end    DATE,
   latitude    DECIMAL(9,6),
-  longtitude  DECIMAL(9,6),
+  longitude  DECIMAL(9,6),
   radius      INT,
   CONSTRAINT CHK_EVT_ICON CHECK (icon_type IN (
     'none','point','normal','danger','assembly_point','medical','shelter'
