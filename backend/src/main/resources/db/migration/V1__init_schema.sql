@@ -106,6 +106,20 @@ CREATE TABLE POINT_OF_INTEREST (
 
 -- EVENT
 CREATE TABLE EVENT (
+<<<<<<<<< Temporary merge branch 1:backend/src/main/resources/schema.sql
+  id          INT PRIMARY KEY AUTO_INCREMENT,
+  name        TEXT    NOT NULL,
+  description TEXT,
+  icon_type   VARCHAR(20) NOT NULL DEFAULT 'none',
+  time_start  DATE,
+  time_end    DATE,
+  latitude    DECIMAL(9,6),
+  longitude  DECIMAL(9,6),
+  radius      INT,
+  CONSTRAINT CHK_EVT_ICON CHECK (icon_type IN (
+    'none','point','normal','danger','assembly_point','medical','shelter'
+  ))
+=========
   id           INT            PRIMARY KEY AUTO_INCREMENT,
   name         TEXT           NOT NULL,
   description  TEXT,
@@ -115,6 +129,7 @@ CREATE TABLE EVENT (
   latitude     DECIMAL(9,6),
   longitude    DECIMAL(9,6),
   radius       INT
+>>>>>>>>> Temporary merge branch 2:backend/src/main/resources/db/migration/V1__init_schema.sql
 );
 
 -- Now create the indexes that were inline in MySQL:
