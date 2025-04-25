@@ -69,6 +69,7 @@ const deleteItem = () => {
 <style scoped>
     .grey-container {
         background-color: var(--light-blue);
+        margin-bottom: 4.1rem;
     }
 
     .small-header {

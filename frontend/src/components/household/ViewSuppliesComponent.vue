@@ -65,6 +65,10 @@ const toggleEditMode = () => {
         align-items: center;
     }
 
+    .dark-button {
+        height: 4rem;
+        width: 10rem;
+    }
     .dark-button.active {
         background-color: var(--good-green);
     }
