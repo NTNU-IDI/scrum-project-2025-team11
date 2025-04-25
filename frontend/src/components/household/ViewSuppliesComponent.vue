@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { useItemTypeStore } from '@/stores/item';
+import { useItemTypeStore } from '@/stores/itemStore';
 
 // Remove later
 const items = ref([
