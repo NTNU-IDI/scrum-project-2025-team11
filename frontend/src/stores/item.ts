@@ -7,14 +7,21 @@ interface itemTypeState {
 
 export const useItemTypeStore = defineStore('itemType', () => {
   const id = ref<number | null>(null)
+  const isEditMode = ref(false)
 
   const setItemType = (newId: number | null) => {
     id.value = newId
   }
 
+  const toggleEditMode = () => {
+    isEditMode.value = !isEditMode.value
+  }
+
   return {
     id,
-    setItemType
+    isEditMode,
+    setItemType,
+    toggleEditMode
   }
 }, {
   persist: true
