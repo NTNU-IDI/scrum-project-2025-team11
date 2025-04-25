@@ -7,6 +7,7 @@
   --orange: #eb5e28;
   --good-green: #3d9c5a;
   --bad-red: #bf0603;
+  --bad-red-opacity: rgba(255, 0, 0, 0.3);
 
   --white: white;
 }
