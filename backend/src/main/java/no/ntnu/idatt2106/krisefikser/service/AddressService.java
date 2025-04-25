@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
+import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
 import no.ntnu.idatt2106.krisefikser.model.Address;
 import no.ntnu.idatt2106.krisefikser.repository.AddressRepository;
 
@@ -44,20 +45,20 @@ public class AddressService {
    * @return the saved address.
    * @throws Exception if the address is invalid or cannot be saved.
    */
-  public Address save(AddressRequestDTO addressRequestDTO) throws Exception {
-    if (addressRequestDTO.getStreet() == null || addressRequestDTO.getPostalCode() == null || addressRequestDTO.getCity() == null) {
+  public AddressResponseDTO save(AddressRequestDTO addressDTO) throws Exception {
+    if (addressDTO.getStreet() == null || addressDTO.getPostalCode() == null || addressDTO.getCity() == null) {
       throw new IllegalArgumentException("Street, postal code, and city cannot be null");
     }
 
-    Address newAddress = new Address();
-    newAddress.setStreet(addressRequestDTO.getStreet());
-    newAddress.setPostalCode(addressRequestDTO.getPostalCode());
-    newAddress.setCity(addressRequestDTO.getCity());
-    newAddress.setLatitude(addressRequestDTO.getLatitude());
-    newAddress.setLongitude(addressRequestDTO.getLongitude());
+    Address address = new Address();
+    address.setStreet(addressDTO.getStreet());
+    address.setPostalCode(addressDTO.getPostalCode());
+    address.setCity(addressDTO.getCity());
+    address.setLatitude(addressDTO.getLatitude());
+    address.setLongitude(addressDTO.getLongitude());
 
-    Address savedAddress = addressRepository.save(newAddress);
-    return savedAddress;
+    Address savedAddress = addressRepository.save(address);
+    return mapToResponseDTO(savedAddress);
     
   }
 

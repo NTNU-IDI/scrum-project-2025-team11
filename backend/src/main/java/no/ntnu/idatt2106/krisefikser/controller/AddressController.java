@@ -22,6 +22,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
+import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
+import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
 import no.ntnu.idatt2106.krisefikser.model.Address;
 import no.ntnu.idatt2106.krisefikser.service.AddressService;
 
@@ -99,11 +101,12 @@ public class AddressController {
     @ApiResponse(responseCode = "400", description = "Invalid address data, for example, missing required fields")
   })
   @PostMapping
-  public ResponseEntity<Address> createAddress(
+  public ResponseEntity<AddressResponseDTO> createAddress(
     @Parameter (description = "Address object to be created", required = true)
     @RequestBody AddressRequestDTO address) {
+    @RequestBody AddressRequestDTO address) {
     try {
-      Address createdAddress = addressService.save(address);
+      AddressResponseDTO createdAddress = addressService.save(address);
       return ResponseEntity.status(HttpStatus.CREATED).body(createdAddress);
     } catch (Exception e) {
       return ResponseEntity.badRequest().header("Error message", e.getMessage()).build();
