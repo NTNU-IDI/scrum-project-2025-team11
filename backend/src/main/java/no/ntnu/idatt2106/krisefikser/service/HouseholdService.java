@@ -2,6 +2,11 @@ package no.ntnu.idatt2106.krisefikser.service;
 
 import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.repository.HouseholdRepository;
+import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
+import no.ntnu.idatt2106.krisefikser.dto.HouseholdRequestDTO;
+import no.ntnu.idatt2106.krisefikser.dto.HouseholdResponseDTO;
+import no.ntnu.idatt2106.krisefikser.dto.HouseholdUpdateDTO;
+import no.ntnu.idatt2106.krisefikser.model.Address;
 import no.ntnu.idatt2106.krisefikser.model.Household;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +24,26 @@ public class HouseholdService {
      * Repository for performing CRUD operations on Household entities.
      */
     private final HouseholdRepository householdRepository;
+    private final AddressService addressService;
+
+    private HouseholdResponseDTO mapToResponseDTO(Household household) {
+        HouseholdResponseDTO dto = new HouseholdResponseDTO();
+        dto.setId(household.getId());
+        dto.setName(household.getName());
+        dto.setMemberCount(household.getMemberCount());
+        Address address = household.getAddress();
+        if (address != null) {
+            AddressResponseDTO addressDto = new AddressResponseDTO();
+            addressDto.setId(address.getId());
+            addressDto.setStreet(address.getStreet());
+            addressDto.setPostalCode(address.getPostalCode());
+            addressDto.setCity(address.getCity());
+            addressDto.setLatitude(address.getLatitude());
+            addressDto.setLongitude(address.getLongitude());
+            dto.setAddress(addressDto);
+        }
+        return dto;
+    }
 
     public Optional<Household> findById(int id) {
         return householdRepository.findById(id);
@@ -32,15 +57,16 @@ public class HouseholdService {
      * @return The updated household entity.
      * @throws RuntimeException if the household with the given ID is not found.
      */
-    public Household updateHousehold(int id, Household household) {
+    public HouseholdResponseDTO updateHousehold(int id, HouseholdUpdateDTO newHousehold) {
         Household currentHousehold = householdRepository.findById(id).orElseThrow(() -> new RuntimeException("Household id not found"));
-        if (household.getMemberCount() != null) {
-            currentHousehold.setMemberCount(household.getMemberCount());
+        if (newHousehold.getMemberCount() != 0) {
+            currentHousehold.setMemberCount(newHousehold.getMemberCount());
         }
-        if (household.getName() != null) {
-            currentHousehold.setName(household.getName());
+        if (newHousehold.getName() != null) {
+            currentHousehold.setName(newHousehold.getName());
         }
-        return householdRepository.save(currentHousehold);
+        Household updatedHousehold = householdRepository.save(currentHousehold);
+        return mapToResponseDTO(updatedHousehold);
     }
 
     /**
@@ -49,9 +75,23 @@ public class HouseholdService {
      * @param newHousehold The household entity to save.
      * @return The saved household entity.
      */
-    public Household save(Household newHousehold) {
-        // TODO make checks to see if household is valid
-        return householdRepository.save(newHousehold);
+    public HouseholdResponseDTO save(HouseholdRequestDTO newHousehold) throws Exception {
+        Household household = new Household();
+        if (newHousehold.getName() == null) {
+            throw new IllegalArgumentException("Name is missing");
+        }
+        if (newHousehold.getMemberCount() == 0) {
+            throw new IllegalArgumentException("Member count is missing");
+        }
+        if (newHousehold.getAddress() == null) {
+            throw new IllegalArgumentException("Invalid address format, make sure to fill all fields");
+        }
+        Address address = addressService.save(newHousehold.getAddress());
+        household.setName(newHousehold.getName());
+        household.setMemberCount(newHousehold.getMemberCount());
+        household.setAddress(address);
+        Household savedHousehold = householdRepository.save(household);
+        return mapToResponseDTO(savedHousehold);
     }
 
     /**
