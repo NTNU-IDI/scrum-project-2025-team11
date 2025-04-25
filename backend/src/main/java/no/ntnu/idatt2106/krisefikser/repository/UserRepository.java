@@ -20,6 +20,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return User object if found, otherwise null
      */
     User findByEmail(String email);
+
+    /**
+     * Find a user by their id
+     * @param id
+     * @return User object if found, otherwise null
+     */
+    User findById(int id);
     
     
 }

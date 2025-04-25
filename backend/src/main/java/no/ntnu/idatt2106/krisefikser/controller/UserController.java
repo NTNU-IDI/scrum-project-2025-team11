@@ -19,6 +19,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import no.ntnu.idatt2106.krisefikser.dto.UserRequest;
+import no.ntnu.idatt2106.krisefikser.dto.UserResponse;
 import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.service.UserService;
 
@@ -46,12 +48,10 @@ public class UserController {
       @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
   })
   @GetMapping("/{id}")
-  public ResponseEntity<User> getUserById(
+  public ResponseEntity<UserResponse> getUserById(
     @Parameter(description = "The unique identifier of the user", required = true)
-    @PathVariable Long id) {
-    return userService.getUserById(id)
-        .map(ResponseEntity::ok)
-        .orElse(ResponseEntity.notFound().build());
+    @PathVariable int id) {
+    return ResponseEntity.ok(userService.getUserById(id));
   }
 
   /**
@@ -69,10 +69,10 @@ public class UserController {
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class)))
   })
   @PostMapping
-  public ResponseEntity<User> saveUser(
+  public ResponseEntity<UserResponse> saveUser(
     @Parameter(description = "User object to be created", required = true)
-    @RequestBody User user) {
-    User newUser = userService.save(user);
+    @RequestBody UserRequest user) {
+    UserResponse newUser = userService.saveUser(user);
     return ResponseEntity.ok(newUser);
   }
 
@@ -91,8 +91,8 @@ public class UserController {
     @ApiResponse(responseCode = "204", description = "No users found")
   })
   @GetMapping
-  public ResponseEntity<List<User>> getAllAddresses() {
-    List<User> users = userService.findAll();
+  public ResponseEntity<List<UserResponse>> getAllUsers() {
+    List<UserResponse> users = userService.findAll();
     if (users.isEmpty()) {
       return ResponseEntity.noContent().build();
     } else {
