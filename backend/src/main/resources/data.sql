@@ -47,7 +47,7 @@ INSERT INTO `POINT_OF_INTEREST` (name, icon_type, description, latitude, longitu
   ('Møteplass',          'assembly_point','Felles samlingssted ved evakuering', 59.912800, 10.753400);
 
 -- Events (Hendelser)
-INSERT INTO `EVENT` (name, description, icon_type, time_start, time_end, latitude, longtitude, radius) VALUES
+INSERT INTO `EVENT` (name, description, icon_type, time_start, time_end, latitude, longitude, radius) VALUES
   ('Brannøvelse',       'Kvartalsvis brannøvelse i nabolaget',   'normal',         '2025-05-01', '2025-05-01', 59.910000, 10.750000, 100),
   ('Flomvarsel',        'Varsel om mulig flom i lavtliggende område', 'danger',        '2025-04-20', '2025-04-25', 59.914000, 10.755000, 500),
   ('Nabolagsmøte',      'Informasjonsmøte om beredskapstiltak',   'assembly_point','2025-06-01', '2025-06-01', 59.912000, 10.753000, 50);
