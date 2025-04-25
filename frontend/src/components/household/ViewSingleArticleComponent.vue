@@ -96,7 +96,7 @@ const deleteItem = () => {
         font-size: var(--font-size-medium);
         width: 100%;
         max-width: 4rem;
-        margin-top: 2px;
+        margin-top: 17px;
         padding: 0;
     }
 

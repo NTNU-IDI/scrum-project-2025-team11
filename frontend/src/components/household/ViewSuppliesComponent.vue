@@ -53,6 +53,7 @@ const toggleEditMode = () => {
                 </div>
             </div>
         </div>
+        <div v-if="isEditMode" class="dark-button" id="add-button">+</div>
     </div>
 
     <button :class="['dark-button', { active: isEditMode }]" @click="toggleEditMode()">
@@ -71,6 +72,18 @@ const toggleEditMode = () => {
     }
     .dark-button.active {
         background-color: var(--good-green);
+    }
+
+    #add-button {
+        display: flex;
+        align-items: center; 
+        justify-content: center; 
+        align-self: right;
+        width: 1.5rem; 
+        height: 2rem; 
+        padding-bottom: 0.7rem;
+        font-size: var(--font-size-xlarge);
+        margin-left: auto;
     }
 
     .article-card {
