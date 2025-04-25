@@ -1,12 +1,17 @@
+import { createPinia } from "pinia";
+import { createApp } from "vue";
+import piniaPluginPersistedState from 'pinia-plugin-persistedstate'
+import App from "./App.vue";
+import "./assets/tailwind.css";
+import "./assets/base.css"
+import "./assets/main.css"
+import router from "./router/index.ts";
 
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import './assets/tailwind.css'
-import router from './router/index.ts'
-import App from './App.vue'
+const app = createApp(App);
+const pinia = createPinia();
 
-const app = createApp(App)
+pinia.use(piniaPluginPersistedState)
 
-app.use(createPinia())
-app.use(router)
-app.mount('#app')
+app.use(createPinia());
+app.use(router);
+app.mount("#app");
