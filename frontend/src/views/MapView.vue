@@ -4,8 +4,10 @@
       <h1>Ikoner</h1>
       <ul>
         <li><span class="icon star"></span> Tilfluktsrom</li>
-        <li><span class="icon danger"></span> Kriseberørt område</li>
         <li><span class="icon meetup"></span> Møteplass</li>
+        <li><span class="icon danger severe"></span> Alvorlig kriseberørt område</li>
+        <li><span class="icon danger moderate"></span> Moderat kriseberørt område</li>
+        <li><span class="icon danger mild"></span> Lett kriseberørt område</li>
       </ul>
     </div>
     <div id="map" class="map"></div>
@@ -33,7 +35,7 @@ const testPointsOfInterest = [
     icon_type: 'meetup',
     description: 'Samleplass ved Elgeseter gate.',
     latitude: 63.434,
-    longitude: 10.399
+    longitude: 10.399,
   }
 ];
 
@@ -47,7 +49,32 @@ const testEvents = [
     time_end: new Date('2025-04-26'),
     latitude: 63.42,
     langtitude: 10.38,
-    radius: 1000
+    radius: 1000,
+    severity: 2 
+  },
+  {
+    id: 2,
+    name: 'Kriseområde Moholt',
+    description: 'Område med moderate hendelser.',
+    icon_type: 'danger',
+    time_start: new Date('2025-04-26'),
+    time_end: new Date('2025-04-27'),
+    latitude: 63.43,
+    langtitude: 10.39,
+    radius: 1500,
+    severity: 1 
+  },
+  {
+    id: 3,
+    name: 'Kriseområde Tiller',
+    description: 'Liten hendelse uten alvorlige konsekvenser.',
+    icon_type: 'danger',
+    time_start: new Date('2025-04-26'),
+    time_end: new Date('2025-04-27'),
+    latitude: 63.42,
+    langtitude: 10.42,
+    radius: 800,
+    severity: 0 
   }
 ];
 
@@ -64,32 +91,52 @@ export default defineComponent({
         attribution: '&copy; OpenStreetMap contributors'
       }).addTo(map);
 
-      // Add interest points
-      testPointsOfInterest.forEach(point => {
-        const customIcon = L.divIcon({
-          html: `<div class="icon ${point.icon_type}" style="margin: 0;"></div>`,
-          className: '',
-          iconSize: [20, 20],
-          iconAnchor: [10, 10]
-        });
-        
-        L.marker([point.latitude, point.longitude], {
-          icon: customIcon
-        }).addTo(map).bindPopup(`<strong>${point.name}</strong><br>${point.description}`);
-      });
+      // Add points of interest
+      addPointsOfInterest(map);
 
       // Add events
-      testEvents.forEach(event => {
-          L.circle([event.latitude, event.langtitude], {
-            color: 'var(--bad-red)',
-            fillColor: 'var(--bad-red)',
-            weight: 1,
-            radius: event.radius
-          }).addTo(map).bindPopup(`<strong>${event.name}</strong><br>${event.description}`);
-        });
+      addEvents(map);
     });
   }
 });
+
+function addPointsOfInterest(map: L.Map) {
+  testPointsOfInterest.forEach(point => {
+    const customIcon = L.divIcon({
+      html: `<div class="icon ${point.icon_type}" style="margin: 0;"></div>`,
+      className: '',
+      iconSize: [20, 20],
+      iconAnchor: [10, 10]
+    });
+
+    L.marker([point.latitude, point.longitude], {
+      icon: customIcon
+    }).addTo(map).bindPopup(`<strong>${point.name}</strong><br>${point.description}`);
+  });
+}
+
+function addEvents(map: L.Map) {
+  testEvents.forEach(event => {
+    let circleColor = 'var(--bad-red)'; 
+    let fillColor = 'var(--bad-red)';
+
+    if (event.severity === 1) {
+      circleColor = 'var(--light-orange)';
+      fillColor = 'var(--light-orange)';
+    } else if (event.severity === 0) {
+      circleColor = 'var(--yellow)';
+      fillColor = 'var(--yellow)';
+    }
+
+    L.circle([event.latitude, event.langtitude], {
+      color: circleColor,
+      fillColor: fillColor,
+      weight: 1,
+      radius: event.radius,
+      fillOpacity: 0.3 
+    }).addTo(map).bindPopup(`<strong>${event.name}</strong><br>${event.description}`);
+  });
+}
 </script>
 
 <style>
@@ -106,7 +153,6 @@ export default defineComponent({
   padding: 1rem 1.5rem 1rem 1rem;
   border-radius: 10px;
   font-size: 0.9rem;
-  color: var(--darkest-blue);
   z-index: 1; 
   display: flex;
   flex-direction: column;
@@ -135,12 +181,25 @@ export default defineComponent({
 }
 
 .icon.danger {
-  background-color: var(--bad-red-opacity);
   border-radius: 50%;
   width: 20px;
   height: 20px;
   display: inline-block;
+}
+
+.icon.danger.severe {
+  background-color: var(--bad-red-opacity);
   border: 1px solid var(--bad-red);
+}
+
+.icon.danger.moderate {
+  background-color: var(--light-orange-opacity);
+  border: 1px solid var(--light-orange);
+}
+
+.icon.danger.mild {
+  background-color: var(--yellow-opacity);
+  border: 1px solid var(--yellow);
 }
 
 .icon.meetup {
