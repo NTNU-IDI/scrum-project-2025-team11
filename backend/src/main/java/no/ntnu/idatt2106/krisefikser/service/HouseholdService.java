@@ -2,6 +2,7 @@ package no.ntnu.idatt2106.krisefikser.service;
 
 import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.repository.HouseholdRepository;
+import no.ntnu.idatt2106.krisefikser.model.Address;
 import no.ntnu.idatt2106.krisefikser.model.Household;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ public class HouseholdService {
      * Repository for performing CRUD operations on Household entities.
      */
     private final HouseholdRepository householdRepository;
+    private final AddressService addressService;
 
     public Optional<Household> findById(int id) {
         return householdRepository.findById(id);
@@ -50,9 +52,16 @@ public class HouseholdService {
      * @return The saved household entity.
      */
     public Household save(Household newHousehold) throws Exception {
-        if (newHousehold.getMemberCount() == null || newHousehold.getName() == null || newHousehold.getAddress() == null) {
-            throw new IllegalArgumentException("Household has to contain member count, name of household, and an address");
+        if (newHousehold.getName() == null) {
+            throw new IllegalArgumentException("Name is missing");
         }
+        if (newHousehold.getMemberCount() == null) {
+            throw new IllegalArgumentException("Member count is missing");
+        }
+        if (newHousehold.getAddress() == null) {
+            throw new IllegalArgumentException("Address is missing");
+        }
+        Address address = addressService.save(newHousehold.getAddress());
         return householdRepository.save(newHousehold);
     }
 
