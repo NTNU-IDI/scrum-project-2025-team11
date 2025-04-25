@@ -9,10 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdResponseDTO;
+import no.ntnu.idatt2106.krisefikser.dto.HouseholdUpdateDTO;
 import no.ntnu.idatt2106.krisefikser.model.Household;
 import no.ntnu.idatt2106.krisefikser.service.HouseholdService;
 
@@ -45,11 +45,11 @@ public class HouseholdController {
             @ApiResponse(responseCode = "400", description = "Invalid ID, ID does not exist")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Household> updateHousehold(@PathVariable int id, @RequestBody Household household) {
+    public ResponseEntity<HouseholdResponseDTO> updateHousehold(@PathVariable int id, @RequestBody HouseholdUpdateDTO household) {
         if (!householdService.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
-        Household updatedHousehold = householdService.updateHousehold(id, household);
+        HouseholdResponseDTO updatedHousehold = householdService.updateHousehold(id, household);
         return ResponseEntity.ok(updatedHousehold);
     }
 

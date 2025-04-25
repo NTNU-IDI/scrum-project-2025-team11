@@ -44,17 +44,17 @@ public class AddressService {
    * @return the saved address.
    * @throws Exception if the address is invalid or cannot be saved.
    */
-  public Address save(Address address) throws Exception {
-    if (address.getStreet() == null || address.getPostalCode() == null || address.getCity() == null) {
+  public Address save(AddressRequestDTO addressRequestDTO) throws Exception {
+    if (addressRequestDTO.getStreet() == null || addressRequestDTO.getPostalCode() == null || addressRequestDTO.getCity() == null) {
       throw new IllegalArgumentException("Street, postal code, and city cannot be null");
     }
 
     Address newAddress = new Address();
-    newAddress.setStreet(address.getStreet());
-    newAddress.setPostalCode(address.getPostalCode());
-    newAddress.setCity(address.getCity());
-    newAddress.setLatitude(address.getLatitude());
-    newAddress.setLongitude(address.getLongitude());
+    newAddress.setStreet(addressRequestDTO.getStreet());
+    newAddress.setPostalCode(addressRequestDTO.getPostalCode());
+    newAddress.setCity(addressRequestDTO.getCity());
+    newAddress.setLatitude(addressRequestDTO.getLatitude());
+    newAddress.setLongitude(addressRequestDTO.getLongitude());
 
     Address savedAddress = addressRepository.save(newAddress);
     return savedAddress;
