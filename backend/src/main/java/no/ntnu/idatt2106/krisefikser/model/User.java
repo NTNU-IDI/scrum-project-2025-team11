@@ -24,7 +24,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(description = "Unique identifier for the user.")
-    private Long id;
+    private int id;
 
     /**
      * User's email address.
@@ -96,6 +96,16 @@ public class User {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "household_id", nullable = false)
     private Household household;
+
+    /**
+   * Gets the ID of the household.
+   *
+   * @return the ID of the household, or {@code null} if no seller is set.
+   */
+  @JsonProperty("householdId")
+  public int getHouseholdId() {
+    return household != null ? household.getId() : null;
+  }
 
 }
 
