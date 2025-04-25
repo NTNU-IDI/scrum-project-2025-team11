@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
+import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
+import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
 import no.ntnu.idatt2106.krisefikser.model.Address;
 import no.ntnu.idatt2106.krisefikser.repository.AddressRepository;
 
@@ -20,6 +22,17 @@ import no.ntnu.idatt2106.krisefikser.repository.AddressRepository;
 @RequiredArgsConstructor
 public class AddressService {
   private final AddressRepository addressRepository;
+
+  private AddressResponseDTO mapToResponseDTO(Address address) {
+    AddressResponseDTO dto = new AddressResponseDTO();
+    dto.setId(address.getId());
+    dto.setStreet(address.getStreet());
+    dto.setPostalCode(address.getPostalCode());
+    dto.setCity(address.getCity());
+    dto.setLatitude(address.getLatitude());
+    dto.setLongitude(address.getLongitude());
+    return dto;
+  }
 
   private AddressResponseDTO mapToResponseDTO(Address address) {
     AddressResponseDTO dto = new AddressResponseDTO();

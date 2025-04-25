@@ -22,6 +22,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
+import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
+import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
 import no.ntnu.idatt2106.krisefikser.model.Address;
 import no.ntnu.idatt2106.krisefikser.service.AddressService;
 
@@ -101,6 +103,7 @@ public class AddressController {
   @PostMapping
   public ResponseEntity<AddressResponseDTO> createAddress(
     @Parameter (description = "Address object to be created", required = true)
+    @RequestBody AddressRequestDTO address) {
     @RequestBody AddressRequestDTO address) {
     try {
       AddressResponseDTO createdAddress = addressService.save(address);
