@@ -1,0 +1,54 @@
+@import './base.css';
+
+body {
+    font-family: 'Inter', sans-serif;
+    font-weight: normal;
+}
+
+.medium-header {
+    font-size: var(--font-size-xlarge);
+    font-weight: normal;
+    color: var(--dark-blue);
+}
+
+.grey-container {
+    background-color: var(--grey);
+    color: var(--dark-blue);
+    padding: 1rem;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 300px;
+    height : 100%;
+    font-weight: normal;
+}
+
+.article-card {
+    display: flex;
+    align-items: center;
+    border: 2px solid var(--light-blue); 
+    border-radius: 8px;
+    background-color: white;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    justify-content: space-between;
+    max-width: 300px;
+    height: 40px;
+}
+
+.article-card .quantity {
+    font-size: var(--font-size-medium);
+    padding: 0.25rem 0.25rem;
+    text-align: left;
+    font-weight: normal;
+}
+
+.article-card .info h2 {
+    margin: 0;
+    font-size: var(--font-size-medium);
+    margin-left: 1rem;
+    text-align: right;
+    font-weight: normal;
+}

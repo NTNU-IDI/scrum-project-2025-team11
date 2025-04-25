@@ -7,4 +7,10 @@
   --orange: #eb5e28;
   --good-green: #3d9c5a;
   --bad-red: #bf0603;
+
+  --font-size-small: 0.875rem; /* 14px */
+  --font-size-medium: 1rem; /* 16px */
+  --font-size-large: 1.25rem; /* 20px */
+  --font-size-xlarge: 1.5rem; /* 24px */
+  --font-size-xxlarge: 2.25rem; /* 36px */
 }
