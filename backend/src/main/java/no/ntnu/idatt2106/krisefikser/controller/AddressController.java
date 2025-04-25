@@ -104,7 +104,6 @@ public class AddressController {
   public ResponseEntity<AddressResponseDTO> createAddress(
     @Parameter (description = "Address object to be created", required = true)
     @RequestBody AddressRequestDTO address) {
-    @RequestBody AddressRequestDTO address) {
     try {
       AddressResponseDTO createdAddress = addressService.save(address);
       return ResponseEntity.status(HttpStatus.CREATED).body(createdAddress);
