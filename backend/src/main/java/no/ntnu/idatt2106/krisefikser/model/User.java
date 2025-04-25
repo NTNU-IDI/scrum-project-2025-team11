@@ -1,19 +1,9 @@
 package no.ntnu.idatt2106.krisefikser.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.Builder.Default;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -24,7 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "users")
+@Table(name = "user_account")
 public class User {
     /**
      * Unique identifier for the user.

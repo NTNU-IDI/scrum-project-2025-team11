@@ -1,6 +1,6 @@
 package no.ntnu.idatt2106.krisefikser.service;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -15,7 +15,6 @@ import no.ntnu.idatt2106.krisefikser.repository.UserRepository;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
     /**
      * Finds a user by their ID.
@@ -83,7 +82,7 @@ public class UserService {
             existingUser.setLastName(updatedUser.getLastName());
           }
           if (updatedUser.getPassword() != null) {
-            existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword())); // Hash the password before saving
+            existingUser.setPassword(updatedUser.getPassword()); // Hash the password before saving
           }
           if (updatedUser.getRole() != null) {
             existingUser.setRole(updatedUser.getRole());
@@ -92,6 +91,12 @@ public class UserService {
           // Save the updated user entity
           return userRepository.save(existingUser);
         }).orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-      }
+    }
+
+    public List<User> findAll() {
+      return userRepository.findAll();
+    }
+
+
     
 }
