@@ -46,14 +46,16 @@ CREATE TABLE HOUSEHOLD (
 
 -- USER_ACCOUNT
 CREATE TABLE USER_ACCOUNT (
-  id            INT PRIMARY KEY AUTO_INCREMENT,
-  email         VARCHAR(255) NOT NULL UNIQUE,
-  first_name    VARCHAR(255) NOT NULL,
-  last_name     VARCHAR(255) NOT NULL,
-  password      VARCHAR(255) NOT NULL,
-  role          role_enum    NOT NULL DEFAULT 'normal',
-  household_id  INT,
-  CONSTRAINT FK_USER_HH FOREIGN KEY (household_id) REFERENCES HOUSEHOLD(id)
+  id           INT PRIMARY KEY AUTO_INCREMENT,
+  email        VARCHAR(255) NOT NULL UNIQUE,
+  username    VARCHAR(255) NOT NULL UNIQUE,
+  first_name   VARCHAR(255) NOT NULL,
+last_name    VARCHAR(255) NOT NULL,
+  password     VARCHAR(255) NOT NULL,
+  role         VARCHAR(20)  NOT NULL DEFAULT 'normal',
+  household_id INT,
+  CONSTRAINT FK_USER_HH FOREIGN KEY (household_id) REFERENCES HOUSEHOLD(id),
+  CONSTRAINT CHK_USER_ROLE CHECK (role IN ('normal','admin','super_admin'))
 );
 
 -- NETWORK

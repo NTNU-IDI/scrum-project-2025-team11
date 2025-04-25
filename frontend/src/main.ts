@@ -1,12 +1,17 @@
 import { createPinia } from "pinia";
 import piniaPersist from 'pinia-plugin-persistedstate'
 import { createApp } from "vue";
+import piniaPluginPersistedState from 'pinia-plugin-persistedstate'
 import App from "./App.vue";
-import './assets/main.css';
-import './assets/base.css';
+import "./assets/tailwind.css";
+import "./assets/base.css"
+import "./assets/main.css"
 import router from "./router/index.ts";
 
 const app = createApp(App);
+const pinia = createPinia();
+
+pinia.use(piniaPluginPersistedState)
 
 const pinia = createPinia()
 pinia.use(piniaPersist)
