@@ -20,6 +20,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
+import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
 import no.ntnu.idatt2106.krisefikser.model.Address;
 import no.ntnu.idatt2106.krisefikser.service.AddressService;
 
@@ -101,7 +103,6 @@ public class AddressController {
     @Parameter (description = "Address object to be created", required = true)
     @RequestBody Address address) {
     try {
-      
       Address createdAddress = addressService.save(address);
       return ResponseEntity.status(HttpStatus.CREATED).body(createdAddress);
     } catch (Exception e) {

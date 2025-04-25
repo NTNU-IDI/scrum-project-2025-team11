@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
+import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
 import no.ntnu.idatt2106.krisefikser.model.Address;
 import no.ntnu.idatt2106.krisefikser.repository.AddressRepository;
 
@@ -18,6 +20,17 @@ import no.ntnu.idatt2106.krisefikser.repository.AddressRepository;
 @RequiredArgsConstructor
 public class AddressService {
   private final AddressRepository addressRepository;
+
+  private AddressResponseDTO mapToResponseDTO(Address address) {
+    AddressResponseDTO dto = new AddressResponseDTO();
+    dto.setId(address.getId());
+    dto.setStreet(address.getStreet());
+    dto.setPostalCode(address.getPostalCode());
+    dto.setCity(address.getCity());
+    dto.setLatitude(address.getLatitude());
+    dto.setLongitude(address.getLongitude());
+    return dto;
+  }
 
   // Add methods for creating, updating, deleting, and retrieving addresses here.
 
@@ -35,7 +48,17 @@ public class AddressService {
     if (address.getStreet() == null || address.getPostalCode() == null || address.getCity() == null) {
       throw new IllegalArgumentException("Street, postal code, and city cannot be null");
     }
-    return addressRepository.save(address);
+
+    Address newAddress = new Address();
+    newAddress.setStreet(address.getStreet());
+    newAddress.setPostalCode(address.getPostalCode());
+    newAddress.setCity(address.getCity());
+    newAddress.setLatitude(address.getLatitude());
+    newAddress.setLongitude(address.getLongitude());
+
+    Address savedAddress = addressRepository.save(newAddress);
+    return savedAddress;
+    
   }
 
   public Address updateAddress(int id, Address updatedAddress) {

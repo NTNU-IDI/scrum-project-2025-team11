@@ -104,15 +104,18 @@ CREATE TABLE POINT_OF_INTEREST (
 
 -- EVENT
 CREATE TABLE EVENT (
-  id           INT            PRIMARY KEY AUTO_INCREMENT,
-  name         TEXT           NOT NULL,
-  description  TEXT,
-  icon_type    evt_icon_enum  NOT NULL DEFAULT 'none',
-  time_start   DATE,
-  time_end     DATE,
-  latitude     DECIMAL(9,6),
-  longitude    DECIMAL(9,6),
-  radius       INT
+  id          INT PRIMARY KEY AUTO_INCREMENT,
+  name        TEXT    NOT NULL,
+  description TEXT,
+  icon_type   VARCHAR(20) NOT NULL DEFAULT 'none',
+  time_start  DATE,
+  time_end    DATE,
+  latitude    DECIMAL(9,6),
+  longitude  DECIMAL(9,6),
+  radius      INT,
+  CONSTRAINT CHK_EVT_ICON CHECK (icon_type IN (
+    'none','point','normal','danger','assembly_point','medical','shelter'
+  ))
 );
 
 -- Now create the indexes that were inline in MySQL:
