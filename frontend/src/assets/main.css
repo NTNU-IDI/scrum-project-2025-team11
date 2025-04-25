@@ -1,0 +1,146 @@
+@import './base.css';
+
+body {
+    font-family: 'Inter', sans-serif;
+    font-weight: normal;
+}
+
+.medium-header {
+    font-size: var(--font-size-xlarge);
+    font-weight: normal;
+    color: var(--darkest-blue);
+}
+
+.grey-container {
+    background-color: var(--grey);
+    color: var(--darkest-blue);
+    padding: 1rem;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 300px;
+    height : 100%;
+    font-weight: normal;
+}
+
+.dark-button {
+    background-color: var(--dark-blue);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: var(--font-size-medium);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dark-button:hover {
+    background-color: var(--light-blue);
+    color: white;
+}
+
+.register-login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: var(--dark-blue);
+}
+
+.register-login-container {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  width: 300px;
+  text-align: left;
+}
+
+h1 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: var(--darkest-blue);
+}
+
+input {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--grey);
+  font-size: 1rem;
+}
+
+button {
+  width: 100%;
+  padding: 0.5rem;
+  color: var(--white);
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+button:hover {
+  transform: scale(1.03);
+}
+
+.good-button {
+  background-color: var(--good-green);
+}
+
+.register-login-text {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: var(--darkest-blue);
+}
+
+.link {
+  color: var(--orange);
+  text-decoration: none;
+}
+
+.article-card {
+    display: flex;
+    align-items: center;
+    border: 2px solid var(--light-blue); 
+    border-radius: 8px;
+    background-color: white;
+    padding: 0.5rem 1.1rem;
+    transition: all 0.2s ease;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 260px;
+    height: 40px;
+}
+
+.article-card .quantity {
+    font-size: var(--font-size-medium);
+    padding: 0.25rem 0.25rem;
+    text-align: left;
+    font-weight: normal;
+}
+
+.article-card .info h2 {
+    margin: 0;
+    font-size: var(--font-size-medium);
+    margin-left: 1rem;
+    text-align: right;
+    font-weight: normal;
+}
+
+.item-card {
+    display: flex;
+    align-items: center;
+    border-radius: 0.5rem;
+}
+
+.delete-button {
+    color: var(--bad-red);
+    padding: 0.5rem;
+    margin-right: 1rem;
+    cursor: pointer;
+}

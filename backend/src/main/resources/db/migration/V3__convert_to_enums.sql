@@ -1,0 +1,63 @@
+-- V3__convert_to_enums.sql
+
+-- 1) Drop and recreate the enum domains
+DROP TYPE IF EXISTS role_enum;
+DROP TYPE IF EXISTS icon_enum;
+
+CREATE TYPE role_enum AS ENUM (
+  'normal',
+  'admin',
+  'super_admin'
+);
+
+CREATE TYPE icon_enum AS ENUM (
+  'none',
+  'point',
+  'normal',
+  'danger',
+  'assembly_point',
+  'medical',
+  'shelter'
+);
+
+-- 2) USER_ACCOUNT.role → role_enum
+
+ALTER TABLE USER_ACCOUNT
+  DROP CONSTRAINT IF EXISTS CHK_USER_ROLE;
+
+ALTER TABLE USER_ACCOUNT
+  ALTER COLUMN role DROP DEFAULT;
+
+ALTER TABLE USER_ACCOUNT
+  ALTER COLUMN role SET DATA TYPE role_enum;
+
+ALTER TABLE USER_ACCOUNT
+  ALTER COLUMN role SET DEFAULT 'normal';
+
+-- 3) POINT_OF_INTEREST.icon_type → icon_enum
+
+ALTER TABLE POINT_OF_INTEREST
+  DROP CONSTRAINT IF EXISTS CHK_POI_ICON;
+
+ALTER TABLE POINT_OF_INTEREST
+  ALTER COLUMN icon_type DROP DEFAULT;
+
+ALTER TABLE POINT_OF_INTEREST
+  ALTER COLUMN icon_type SET DATA TYPE icon_enum;
+
+ALTER TABLE POINT_OF_INTEREST
+  ALTER COLUMN icon_type SET DEFAULT 'point';
+
+-- 4) EVENT.icon_type → icon_enum
+
+ALTER TABLE EVENT
+  DROP CONSTRAINT IF EXISTS CHK_EVT_ICON;
+
+ALTER TABLE EVENT
+  ALTER COLUMN icon_type DROP DEFAULT;
+
+ALTER TABLE EVENT
+  ALTER COLUMN icon_type SET DATA TYPE icon_enum;
+
+ALTER TABLE EVENT
+  ALTER COLUMN icon_type SET DEFAULT 'none';
