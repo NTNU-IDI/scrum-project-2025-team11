@@ -13,7 +13,6 @@ const pinia = createPinia();
 
 pinia.use(piniaPluginPersistedState)
 
-const pinia = createPinia()
 pinia.use(piniaPersist)
 app.use(createPinia());
 
