@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
+import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
 import no.ntnu.idatt2106.krisefikser.model.Address;
 import no.ntnu.idatt2106.krisefikser.repository.AddressRepository;
 
@@ -19,6 +21,17 @@ import no.ntnu.idatt2106.krisefikser.repository.AddressRepository;
 public class AddressService {
   private final AddressRepository addressRepository;
 
+  private AddressResponseDTO mapToResponseDTO(Address address) {
+    AddressResponseDTO dto = new AddressResponseDTO();
+    dto.setId(address.getId());
+    dto.setStreet(address.getStreet());
+    dto.setPostalCode(address.getPostalCode());
+    dto.setCity(address.getCity());
+    dto.setLatitude(address.getLatitude());
+    dto.setLongitude(address.getLongitude());
+    return dto;
+  }
+
   // Add methods for creating, updating, deleting, and retrieving addresses here.
 
   public Optional<Address> findById(int id) {
@@ -31,11 +44,21 @@ public class AddressService {
    * @return the saved address.
    * @throws Exception if the address is invalid or cannot be saved.
    */
-  public Address save(Address address) throws Exception {
-    if (address.getStreet() == null || address.getPostalCode() == null || address.getCity() == null) {
+  public AddressResponseDTO save(AddressRequestDTO addressDTO) throws Exception {
+    if (addressDTO.getStreet() == null || addressDTO.getPostalCode() == null || addressDTO.getCity() == null) {
       throw new IllegalArgumentException("Street, postal code, and city cannot be null");
     }
-    return addressRepository.save(address);
+
+    Address address = new Address();
+    address.setStreet(addressDTO.getStreet());
+    address.setPostalCode(addressDTO.getPostalCode());
+    address.setCity(addressDTO.getCity());
+    address.setLatitude(addressDTO.getLatitude());
+    address.setLongitude(addressDTO.getLongitude());
+
+    Address savedAddress = addressRepository.save(address);
+    return mapToResponseDTO(savedAddress);
+    
   }
 
   public Address updateAddress(int id, Address updatedAddress) {
