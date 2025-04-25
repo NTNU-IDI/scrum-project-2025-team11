@@ -46,14 +46,16 @@ CREATE TABLE HOUSEHOLD (
 
 -- USER_ACCOUNT
 CREATE TABLE USER_ACCOUNT (
-  id            INT PRIMARY KEY AUTO_INCREMENT,
-  email         VARCHAR(255) NOT NULL UNIQUE,
-  first_name    VARCHAR(255) NOT NULL,
-  last_name     VARCHAR(255) NOT NULL,
-  password      VARCHAR(255) NOT NULL,
-  role          role_enum    NOT NULL DEFAULT 'normal',
-  household_id  INT,
-  CONSTRAINT FK_USER_HH FOREIGN KEY (household_id) REFERENCES HOUSEHOLD(id)
+  id           INT PRIMARY KEY AUTO_INCREMENT,
+  email        VARCHAR(255) NOT NULL UNIQUE,
+  username    VARCHAR(255) NOT NULL UNIQUE,
+  first_name   VARCHAR(255) NOT NULL,
+last_name    VARCHAR(255) NOT NULL,
+  password     VARCHAR(255) NOT NULL,
+  role         VARCHAR(20)  NOT NULL DEFAULT 'normal',
+  household_id INT,
+  CONSTRAINT FK_USER_HH FOREIGN KEY (household_id) REFERENCES HOUSEHOLD(id),
+  CONSTRAINT CHK_USER_ROLE CHECK (role IN ('normal','admin','super_admin'))
 );
 
 -- NETWORK
@@ -104,15 +106,18 @@ CREATE TABLE POINT_OF_INTEREST (
 
 -- EVENT
 CREATE TABLE EVENT (
-  id           INT            PRIMARY KEY AUTO_INCREMENT,
-  name         TEXT           NOT NULL,
-  description  TEXT,
-  icon_type    evt_icon_enum  NOT NULL DEFAULT 'none',
-  time_start   DATE,
-  time_end     DATE,
-  latitude     DECIMAL(9,6),
-  longitude    DECIMAL(9,6),
-  radius       INT
+  id          INT PRIMARY KEY AUTO_INCREMENT,
+  name        TEXT    NOT NULL,
+  description TEXT,
+  icon_type   VARCHAR(20) NOT NULL DEFAULT 'none',
+  time_start  DATE,
+  time_end    DATE,
+  latitude    DECIMAL(9,6),
+  longitude  DECIMAL(9,6),
+  radius      INT,
+  CONSTRAINT CHK_EVT_ICON CHECK (icon_type IN (
+    'none','point','normal','danger','assembly_point','medical','shelter'
+  ))
 );
 
 -- Now create the indexes that were inline in MySQL:
