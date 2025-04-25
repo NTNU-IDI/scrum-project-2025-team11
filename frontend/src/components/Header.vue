@@ -1,38 +1,66 @@
 <template>
-
-
-  <header class="bg-blue-600 text-white p-4">
+<header class="bg-[#1b263b] text-white p-4">
     <div class="container mx-auto flex justify-between items-center">
-      <h1 class="text-2xl font-bold">Krisefikser.no</h1>
+      <div class="flex items-center space-x-4">
+      <a href="/" class="button other">// Sett inn logo</a>
+      <a href="/" class="button other">📍 Kart</a>
+    </div>
       <nav class="space-x-4">
-        <a href="/" class="hover:underline">Hjem</a>
-        <a href="/login" class="hover:underline">Logg inn</a>
+        <a href="/" class="button other">Hjem</a>
+        <a href="/about" class="button other">Om oss</a>
+        <a href="/login" class="button login">Logg inn</a>
       </nav>
     </div>
   </header>
-
-  <button>Default Button</button>
-<a href="#" class="button">Link Button</a>
-<button class="button">Button</button>
-<input type="button" class="button" value="Input Button">
-
 </template>
 
 <script lang="ts" setup>
-
 </script>
 
-<style>
+<style scoped>
 .button {
-  background-color: #04AA6D;
-  border: none;
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
   display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
+  padding: 10px 20px;
+  font-size: 18px;
+  border-radius: 4px;
+  border: 2px solid transparent;
+  text-align: center;
   cursor: pointer;
+  transition: all 0.4s ease;
+  text-decoration: none;
+  font-weight: 500;
+  margin: 30px 20px;
+
+  /* Default farger hvis ingen variant settes */
+  /*background-color: rgb(41, 35, 153);*/
+  background-color: var(--light-blue);
+  color: rgb(255, 255, 255);
 }
+
+/* Login-variant */
+.button.login {
+  background-color: var(--good-green); 
+  border-color: var(--good-green);
+  color: rgb(255, 255, 255);
+}
+
+.button.login:hover {
+  background-color: rgb(255, 255, 255);
+  border-color: var(--good-green);
+  color: var(--good-green);
+}
+
+/* Other-variant */
+.button.other {
+  background-color: var(--light-blue);
+  border-color: var(--light-blue);
+  color: rgb(255, 255, 255);
+}
+
+.button.other:hover {
+  background-color: rgb(255, 255, 255);
+  border-color: var(--light-blue);
+  color: var(--darkest-blue);
+}
+
 </style>
