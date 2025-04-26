@@ -86,10 +86,10 @@ public class HouseholdService {
         if (newHousehold.getAddress() == null) {
             throw new IllegalArgumentException("Invalid address format, make sure to fill all fields");
         }
-        Address address = addressService.save(newHousehold.getAddress());
+        AddressResponseDTO addressResponseDTO = addressService.save(newHousehold.getAddress());
         household.setName(newHousehold.getName());
         household.setMemberCount(newHousehold.getMemberCount());
-        household.setAddress(address);
+        household.setAddress(addressService.findById(addressResponseDTO.getId()).orElseThrow(() -> new RuntimeException("Address id not found")));
         Household savedHousehold = householdRepository.save(household);
         return mapToResponseDTO(savedHousehold);
     }
