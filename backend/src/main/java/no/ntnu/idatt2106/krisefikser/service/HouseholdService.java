@@ -11,7 +11,9 @@ import no.ntnu.idatt2106.krisefikser.model.Address;
 import no.ntnu.idatt2106.krisefikser.model.Household;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Service class for managing households.
@@ -84,6 +86,21 @@ public class HouseholdService {
      */
     public boolean existsById(int id) {
         return householdRepository.existsById(id);
-    } 
-    
+    }
+
+    /**
+     * Delete a household entry in the household
+     * table based on the given id
+     * @param id The id of the household we wish to delete.
+     */
+    public void deleteById(int id) {
+        householdRepository.deleteById(id);
+    }
+
+    public List<HouseholdResponseDTO> findAll() {
+        return householdRepository.findAll()
+                .stream()
+                .map(HouseholdMapper::toResponseDTO)
+                .toList();
+    }
 }

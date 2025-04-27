@@ -1,5 +1,7 @@
 package no.ntnu.idatt2106.krisefikser.controller;
 
+import java.util.List;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -89,5 +91,40 @@ public class HouseholdController {
         } else {
             return ResponseEntity.ok(HouseholdMapper.toResponseDTO(household));
         }
+    }
+
+    /* TODO add maybe on delete cascade so that it is possible to delete entries
+    @Operation(
+            summary = "Delete household",
+            description = "Delete a entry in the household table based on the id"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Household successfully deleted"),
+            @ApiResponse(responseCode = "400", description = "Household could not be found, make sure that the id is correct")
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteHousehold(@PathVariable int id) {
+        if (!householdService.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        householdService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }*/
+
+    @Operation(
+            summary = "List all households",
+            description = "List all the households that is in the household table"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Households fetched"),
+            @ApiResponse(responseCode = "400", description = "Households could not be found")
+    })
+    @GetMapping
+    public ResponseEntity<List<HouseholdResponseDTO>> getAllHouseholds() {
+        List<HouseholdResponseDTO> householdList = householdService.findAll();
+        if (householdList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(householdList);
     }
 }
