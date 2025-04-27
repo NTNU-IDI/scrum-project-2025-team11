@@ -1,6 +1,7 @@
 package no.ntnu.idatt2106.krisefikser.service;
 
 import lombok.RequiredArgsConstructor;
+import no.ntnu.idatt2106.krisefikser.mapper.HouseholdMapper;
 import no.ntnu.idatt2106.krisefikser.repository.HouseholdRepository;
 import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdRequestDTO;
@@ -26,25 +27,6 @@ public class HouseholdService {
     private final HouseholdRepository householdRepository;
     private final AddressService addressService;
 
-    private HouseholdResponseDTO mapToResponseDTO(Household household) {
-        HouseholdResponseDTO dto = new HouseholdResponseDTO();
-        dto.setId(household.getId());
-        dto.setName(household.getName());
-        dto.setMemberCount(household.getMemberCount());
-        Address address = household.getAddress();
-        if (address != null) {
-            AddressResponseDTO addressDto = new AddressResponseDTO();
-            addressDto.setId(address.getId());
-            addressDto.setStreet(address.getStreet());
-            addressDto.setPostalCode(address.getPostalCode());
-            addressDto.setCity(address.getCity());
-            addressDto.setLatitude(address.getLatitude());
-            addressDto.setLongitude(address.getLongitude());
-            dto.setAddress(addressDto);
-        }
-        return dto;
-    }
-
     public Optional<Household> findById(int id) {
         return householdRepository.findById(id);
     }
@@ -53,7 +35,7 @@ public class HouseholdService {
      * Updates an existing household with new data.
      *
      * @param id        The ID of the household to update.
-     * @param household The new household data to update with.
+     * @param newHousehold The new household data to update with.
      * @return The updated household entity.
      * @throws RuntimeException if the household with the given ID is not found.
      */
@@ -66,7 +48,7 @@ public class HouseholdService {
             currentHousehold.setName(newHousehold.getName());
         }
         Household updatedHousehold = householdRepository.save(currentHousehold);
-        return mapToResponseDTO(updatedHousehold);
+        return HouseholdMapper.toResponseDTO(updatedHousehold);
     }
 
     /**
@@ -91,7 +73,7 @@ public class HouseholdService {
         household.setMemberCount(newHousehold.getMemberCount());
         household.setAddress(addressService.findById(addressResponseDTO.getId()).orElseThrow(() -> new RuntimeException("Address id not found")));
         Household savedHousehold = householdRepository.save(household);
-        return mapToResponseDTO(savedHousehold);
+        return HouseholdMapper.toResponseDTO(savedHousehold);
     }
 
     /**

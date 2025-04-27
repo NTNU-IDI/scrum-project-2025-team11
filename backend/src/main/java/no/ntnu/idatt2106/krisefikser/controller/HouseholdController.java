@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
+import no.ntnu.idatt2106.krisefikser.mapper.HouseholdMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,8 @@ import no.ntnu.idatt2106.krisefikser.dto.HouseholdResponseDTO;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdUpdateDTO;
 import no.ntnu.idatt2106.krisefikser.model.Household;
 import no.ntnu.idatt2106.krisefikser.service.HouseholdService;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/household")
@@ -68,6 +71,23 @@ public class HouseholdController {
         System.out.println("Raw JSON payload: " + household);
         HouseholdResponseDTO createdHousehold = householdService.save(household);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdHousehold);
+    }
 
+    @Operation(
+            summary = "Get household information",
+            description = "Receive household information based on the given id"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Household information fetched"),
+            @ApiResponse(responseCode = "400", description = "Household could not be found, make sure that the id is correct")
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<HouseholdResponseDTO> getHousehold(@PathVariable int id) {
+        Household household = householdService.findById(id).orElse(null);
+        if (household == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(HouseholdMapper.toResponseDTO(household));
+        }
     }
 }
