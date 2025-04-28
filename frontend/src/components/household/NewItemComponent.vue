@@ -56,7 +56,6 @@ const addItemOption = (newName: string) => {
         existingItems.value.push(newName);
     }
     showDropdown.value = false;
-    emit('hide-new-item-box');
 }
 
 const handleKeydown = (event: KeyboardEvent, name: string) => {
