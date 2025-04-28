@@ -4,7 +4,8 @@ import { getJwtTokenFromLogin, getJwtTokenAfterRegistration } from '../utils/aut
 
 export const useUserStore = defineStore('token', {
     state: () => ({
-        jwtToken: ''
+        jwtToken: '',
+        username: '',
     }),
 
     persist: {
@@ -25,6 +26,7 @@ export const useUserStore = defineStore('token', {
             } catch(error) {
                 console.log('Error: ' + error);
             }
+            this.username = username;
         },
 
         async login(username: string, password: string) {
@@ -39,6 +41,7 @@ export const useUserStore = defineStore('token', {
             } catch(error) {
                 console.log('Error: ' + error);
             }
+            this.username = username;
         },
 
         getToken() {
@@ -54,6 +57,7 @@ export const useUserStore = defineStore('token', {
 
         logout() {
             this.jwtToken = '';
+            this.username = '';
         },
 
         isTokenExpired() {
