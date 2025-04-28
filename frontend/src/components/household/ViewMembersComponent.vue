@@ -46,7 +46,7 @@ const addMember = () => {
                     </div>
                 </div>
             </div>
-            <button class="dark-button" @click="$emit('show-new-member-box'), addMember">+</button>
+            <button class="dark-button" @click="() => { addMember(); $emit('show-new-member-box'); }">+</button>
         </div>    
     </div>
 </template>
