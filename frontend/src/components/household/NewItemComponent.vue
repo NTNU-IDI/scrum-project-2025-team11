@@ -10,30 +10,30 @@ const errorMsg = ref('');
 
 const addItem = () => {
     if(!validateItemName(newName.value)) {
-        errorMsg.value = 'Vennligst skriv inn et navn';
+        errorMsg.value = 'Vennligst skriv inn et gyldig navn';
         console.log(errorMsg.value);
         alert(errorMsg.value);
         return;
     }
     if(!validateItemQuantity(newQuantity.value)) {
-        errorMsg.value = 'Vennligst skriv inn en mengde';
+        errorMsg.value = 'Vennligst skriv inn en gyldig mengde';
         console.log(errorMsg.value);
         alert(errorMsg.value);
         return;
     }
     if(!validateItemUnit(newUnit.value)) {
-        errorMsg.value = 'Vennligst skriv inn en enhet';
+        errorMsg.value = 'Vennligst skriv inn en gyldig enhet';
         console.log(errorMsg.value);
         alert(errorMsg.value);
         return;
     }
     if(!validateItemExpirationDate(newExpirationDate.value)) {
-        errorMsg.value = 'Vennligst skriv inn en utløpsdato';
+        errorMsg.value = 'Vennligst skriv inn en gyldig utløpsdato';
         console.log(errorMsg.value);
         alert(errorMsg.value);
         return;
     }
-    
+
     // TODO: add item to list
     // TODO: hide component
 }
@@ -44,7 +44,12 @@ const cancel = () => {
 </script>
 <template>
     <div class="grey-container">
-        <h1 class="medium-header">Ny artikkel</h1>
+
+        <div class="header-container">
+            <h1 class="medium-header">Ny artikkel</h1>
+            <button class="cancel-button" @click="cancel, $emit('hide-new-item-box')">X</button> 
+        </div>
+
         <div class="item-input">
             <input type="text" class="edit-input" placeholder="Navn på vare" v-model="newName" />
             <div class="quantity-container">
@@ -58,9 +63,9 @@ const cancel = () => {
             </div>
             <input type="date" class="edit-input" v-model="newExpirationDate" />
         </div>
+
         <div class="button-container">
             <button class="dark-button" @click="addItem, $emit('hide-new-item-box')">Legg til</button>
-            <button class="dark-button" id="cancel-button" @click="cancel, $emit('hide-new-item-box')">Avbryt</button>
         </div>
     </div>
 </template>
@@ -68,6 +73,10 @@ const cancel = () => {
     .grey-container {
         width: 20rem;
         height: 18rem;
+    }
+
+    .header-container {
+        position: relative;
     }
 
     .medium-header {
@@ -92,7 +101,6 @@ const cancel = () => {
     .button-container {
         display: flex;
         justify-content: space-between;
-        gap: 1rem;
     }
 
     .dark-button {
@@ -100,7 +108,11 @@ const cancel = () => {
         height: 3rem; 
     }
 
-    #cancel-button {
-        background-color: var(--bad-red);
+    .cancel-button {
+        position:absolute;
+        top: -0.5rem;
+        right: -9.5rem;
+        color: var(--bad-red);
+        background-color: transparent;
     }
 </style>
