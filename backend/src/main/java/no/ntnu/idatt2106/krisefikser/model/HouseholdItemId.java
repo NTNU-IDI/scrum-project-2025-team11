@@ -4,6 +4,7 @@ import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
@@ -16,6 +17,7 @@ import java.time.LocalDate;
  */
 @Embeddable
 @Data
+@NoArgsConstructor
 public class HouseholdItemId implements Serializable {
     private Integer householdId;
     private Integer itemId;
