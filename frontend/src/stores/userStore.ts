@@ -26,7 +26,6 @@ export const useUserStore = defineStore('token', {
             } catch(error) {
                 console.log('Error: ' + error);
             }
-            this.username = username;
         },
 
         async login(username: string, password: string) {
@@ -41,7 +40,6 @@ export const useUserStore = defineStore('token', {
             } catch(error) {
                 console.log('Error: ' + error);
             }
-            this.username = username;
         },
 
         getToken() {
@@ -67,6 +65,10 @@ export const useUserStore = defineStore('token', {
 
             const payload = JSON.parse(atob(this.jwtToken.split('.')[1]));
             return payload.exp < Date.now() / 1000;
-        }
+        },
+
+        setUsername(username: string) {
+            this.username = username;
+        },
     }
 })
