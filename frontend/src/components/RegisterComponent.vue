@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import {ref, watch} from 'vue'
+import {ref, watch, onMounted} from 'vue'
 import axios from 'axios'
 
 const postalCode = ref('');
+const householdCode = ref('');
+const householdChoice = ref()
+const hasChosenNewHousehold = ref();
 let errorMessage = ref('');
 
 /*
@@ -17,8 +20,17 @@ How to get the relevant information from this request (has to be inside a method
 The things to retrieve for backend are: longitude, latitude and city
  */
 async function getLocationDataFromAdressAndPostalCode(address: string, postalCode: string) {
+  //Got help from ChatGPT with the use of 'street', 'postalcode' and 'country'
   const response = await axios.get(`https://nominatim.openstreetmap.org/search?street=${address}&postalcode=${postalCode}&country=Norway&format=json&limit=1`);
   return response.data[0];
+}
+
+function handleHouseholdChoice() {
+  if (householdChoice.value === "new") {
+    hasChosenNewHousehold.value = true;
+  } else if (householdChoice.value === "existing"){
+    hasChosenNewHousehold.value = false;
+  }
 }
 
 watch(postalCode, (newPostalCode) => {
@@ -31,19 +43,29 @@ watch(postalCode, (newPostalCode) => {
   }
 })
 
+onMounted(() => {
+  householdChoice.value = "new"
+  handleHouseholdChoice()
+})
+
 </script>
 
 <template>
   <div id="divRegister" class="register-login-container">
     <h1>Registrer bruker</h1>
     <form v-on:submit.prevent>
-      <div id="inputFields">
+      <div id="divConstantInputs">
         <input type="text" placeholder="Fornavn" required>
         <input type="text" placeholder="Etternavn" required>
         <input type="text" placeholder="Brukernavn" required>
         <input type="email" placeholder="Epost" required>
         <input type="password" placeholder="Passord" required>
         <input type="password" placeholder="Gjenta passord" required>
+      </div>
+      <label><input type="radio" v-model="householdChoice" value="new" @change="handleHouseholdChoice"> Ny husstand </label>
+      <input type="text" v-if="hasChosenNewHousehold" placeholder="Husstandsskode" required><br>
+      <label><input type="radio" v-model="householdChoice" value="existing" @change="handleHouseholdChoice"> Eksisterende husstand</label> <br>
+      <div id="divPlaceInfo" v-if="!hasChosenNewHousehold">
         <input type="text" placeholder="Adresse" required>
         <input type="text" placeholder="Postkode" v-model="postalCode" required>
       </div>
@@ -59,21 +81,25 @@ watch(postalCode, (newPostalCode) => {
 
 <style scoped>
 
-#inputFields {
+#divConstantInputs {
   display: grid;
   grid-template-columns: repeat(1, auto);
   grid-template-rows: repeat(8, auto);
 }
 
+input[type="radio"] {
+  width: auto;
+}
+
 #error {
-  font-size: small;
+  font-size: var(--font-size-small);
   color: var(--bad-red);
 }
 
 @media (min-width: 480px) {
-  #inputFields {
+  #divConstantInputs {
     grid-template-columns: repeat(2, auto);
-    grid-template-rows: repeat(4, auto);
+    grid-template-rows: repeat(3, auto);
     gap: 0px 20px;
   }
 
