@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
-import { useItemTypeStore } from '@/stores/item';
+import { useItemTypeStore } from '@/stores/itemStore';
 import { formatDate, formatDateToList } from '@/utils/formatDate';
 
 // Remove later

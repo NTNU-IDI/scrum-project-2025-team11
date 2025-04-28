@@ -1,6 +1,7 @@
 package no.ntnu.idatt2106.krisefikser.service;
 
 import lombok.RequiredArgsConstructor;
+import no.ntnu.idatt2106.krisefikser.mapper.HouseholdMapper;
 import no.ntnu.idatt2106.krisefikser.repository.HouseholdRepository;
 import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdRequestDTO;
@@ -10,7 +11,9 @@ import no.ntnu.idatt2106.krisefikser.model.Address;
 import no.ntnu.idatt2106.krisefikser.model.Household;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Service class for managing households.
@@ -26,25 +29,6 @@ public class HouseholdService {
     private final HouseholdRepository householdRepository;
     private final AddressService addressService;
 
-    private HouseholdResponseDTO mapToResponseDTO(Household household) {
-        HouseholdResponseDTO dto = new HouseholdResponseDTO();
-        dto.setId(household.getId());
-        dto.setName(household.getName());
-        dto.setMemberCount(household.getMemberCount());
-        Address address = household.getAddress();
-        if (address != null) {
-            AddressResponseDTO addressDto = new AddressResponseDTO();
-            addressDto.setId(address.getId());
-            addressDto.setStreet(address.getStreet());
-            addressDto.setPostalCode(address.getPostalCode());
-            addressDto.setCity(address.getCity());
-            addressDto.setLatitude(address.getLatitude());
-            addressDto.setLongitude(address.getLongitude());
-            dto.setAddress(addressDto);
-        }
-        return dto;
-    }
-
     public Optional<Household> findById(int id) {
         return householdRepository.findById(id);
     }
@@ -53,7 +37,7 @@ public class HouseholdService {
      * Updates an existing household with new data.
      *
      * @param id        The ID of the household to update.
-     * @param household The new household data to update with.
+     * @param newHousehold The new household data to update with.
      * @return The updated household entity.
      * @throws RuntimeException if the household with the given ID is not found.
      */
@@ -66,7 +50,7 @@ public class HouseholdService {
             currentHousehold.setName(newHousehold.getName());
         }
         Household updatedHousehold = householdRepository.save(currentHousehold);
-        return mapToResponseDTO(updatedHousehold);
+        return HouseholdMapper.toResponseDTO(updatedHousehold);
     }
 
     /**
@@ -86,12 +70,12 @@ public class HouseholdService {
         if (newHousehold.getAddress() == null) {
             throw new IllegalArgumentException("Invalid address format, make sure to fill all fields");
         }
-        Address address = addressService.save(newHousehold.getAddress());
+        AddressResponseDTO addressResponseDTO = addressService.save(newHousehold.getAddress());
         household.setName(newHousehold.getName());
         household.setMemberCount(newHousehold.getMemberCount());
-        household.setAddress(address);
+        household.setAddress(addressService.findById(addressResponseDTO.getId()).orElseThrow(() -> new RuntimeException("Address id not found")));
         Household savedHousehold = householdRepository.save(household);
-        return mapToResponseDTO(savedHousehold);
+        return HouseholdMapper.toResponseDTO(savedHousehold);
     }
 
     /**
@@ -102,6 +86,21 @@ public class HouseholdService {
      */
     public boolean existsById(int id) {
         return householdRepository.existsById(id);
-    } 
-    
+    }
+
+    /**
+     * Delete a household entry in the household
+     * table based on the given id
+     * @param id The id of the household we wish to delete.
+     */
+    public void deleteById(int id) {
+        householdRepository.deleteById(id);
+    }
+
+    public List<HouseholdResponseDTO> findAll() {
+        return householdRepository.findAll()
+                .stream()
+                .map(HouseholdMapper::toResponseDTO)
+                .toList();
+    }
 }
