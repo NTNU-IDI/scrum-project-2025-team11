@@ -10,6 +10,19 @@ const householdMembers = ref([
     { id: 1, name: 'Lars Larsen' },
     { id: 2, name: 'Mamma Mammasen' },
     { id: 3, name: 'Pappa Papapp' },
+    { id: 4, name: 'Søster Søster' },
+    { id: 5, name: 'Bror Bror' },
+    { id: 6, name: 'Bestemor Bestemor' },
+    { id: 7, name: 'Bestefar Bestefar' },
+    { id: 8, name: 'Onkel Onkel' },
+    { id: 9, name: 'Tante Tante' },
+    { id: 10, name: 'Fetter Fetter' },
+    { id: 11, name: 'Kusine Kusine' },
+    { id: 12, name: 'Sønn Sønn' },
+    { id: 13, name: 'Datter Datter' },
+    { id: 14, name: 'Barnebarn Barnebarn' },
+    { id: 15, name: 'Oldefar Oldefar' },
+    { id: 16, name: 'Oldemor Oldemor' },
 ]);
 
 const addMember = () => {
@@ -63,6 +76,11 @@ const addMember = () => {
         display: flex;
         flex-direction: row;
         gap: 1rem;
+        overflow-x: auto;
+        max-width: 50rem;
+        height: 5rem;
+        padding: 0.5rem;
+        scrollbar-width: thin;
     }
 
     .article-card {

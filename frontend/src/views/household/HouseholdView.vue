@@ -51,6 +51,11 @@ const toggleNewMemberBox = () => {
 		gap: 2rem;
 		padding: 1rem;
 	}
+
+	h1 {
+		font-size: var(--font-size-xxlarge);
+		font-weight: normal;
+	}
 	.items-container {
 		display: flex;
 		flex-direction: row;
