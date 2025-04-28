@@ -14,7 +14,7 @@ import lombok.Setter;
 /**
  * Entity class representing an Item in the database.
  * This class is used to map the ITEM table in the database.
- * 
+ *
  * It contains the following fields:
  * - id: Unique identifier for the item
  * - name: Name of the item
