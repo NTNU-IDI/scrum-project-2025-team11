@@ -63,7 +63,7 @@ onMounted(() => {
         <input type="password" placeholder="Gjenta passord" required>
       </div>
       <label><input type="radio" v-model="householdChoice" value="new" @change="handleHouseholdChoice"> Ny husstand </label>
-      <input type="text" v-if="hasChosenNewHousehold" placeholder="Husstandsskode" required><br>
+      <input type="text" id="iptHouseholdCode" v-if="hasChosenNewHousehold" placeholder="Husstandsskode" required><br>
       <label><input type="radio" v-model="householdChoice" value="existing" @change="handleHouseholdChoice"> Eksisterende husstand</label> <br>
       <div id="divPlaceInfo" v-if="!hasChosenNewHousehold">
         <input type="text" placeholder="Adresse" required>
