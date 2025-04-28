@@ -3,12 +3,12 @@
     <div class="container mx-auto flex justify-between items-center">
       <div class="flex items-center space-x-4">
       <a href="/" class="button other">// Sett inn logo</a>
-      <a href="/mapview" class="button other">📍 Kart</a>
+      <!--<a href="/mapview" class="button other">📍 Kart</a> -->
 
     </div>
       <nav class="space-x-4">
-        <a href="/" class="button other">Hjem</a>
-        <a href="/about" class="button other">Om oss</a>
+        <!--<a href="/" class="button other">Hjem</a>-->
+        <!--<a href="/about" class="button other">Om oss</a>-->
         <a href="/login" class="button login">Logg inn</a>
       </nav>
     </div>
