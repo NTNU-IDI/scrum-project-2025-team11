@@ -61,24 +61,20 @@ public class AddressService {
     
   }
 
-  public Address updateAddress(int id, Address updatedAddress) {
+  public AddressResponseDTO updateAddress(int id, AddressRequestDTO addressDTO) throws Exception {
+    if (addressDTO.getStreet() == null || addressDTO.getPostalCode() == null || addressDTO.getCity() == null) {
+      throw new IllegalArgumentException("Street, postal code, and city cannot be null");
+    }
+
     Address existingAddress = addressRepository.findById(id).orElseThrow(() -> new RuntimeException("Address not found"));
-    if (updatedAddress.getStreet() != null) {
-      existingAddress.setStreet(updatedAddress.getStreet());
-    }
-    if (updatedAddress.getPostalCode() != null) {
-      existingAddress.setPostalCode(updatedAddress.getPostalCode());
-    }
-    if (updatedAddress.getCity() != null) {
-      existingAddress.setCity(updatedAddress.getCity());
-    }
-    if (updatedAddress.getLatitude() != null) {
-      existingAddress.setLatitude(updatedAddress.getLatitude());
-    }
-    if (updatedAddress.getLongitude() != null) {
-      existingAddress.setLongitude(updatedAddress.getLongitude());
-    }
-    return addressRepository.save(existingAddress);
+    existingAddress.setStreet(addressDTO.getStreet());
+    existingAddress.setPostalCode(addressDTO.getPostalCode());
+    existingAddress.setCity(addressDTO.getCity());
+    existingAddress.setLatitude(addressDTO.getLatitude());
+    existingAddress.setLongitude(addressDTO.getLongitude());
+
+    Address updatedAddress = addressRepository.save(existingAddress);
+    return mapToResponseDTO(updatedAddress);
   }
 
   public void deleteById(int id) {
