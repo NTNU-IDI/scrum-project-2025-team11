@@ -135,6 +135,75 @@ public class AddressServiceTest {
       assertEquals(address2.getStreet(), addresses.get(1).getStreet());
     }
   }
+
+  @Nested
+  @DisplayName("Negative Tests")
+  class NegativeTests {
+    @Test
+    void testCreateAddressWithMissingFields() {
+      AddressRequestDTO addressDTO = new AddressRequestDTO();
+      addressDTO.setStreet(null); // Missing street
+
+      Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+        addressService.save(addressDTO);
+      });
+
+      String expectedMessage = "Street, postal code, and city cannot be null";
+      String actualMessage = exception.getMessage();
+
+      assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    void testUpdateAddressNotFound() {
+      AddressRequestDTO addressDTO = new AddressRequestDTO();
+      addressDTO.setStreet("Updated Street");
+      addressDTO.setPostalCode("5678");
+      addressDTO.setCity("Updated City");
+
+      when(addressRepository.findById(1)).thenReturn(Optional.empty());
+
+      Exception exception = assertThrows(RuntimeException.class, () -> {
+        addressService.updateAddress(1, addressDTO);
+      });
+
+      String expectedMessage = "Address not found with id: 1";
+      String actualMessage = exception.getMessage();
+
+      assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    void testUpdateAddressWithMissingFields() {
+      AddressRequestDTO addressDTO = new AddressRequestDTO();
+      addressDTO.setStreet(null); // Missing street
+
+      when(addressRepository.findById(1)).thenReturn(Optional.of(address));
+
+      Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+        addressService.updateAddress(1, addressDTO);
+      });
+
+      String expectedMessage = "Street, postal code, and city cannot be null";
+      String actualMessage = exception.getMessage();
+
+      assertTrue(actualMessage.contains(expectedMessage));
+    }
+    
+    @Test
+    void testDeleteAddressNotFound() {
+      when(addressRepository.existsById(1)).thenReturn(false);
+
+      Exception exception = assertThrows(RuntimeException.class, () -> {
+        addressService.deleteById(1);
+      });
+
+      String expectedMessage = "Address not found with id: 1";
+      String actualMessage = exception.getMessage();
+
+      assertTrue(actualMessage.contains(expectedMessage));
+    }
+  }
   
 
 }
