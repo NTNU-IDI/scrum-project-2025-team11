@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 import no.ntnu.idatt2106.krisefikser.model.User;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Integer> {
 
     /**
      * Finds a user by their username.
