@@ -37,13 +37,11 @@ const deleteItem = () => {
             <div class="delete-button" @click="deleteItem()">X</div>
             <div class="article-card">
                 <input type="text" class="edit-input" id="quantity-input" v-model="item.quantity" /> 
-                <input type="text" class="edit-input" v-model="item.unit" />
+                <input type="text" class="edit-input" id="unit-input" v-model="item.unit" />
                 <div class="info">
                     <div class="exp-date">
                         <span class="grey-text">Utløper: </span> 
-                        <input type="text" class="edit-input" id="year-input" v-model="formatDateToList(item.expirationDate)[0]" />-
-                        <input type="text" class="edit-input" id="month-input" v-model="formatDateToList(item.expirationDate)[1]" />-
-                        <input type="text" class="edit-input" id="day-input" v-model="formatDateToList(item.expirationDate)[2]" />
+                        <input type="date" class="edit-input" id="date-input" v-model="item.expirationDate.toISOString().split('T')[0]" />
                     </div>
                 </div>
             </div>
@@ -53,7 +51,7 @@ const deleteItem = () => {
     <!-- View mode -->
     <div class="grey-container" v-else>
         <h2 class="small-header">{{ itemTypeName }}</h2>
-        <div v-for="item in items" :key="item.expirationDate.toLocaleDateString">
+        <div v-for="item in items" :key="item.expirationDate.toLocaleDateString" class="item-card">
             <div class="article-card">
                 <p>{{ item.quantity }} {{ item.unit }}</p>
                 <div class="info">
@@ -76,7 +74,7 @@ const deleteItem = () => {
         color: white;
         font-size: var(--font-size-large);
         font-weight: normal;
-        text-align: right;
+        text-align: center;
     }
 
     .article-card {
@@ -86,7 +84,7 @@ const deleteItem = () => {
 
     .grey-text {
         color: grey;
-        padding: 0.1rem;
+        padding: 0.3rem;
     }
 
     .edit-input {
@@ -101,22 +99,14 @@ const deleteItem = () => {
     }
 
     #quantity-input {
-        min-width: 1.2rem;
-        max-width: 2rem;
-        margin-right: 0.2rem;
+        max-width: 3rem;
     }
 
-    #year-input {
-        min-width: 2.2rem;      
+    #date-input {
+        min-width: 7rem;
+        font-family: 'Inter', sans-serif;     
     }
 
-    #month-input {
-        min-width: 1.2rem;      
-    }
-
-    #day-input {
-        min-width: 1.2rem;      
-    }
     .exp-date {
         display: flex;
         align-items: center;
