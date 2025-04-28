@@ -51,8 +51,8 @@ public class AddressController {
     @ApiResponse(responseCode = "204", description = "No addresses found")
   })
   @GetMapping
-  public ResponseEntity<List<Address>> getAllAddresses() {
-    List<Address> addresses = addressService.findAll();
+  public ResponseEntity<List<AddressResponseDTO>> getAllAddresses() {
+    List<AddressResponseDTO> addresses = addressService.findAllAddresses();
     if (addresses.isEmpty()) {
       return ResponseEntity.noContent().build();
     } else {
@@ -134,12 +134,11 @@ public class AddressController {
     @PathVariable int id, 
     @Parameter (description = "Updated address object", required = true)
     @RequestBody AddressRequestDTO address) {
-    if (!addressService.existsById(id)) {
-      return ResponseEntity.notFound().build();
-    }
     try {
       AddressResponseDTO updatedAddress = addressService.updateAddress(id, address);
       return ResponseEntity.ok(updatedAddress);
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().header("Error message", e.getMessage()).build();
     } catch (Exception e) {
       return ResponseEntity.badRequest().header("Error message", e.getMessage()).build();
     }
@@ -162,10 +161,13 @@ public class AddressController {
   public ResponseEntity<Void> deleteAddress(
     @Parameter (description = "ID of the address to delete", example = "1", required = true)
     @PathVariable int id) {
-    if (!addressService.existsById(id)) {
-      return ResponseEntity.notFound().build();
+    try {
+      addressService.deleteById(id);
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.notFound().header("Error message", e.getMessage()).build();
+    } catch (Exception e) {
+      return ResponseEntity.notFound().header("Error message", e.getMessage()).build();
     }
-    addressService.deleteById(id);
     return ResponseEntity.noContent().build();
   }
   

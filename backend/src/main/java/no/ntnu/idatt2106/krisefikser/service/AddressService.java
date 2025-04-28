@@ -61,7 +61,17 @@ public class AddressService {
     
   }
 
+  /**
+   * Updates an existing address in the database.
+   * @param id the ID of the address to update.
+   * @param addressDTO the new address data.
+   * @return the updated address.
+   * @throws Exception if the address is not found or fields are invalid
+   */
   public AddressResponseDTO updateAddress(int id, AddressRequestDTO addressDTO) throws Exception {
+    if (!existsById(id)) {
+      throw new RuntimeException("Address not found with id: " + id);
+    }
     if (addressDTO.getStreet() == null || addressDTO.getPostalCode() == null || addressDTO.getCity() == null) {
       throw new IllegalArgumentException("Street, postal code, and city cannot be null");
     }
@@ -77,16 +87,36 @@ public class AddressService {
     return mapToResponseDTO(updatedAddress);
   }
 
+  /**
+   * Deletes an address by its ID.
+   * @param id the ID of the address to delete.
+   * @throws RuntimeException if the address to delete is not found.
+   */
   public void deleteById(int id) {
+    if (!existsById(id)) {
+      throw new RuntimeException("Address not found with id: " + id);
+    }
     addressRepository.deleteById(id);
   }
 
-  public boolean existsById(int id) {
+  /**
+   * Private method that checks if an address exists by its ID.
+   * @param id the ID of the address to check.
+   * @return true if the address exists, false otherwise.
+   */
+  private boolean existsById(int id) {
     return addressRepository.existsById(id);
   }
 
-  public List<Address> findAll() {
-    return addressRepository.findAll();
+  /**
+   * Retrieves all addresses from the database.
+   * @return a list of all addresses.
+   */
+  public List<AddressResponseDTO> findAllAddresses() {
+    List<Address> addresses = addressRepository.findAll();
+    return addresses.stream()
+        .map(this::mapToResponseDTO)
+        .toList();
   }
 
   
