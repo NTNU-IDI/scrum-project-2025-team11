@@ -11,13 +11,18 @@
       </ul>
     </div>
     <div id="map" class="map"></div>
+
+    <div v-if="showCrisisAlert" class="crisis-alert">
+      <p><strong>Viktig melding:</strong> Du er i et kriseområde!</p>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { defineComponent, onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
+const showCrisisAlert = ref(false);
 
 // Test data
 const testPointsOfInterest = [
@@ -109,6 +114,9 @@ function getUserLocation(map: L.Map) {
           .bindPopup("<strong>Din posisjon</strong>")
           .openPopup();
         map.setView([userLatitude, userLongitude], 13);
+
+        // Check if user is in a crisis area
+        checkIfInCrisisArea(userLatitude, userLongitude);
       },
       (error) => {
         console.error("Error getting location: ", error);
@@ -117,6 +125,32 @@ function getUserLocation(map: L.Map) {
   } else {
     console.warn("Geolocation is not supported by this browser.");
   }
+}
+
+function checkIfInCrisisArea(userLatitude: number, userLongitude: number) {
+  testEvents.forEach(event => {
+    const distance = calculateDistance(userLatitude, userLongitude, event.latitude, event.langtitude);
+    
+    if (distance <= event.radius) {
+      showCrisisAlert.value = true;
+    }
+  });
+}
+
+function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371;
+  const dLat = toRadians(lat2 - lat1);
+  const dLon = toRadians(lon2 - lon1);
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c;
+  return distance * 1000;
+}
+
+function toRadians(degrees: number): number {
+  return degrees * (Math.PI / 180);
 }
 
 function addPointsOfInterest(map: L.Map) {
@@ -229,5 +263,33 @@ function addEvents(map: L.Map) {
   height: 100%;
   width: 100%;
   z-index: 0;
+}
+
+.crisis-alert {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--bad-red);
+  color: var(--white);
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+@media (max-width: 768px) {
+  .icons-box h1 {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+  }
+
+  .icons-box li {
+    font-size: 0.8rem;
+  }
 }
 </style>
