@@ -2,11 +2,15 @@ package no.ntnu.idatt2106.krisefikser.service;
 
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdItemRequest;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdItemResponse;
+import no.ntnu.idatt2106.krisefikser.dto.UpsertInventoryRequest;
 import no.ntnu.idatt2106.krisefikser.mapper.HouseholdItemMapper;
 import no.ntnu.idatt2106.krisefikser.model.*;
 import no.ntnu.idatt2106.krisefikser.repository.*;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -56,6 +60,43 @@ public class InventoryServiceImpl implements InventoryService {
         hi.setUnit(req.getUnit());
         hi.setExpirationDate(req.getExpirationDate());
         return mapper.toResponse(hiRepo.save(hi));
+    }
+
+    @Override
+    public HouseholdItemResponse upsert(Integer householdId, UpsertInventoryRequest req) {
+        // Validate household
+        Household hh = hhRepo.findById(householdId)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "Household not found"));
+
+        // Find or create master Item
+        Item item;
+        if (req.getItemId() != null) {
+            item = itemRepo.findById(req.getItemId())
+                .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Item not found"));
+        } else {
+            item = new Item();
+            item.setName(req.getName());
+            item.setDescription(req.getDescription());
+            item = itemRepo.save(item);
+        }
+
+        // Create inventory entry
+        HouseholdItemId pk = new HouseholdItemId(
+            householdId,
+            item.getId(),
+            req.getAcquiredDate()
+        );
+        HouseholdItem hi = new HouseholdItem(
+            pk, hh, item,
+            req.getQuantity(),
+            req.getUnit(),
+            req.getExpirationDate()
+        );
+        hi = hiRepo.save(hi);
+
+        return mapper.toResponse(hi);
     }
 
     @Override

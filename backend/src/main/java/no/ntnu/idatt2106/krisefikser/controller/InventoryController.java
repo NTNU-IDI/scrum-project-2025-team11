@@ -2,6 +2,7 @@ package no.ntnu.idatt2106.krisefikser.controller;
 
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdItemRequest;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdItemResponse;
+import no.ntnu.idatt2106.krisefikser.dto.UpsertInventoryRequest;
 import no.ntnu.idatt2106.krisefikser.service.InventoryService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -48,10 +49,14 @@ public class InventoryController {
         @PathVariable Integer hhId,
         @Valid @RequestBody HouseholdItemRequest req
     ) {
-        var created = service.add(hhId, req);
-        return ResponseEntity
-            .created(URI.create("/api/households/" + hhId + "/items/" + created.getItemId() + "/" + created.getAcquiredDate()))
-            .body(created);
+        HouseholdItemResponse created = service.add(hhId, req);
+        URI location = URI.create(String.format(
+            "/api/households/%d/items/%d/%s",
+            hhId,
+            created.getItemId(),
+            created.getAcquiredDate()
+        ));
+        return ResponseEntity.created(location).body(created);
     }
 
     @PutMapping("/{itemId}/{acquiredDate}")
@@ -67,10 +72,10 @@ public class InventoryController {
         @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate acquiredDate,
         @Valid @RequestBody HouseholdItemRequest req
     ) {
-         // we ignore any itemId / acquiredDate in the JSON
-    req.setItemId(itemId);
-    req.setAcquiredDate(acquiredDate);
-    return service.update(hhId, itemId, req);
+        // ignore any key fields in JSON, use path variables
+        req.setItemId(itemId);
+        req.setAcquiredDate(acquiredDate);
+        return service.update(hhId, itemId, req);
     }
 
     @DeleteMapping("/{itemId}/{acquiredDate}")
@@ -86,5 +91,26 @@ public class InventoryController {
     ) {
         service.remove(hhId, itemId, acquiredDate);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/upsert")
+    @Operation(summary = "Create or link an item and add to inventory in one call")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Inventory entry created"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data"),
+        @ApiResponse(responseCode = "404", description = "Household or Item not found")
+    })
+    public ResponseEntity<HouseholdItemResponse> upsert(
+        @PathVariable Integer hhId,
+        @Valid @RequestBody UpsertInventoryRequest req
+    ) {
+        HouseholdItemResponse created = service.upsert(hhId, req);
+        URI location = URI.create(String.format(
+            "/api/households/%d/items/%d/%s",
+            hhId,
+            created.getItemId(),
+            created.getAcquiredDate()
+        ));
+        return ResponseEntity.created(location).body(created);
     }
 }
