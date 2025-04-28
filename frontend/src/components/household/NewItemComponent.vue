@@ -15,6 +15,8 @@ const newUnit = ref('');
 const newExpirationDate = ref(new Date().toISOString().split('T')[0]);
 const errorMsg = ref('');
 
+const emit = defineEmits(['hide-new-item-box']);
+
 const addItem = () => {
     if(!validateItemName(newName.value)) {
         errorMsg.value = 'Vennligst skriv inn et gyldig navn';
@@ -41,11 +43,11 @@ const addItem = () => {
         return;
     }
 
+    emit('hide-new-item-box');
     // TODO: add item to list
 }
 
 const selectOption = (itemName: string) => {
-
     newName.value = itemName;
     showDropdown.value = false;
 }
@@ -54,6 +56,7 @@ const addItemOption = (newName: string) => {
         existingItems.value.push(newName);
     }
     showDropdown.value = false;
+    emit('hide-new-item-box');
 }
 
 const handleKeydown = (event: KeyboardEvent, name: string) => {
@@ -104,7 +107,7 @@ const handleKeydown = (event: KeyboardEvent, name: string) => {
         </div>
 
         <div class="button-container">
-            <button class="dark-button" @click="addItem, $emit('hide-new-item-box')">Legg til</button>
+            <button class="dark-button" @click="addItem">Legg til</button>
         </div>
     </div>
 </template>
