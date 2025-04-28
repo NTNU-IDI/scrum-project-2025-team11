@@ -205,7 +205,7 @@ function addEvents(map: L.Map) {
   background: var(--white);
   padding: 1rem 1.5rem 1rem 1rem;
   border-radius: 10px;
-  font-size: 0.9rem;
+  font-size: var(--font-size-medium);
   z-index: 1; 
   display: flex;
   flex-direction: column;
@@ -274,7 +274,7 @@ function addEvents(map: L.Map) {
   color: var(--white);
   padding: 10px 20px;
   border-radius: 5px;
-  font-size: 1rem;
+  font-size: var(--font-size-medium);
   font-weight: bold;
   display: flex;
   align-items: center;
@@ -284,12 +284,12 @@ function addEvents(map: L.Map) {
 
 @media (max-width: 768px) {
   .icons-box h1 {
-    font-size: 1.5rem;
+    font-size: var(--font-size-xlarge);
     margin-bottom: 5px;
   }
 
   .icons-box li {
-    font-size: 0.8rem;
+    font-size: var(--font-size-small);
   }
 }
 </style>
