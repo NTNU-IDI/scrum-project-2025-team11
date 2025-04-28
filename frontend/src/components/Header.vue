@@ -3,7 +3,8 @@
     <div class="container mx-auto flex justify-between items-center">
       <div class="flex items-center space-x-4">
       <a href="/" class="button other">// Sett inn logo</a>
-      <a href="/" class="button other">📍 Kart</a>
+      <a href="/mapview" class="button other">📍 Kart</a>
+
     </div>
       <nav class="space-x-4">
         <a href="/" class="button other">Hjem</a>
@@ -15,9 +16,22 @@
 </template>
 
 <script lang="ts" setup>
+/**Når man trykker på kart, skal man komme til mapview.vue */
+import { useRouter } from 'vue-router'
+const router = useRouter()
+const goToMapView = () => {
+  router.push('/map')
+}
+const goToHome = () => {
+  router.push('/')
+}
+const goToLogin = () => {
+  router.push('/login')
+}
 </script>
 
 <style scoped>
+
 .button {
   display: inline-block;
   padding: 10px 20px;
