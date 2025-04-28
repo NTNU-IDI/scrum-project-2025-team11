@@ -18,10 +18,19 @@ import java.util.Optional;
 public class PointOfInterestService {
     private final PointOfInterestRepository pointOfInterestRepository;
 
+    /**
+     * Find a single point based on an id
+     * @param id Unique identifier
+     * @return A single tuple in the point_of_interest table
+     */
     public Optional<PointOfInterest> findById(int id) {
         return pointOfInterestRepository.findById(id);
     }
 
+    /**
+     * Find all points of interest
+     * @return All points of interest that exist in the table
+     */
     public List<PointOfInterestResponseDTO> findAll() {
         return pointOfInterestRepository.findAll()
                 .stream()
@@ -29,6 +38,13 @@ public class PointOfInterestService {
                 .toList();
     }
 
+    /**
+     * Save a new point of interest to the table
+     * @param newPointOfInterest of the type PointOfInterestRequestDTO which contains all
+     *                           the information about a point of interest
+     * @return PointOfInterestResponseDTO which is all the information given about that point
+     * plus the auto generated unique identifier
+     */
     public PointOfInterestResponseDTO save(PointOfInterestRequestDTO newPointOfInterest) {
         PointOfInterest pointOfInterest = new PointOfInterest();
 
@@ -58,6 +74,11 @@ public class PointOfInterestService {
         return PointOfInterestMapper.toResponseDTO(pointOfInterest);
     }
 
+    /**
+     * Find multiple points of interest based on the RequestParam
+     * @param iconTypeString String that will be used to sort after points of interest
+     * @return A list of points that match the input parameter
+     */
     public List<PointOfInterestResponseDTO> findByIconType(String iconTypeString) {
         Enums.IconEnum iconType;
         try {

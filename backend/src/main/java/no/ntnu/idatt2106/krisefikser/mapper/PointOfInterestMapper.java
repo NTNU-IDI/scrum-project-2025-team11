@@ -3,6 +3,9 @@ package no.ntnu.idatt2106.krisefikser.mapper;
 import no.ntnu.idatt2106.krisefikser.dto.PointOfInterestResponseDTO;
 import no.ntnu.idatt2106.krisefikser.model.PointOfInterest;
 
+/**
+ * Mapper class to map household entities to PointOfInterestResponseDTO
+ */
 public class PointOfInterestMapper {
 
     public static PointOfInterestResponseDTO toResponseDTO(PointOfInterest pointOfInterest) {
