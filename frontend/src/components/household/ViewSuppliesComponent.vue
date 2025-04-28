@@ -65,7 +65,7 @@ const toggleNewItemBox = () => {
         >+</button>
     </div>
 
-    <button :class="['dark-button', { active: isEditMode }]" @click="toggleEditMode(), $emit('hide-new-item-box')">
+    <button :class="['dark-button', { active: isEditMode }]" @click="() => { toggleEditMode(); $emit('hide-new-item-box'); }">
         {{ isEditMode ? 'Large' : 'Endre lager' }}
     </button>
 </template>
