@@ -113,7 +113,8 @@ public class AddressController {
   /**
    * Endpoint to update an existing address.
    * @param id the ID of the address to update.
-   * @param address the updated address information.
+   * @param address the updated address data as a DTO.
+   * @throws IllegalArgumentException if the address data is invalid or missing required fields.
    * @return {@code ResponseEntity} containing the updated address, or a 404 Not Found status if not found.
    */
   @Operation(
@@ -128,16 +129,20 @@ public class AddressController {
     @ApiResponse(responseCode = "400", description = "Invalid address data, for example, missing required fields")
   })
   @PutMapping("/{id}")
-  public ResponseEntity<Address> updateAddress(
+  public ResponseEntity<AddressResponseDTO> updateAddress(
     @Parameter (description = "ID of the address to update", example = "1", required = true)
     @PathVariable int id, 
     @Parameter (description = "Updated address object", required = true)
-    @RequestBody Address address) {
+    @RequestBody AddressRequestDTO address) {
     if (!addressService.existsById(id)) {
       return ResponseEntity.notFound().build();
     }
-    Address updatedAddress = addressService.updateAddress(id, address);
-    return ResponseEntity.ok(updatedAddress);
+    try {
+      AddressResponseDTO updatedAddress = addressService.updateAddress(id, address);
+      return ResponseEntity.ok(updatedAddress);
+    } catch (Exception e) {
+      return ResponseEntity.badRequest().header("Error message", e.getMessage()).build();
+    }
   }
 
   /**
