@@ -105,31 +105,20 @@ public class UserService {
      * @param updatedUser
      * @return User object that was updated
      */
-    public User updateUser(Long id, User updatedUser) {
-        return userRepository.findById(id).map(existingUser -> {
-          // Update fields based on the values in the updatedUser object
-          if (updatedUser.getUsername() != null) {
-            existingUser.setUsername(updatedUser.getUsername());
-          }
-          if (updatedUser.getEmail() != null) {
-            existingUser.setEmail(updatedUser.getEmail());
-          }
-          if (updatedUser.getFirstName() != null) {
-            existingUser.setFirstName(updatedUser.getFirstName());
-          }
-          if (updatedUser.getLastName() != null) {
-            existingUser.setLastName(updatedUser.getLastName());
-          }
-          if (updatedUser.getPassword() != null) {
-            existingUser.setPassword(updatedUser.getPassword()); // Hash the password before saving
-          }
-          if (updatedUser.getRole() != null) {
-            existingUser.setRole(updatedUser.getRole());
-          }
-    
-          // Save the updated user entity
-          return userRepository.save(existingUser);
-        }).orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+    public UserResponse updateUser(int id, UserRequest updated) {
+
+      User existing = Optional.ofNullable(userRepository.findById(id))
+          .orElseThrow(() -> new RuntimeException("User not found " + id));
+  
+      if (updated.getUsername() != null)  existing.setUsername(updated.getUsername());
+      if (updated.getEmail()    != null)  existing.setEmail(updated.getEmail());
+      if (updated.getFirstName()!= null)  existing.setFirstName(updated.getFirstName());
+      if (updated.getLastName() != null)  existing.setLastName(updated.getLastName());
+      if (updated.getPassword() != null)  existing.setPassword(updated.getPassword()); // husk hashing
+      
+      User saved = userRepository.save(existing);   // lagrer entiteten
+  
+      return mapToResponse(saved);                  // mapper → DTO
     }
 
     
