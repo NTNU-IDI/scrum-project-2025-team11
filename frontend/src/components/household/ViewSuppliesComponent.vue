@@ -24,6 +24,8 @@ const itemTypeStore = useItemTypeStore();
 const selectedTypeId = ref<number | null>(null)
 // Is edit mode enabled
 const isEditMode = ref(false);
+// Is new item box visible
+const isBoxVisible = ref(false);
 
 // TODO: get total number of items by type
 // const items = getItemsByType()
@@ -39,6 +41,10 @@ const toggleEditMode = () => {
     itemTypeStore.toggleEditMode();
     isEditMode.value = !isEditMode.value;
 }
+
+const toggleNewItemBox = () => {
+    isBoxVisible.value = !isBoxVisible.value;
+}
 </script>
 <template>
     <h1 class="medium-header">Beredskapslager</h1>
@@ -53,9 +59,13 @@ const toggleEditMode = () => {
                 </div>
             </div>
         </div>
+        <button v-if="isEditMode" class="dark-button" id="add-button" 
+            @click="$emit('show-new-item-box'), toggleNewItemBox"
+            :disabled="isBoxVisible"
+        >+</button>
     </div>
 
-    <button :class="['dark-button', { active: isEditMode }]" @click="toggleEditMode()">
+    <button :class="['dark-button', { active: isEditMode }]" @click="toggleEditMode(), $emit('hide-new-item-box')">
         {{ isEditMode ? 'Large' : 'Endre lager' }}
     </button>
 </template>
@@ -71,6 +81,17 @@ const toggleEditMode = () => {
     }
     .dark-button.active {
         background-color: var(--good-green);
+    }
+
+    #add-button {
+        display: flex;
+        align-items: center; 
+        justify-content: center; 
+        width: 3rem; 
+        height: 3rem; 
+        font-size: var(--font-size-xlarge);
+        margin-left: auto;
+        margin-top: 1rem;
     }
 
     .article-card {
