@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { mount } from "@vue/test-utils";
-import LogInView from "@/views/LogInView.vue";
+import LogInView from "@/components/LogInComponent.vue";
 
-describe("LogInView", () => {
-  it("renders login page properly", () => {
+describe("LogInComponent", () => {
+  it("renders login component properly", () => {
     const wrapper = mount(LogInView);
 
     // "Logg inn" heading
