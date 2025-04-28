@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import no.ntnu.idatt2106.krisefikser.dto.PasswordChangeDTO;
 import no.ntnu.idatt2106.krisefikser.dto.UserRequest;
 import no.ntnu.idatt2106.krisefikser.dto.UserResponse;
 import no.ntnu.idatt2106.krisefikser.model.Household;
@@ -29,6 +30,28 @@ public class UserService {
     public UserResponse getUserById(int id) {
       User user = userRepository.findById(id);
       return mapToResponse(user);
+    }
+
+    /**
+     * Delete a user by their ID.
+     * @param id
+     */
+    public void deleteById(int id) {
+        userRepository.deleteById(id);
+    }
+
+    /**
+     * Changes the password for a user.
+     * @param id the ID of the user whose password will be changed
+     * @param newPassword the new password (should be hashed before saving)
+     * @return UserResponse object for the updated user
+     */
+    public UserResponse changePassword(int id, PasswordChangeDTO password) {
+      User existing = Optional.ofNullable(userRepository.findById(id))
+        .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+      existing.setPassword(password.getNewPassword()); // Remember to hash the password before saving
+      User saved = userRepository.save(existing);
+      return mapToResponse(saved);
     }
 
     /**
@@ -120,6 +143,8 @@ public class UserService {
   
       return mapToResponse(saved);                  // mapper → DTO
     }
+
+    
 
     
 }
