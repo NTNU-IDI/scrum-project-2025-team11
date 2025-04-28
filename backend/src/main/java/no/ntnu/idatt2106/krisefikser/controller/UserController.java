@@ -101,6 +101,28 @@ public class UserController {
   }
 
 
+  /**
+   * Updates an existing user entity.
+   * 
+   * @param id the unique identifier of the user to be updated
+   * @param user the updated user entity
+   * @return {@code ResponseEntity} containing the updated user entity
+   */
+  @Operation(
+    summary = "Update user",
+    description = "Updates an existing user entity in the system."
+  )
+  @ApiResponse(responseCode = "200", description = "User updated successfully",
+      content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class)))
+  @PostMapping("/{id}")
+  public ResponseEntity<UserResponse> updateUser(
+    @Parameter(description = "The unique identifier of the user", required = true)
+    @PathVariable int id,
+    @Parameter(description = "Updated user object", required = true)
+    @RequestBody UserRequest user) {
+    UserResponse updatedUser = userService.updateUser(id, user);
+    return ResponseEntity.ok(updatedUser);
+  }
 
   
     
