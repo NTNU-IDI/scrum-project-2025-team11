@@ -10,7 +10,6 @@ import lombok.Setter;
 @Setter
 public class HouseholdItemRequest {
 
-    @NotNull
     private Integer itemId;
 
     @NotNull

@@ -67,9 +67,10 @@ public class InventoryController {
         @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate acquiredDate,
         @Valid @RequestBody HouseholdItemRequest req
     ) {
-        // ensure the request key matches the path
-        req.setAcquiredDate(acquiredDate);
-        return service.update(hhId, itemId, req);
+         // we ignore any itemId / acquiredDate in the JSON
+    req.setItemId(itemId);
+    req.setAcquiredDate(acquiredDate);
+    return service.update(hhId, itemId, req);
     }
 
     @DeleteMapping("/{itemId}/{acquiredDate}")
