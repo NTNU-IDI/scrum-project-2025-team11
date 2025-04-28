@@ -41,7 +41,7 @@ public class AddressService {
 
   /**
    * Saves a new address to the database.
-   * @param address the address to save.
+   * @param addressDTO the address to save.
    * @return the saved address.
    * @throws Exception if the address is invalid or cannot be saved.
    */

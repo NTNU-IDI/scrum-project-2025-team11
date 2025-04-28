@@ -1,0 +1,93 @@
+package no.ntnu.idatt2106.krisefikser.service;
+
+import lombok.RequiredArgsConstructor;
+import no.ntnu.idatt2106.krisefikser.dto.PointOfInterestRequestDTO;
+import no.ntnu.idatt2106.krisefikser.dto.PointOfInterestResponseDTO;
+import no.ntnu.idatt2106.krisefikser.mapper.HouseholdMapper;
+import no.ntnu.idatt2106.krisefikser.mapper.PointOfInterestMapper;
+import no.ntnu.idatt2106.krisefikser.model.Enums;
+import no.ntnu.idatt2106.krisefikser.model.PointOfInterest;
+import no.ntnu.idatt2106.krisefikser.repository.PointOfInterestRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class PointOfInterestService {
+    private final PointOfInterestRepository pointOfInterestRepository;
+
+    public Optional<PointOfInterest> findById(int id) {
+        return pointOfInterestRepository.findById(id);
+    }
+
+    public List<PointOfInterestResponseDTO> findAll() {
+        return pointOfInterestRepository.findAll()
+                .stream()
+                .map(PointOfInterestMapper::toResponseDTO)
+                .toList();
+    }
+
+    public PointOfInterestResponseDTO save(PointOfInterestRequestDTO newPointOfInterest) {
+        PointOfInterest pointOfInterest = new PointOfInterest();
+
+        if (newPointOfInterest.getName() == null) {
+            throw new IllegalArgumentException("Name cannot be null");
+        }
+        if (newPointOfInterest.getDescription() == null) {
+            throw new IllegalArgumentException("Description cannot be null");
+        }
+        if (newPointOfInterest.getIconType() == null) {
+            throw new IllegalArgumentException("IconType cannot be null");
+        }
+        if (newPointOfInterest.getLatitude() == null) {
+            throw new IllegalArgumentException("Latitude cannot be null");
+        }
+        if (newPointOfInterest.getLongitude() == null) {
+            throw new IllegalArgumentException("Longitude cannot be null");
+        }
+
+        pointOfInterest.setName(newPointOfInterest.getName());
+        pointOfInterest.setDescription(newPointOfInterest.getDescription());
+        pointOfInterest.setIconType(newPointOfInterest.getIconType());
+        pointOfInterest.setLatitude(newPointOfInterest.getLatitude());
+        pointOfInterest.setLongitude(newPointOfInterest.getLongitude());
+
+        pointOfInterestRepository.save(pointOfInterest);
+        return PointOfInterestMapper.toResponseDTO(pointOfInterest);
+    }
+
+    public List<PointOfInterestResponseDTO> findByIconType(String iconTypeString) {
+        Enums.IconEnum iconType;
+        try {
+            iconType = Enums.IconEnum.valueOf(iconTypeString.toLowerCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid icon type: " + iconTypeString);
+        }
+
+        return pointOfInterestRepository.findByIconType(iconType)
+                .stream()
+                .map(PointOfInterestMapper::toResponseDTO)
+                .toList();
+    }
+
+    /**
+     * Checks if a point exists by its ID.
+     *
+     * @param id The ID of the point to check.
+     * @return True if the point exists, false otherwise.
+     */
+    public boolean existsById(int id) {
+        return pointOfInterestRepository.existsById(id);
+    }
+
+    /**
+     * Delete a point entry in the point of interest
+     * table based on the given id
+     * @param id The id of the point we wish to delete.
+     */
+    public void deleteById(int id) {
+        pointOfInterestRepository.deleteById(id);
+    }
+}
