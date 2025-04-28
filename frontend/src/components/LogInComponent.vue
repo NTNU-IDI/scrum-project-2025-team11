@@ -8,7 +8,8 @@
     <input type="password" placeholder="Passord"/>
     <button class="good-button">Logg inn</button>
     <p class="register-login-text">
-      Har du ikke en bruker? <a href="#" class="link">Registrer deg her</a>
+      Har du ikke en bruker?
+      <router-link to="/register" class="link">Registrer deg her</router-link>
     </p>
   </div>
 </template>
