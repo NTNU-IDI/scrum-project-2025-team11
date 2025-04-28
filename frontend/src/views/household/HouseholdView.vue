@@ -1,17 +1,28 @@
 <script lang="ts" setup>
-import ViewSingleArticleComponent from '@/components/household/ViewSingleArticleComponent.vue';
+import NewItemComponent from '@/components/household/NewItemComponent.vue';
+import ViewSingleItemComponent from '@/components/household/ViewSingleItemComponent.vue';
 import ViewSuppliesComponent from '@/components/household/ViewSuppliesComponent.vue';
+import { ref } from 'vue';
 
+// Toggle new item component visibility
+const isBoxVisible = ref(false);
+
+const toggleNewItemBox = () => {
+	isBoxVisible.value = !isBoxVisible.value;
+}
 </script>
 
 <template>
   	<div class="page-container">
     	<div class="column">
-      		<ViewSuppliesComponent />
+      		<ViewSuppliesComponent @show-new-item-box="toggleNewItemBox" @hide-new-item-box="isBoxVisible = false" />
     	</div>
     	<div class="column">
-      		<ViewSingleArticleComponent />
+      		<ViewSingleItemComponent />
     	</div>
+		<div class="new-item-box">
+			<NewItemComponent v-if="isBoxVisible" @hide-new-item-box="toggleNewItemBox"/>
+		</div>
   	</div>
 </template>
 
@@ -26,5 +37,10 @@ import ViewSuppliesComponent from '@/components/household/ViewSuppliesComponent.
 		display: flex;
   		flex-direction: column;
   		gap: 1rem;
+	}
+	.new-item-box {
+		position: absolute;
+		bottom: 24.5rem;
+		right: 8.5rem;
 	}
 </style>
