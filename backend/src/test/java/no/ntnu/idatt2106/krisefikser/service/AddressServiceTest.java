@@ -3,6 +3,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -94,16 +95,44 @@ public class AddressServiceTest {
       AddressResponseDTO updatedAddress = null;
       try {
         updatedAddress = addressService.updateAddress(1, addressDTO);
-        assertNotNull(updatedAddress);
-        assertEquals(address.getId(), updatedAddress.getId());
       } catch (Exception e) {
         fail("Exception should not be thrown: " + e.getMessage());
       }
 
       verify(addressRepository, times(1)).save(any(Address.class));
       verify(addressRepository, times(1)).findById(1);
-      //assertTrue(updatedAddress.isPresent());
+      assertNotNull(updatedAddress);
       assertEquals(updatedAddress.getStreet(), address.getStreet());
+    }
+
+    @Test
+    void testDeleteAddress() {
+      when(addressRepository.existsById(1)).thenReturn(true);
+      doNothing().when(addressRepository).deleteById(1);
+      addressService.deleteById(1);
+      verify(addressRepository, times(1)).deleteById(1);
+    }
+
+    @Test
+    void findFindAllAddresses() {
+      Address address2 = new Address();
+      address2.setId(2);
+      address2.setStreet("Test Street 2");
+      address2.setPostalCode("5678");
+      address2.setCity("Test City 2");
+      address2.setLatitude(30.0);
+      address2.setLongitude(40.0);
+
+      when(addressRepository.findAll()).thenReturn(List.of(address, address2));
+      List<AddressResponseDTO> addresses = addressService.findAllAddresses();
+      verify(addressRepository, times(1)).findAll();
+
+      assertNotNull(addresses);
+      assertEquals(2, addresses.size());
+      assertEquals(address.getId(), addresses.get(0).getId());
+      assertEquals(address2.getId(), addresses.get(1).getId());
+      assertEquals(address.getStreet(), addresses.get(0).getStreet());
+      assertEquals(address2.getStreet(), addresses.get(1).getStreet());
     }
   }
   

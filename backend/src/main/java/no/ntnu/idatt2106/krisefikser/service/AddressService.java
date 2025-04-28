@@ -69,14 +69,12 @@ public class AddressService {
    * @throws Exception if the address is not found or fields are invalid
    */
   public AddressResponseDTO updateAddress(int id, AddressRequestDTO addressDTO) throws Exception {
-    if (!existsById(id)) {
-      throw new RuntimeException("Address not found with id: " + id);
-    }
+    Address existingAddress = addressRepository.findById(id).orElseThrow(() -> new RuntimeException("Address not found with id: " + id));
+
     if (addressDTO.getStreet() == null || addressDTO.getPostalCode() == null || addressDTO.getCity() == null) {
       throw new IllegalArgumentException("Street, postal code, and city cannot be null");
     }
 
-    Address existingAddress = addressRepository.findById(id).orElseThrow(() -> new RuntimeException("Address not found"));
     existingAddress.setStreet(addressDTO.getStreet());
     existingAddress.setPostalCode(addressDTO.getPostalCode());
     existingAddress.setCity(addressDTO.getCity());
@@ -92,20 +90,11 @@ public class AddressService {
    * @param id the ID of the address to delete.
    * @throws RuntimeException if the address to delete is not found.
    */
-  public void deleteById(int id) {
-    if (!existsById(id)) {
+  public void deleteById(int id) throws RuntimeException {
+    if (!addressRepository.existsById(id)) {
       throw new RuntimeException("Address not found with id: " + id);
     }
     addressRepository.deleteById(id);
-  }
-
-  /**
-   * Private method that checks if an address exists by its ID.
-   * @param id the ID of the address to check.
-   * @return true if the address exists, false otherwise.
-   */
-  private boolean existsById(int id) {
-    return addressRepository.existsById(id);
   }
 
   /**
