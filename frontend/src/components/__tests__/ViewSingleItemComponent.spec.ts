@@ -1,4 +1,4 @@
-import ViewSingleArticleComponent from "@/components/household/ViewSingleArticleComponent.vue";
+import ViewSingleItemComponent from "@/components/household/ViewSingleItemComponent.vue";
 import { useItemTypeStore } from "@/stores/itemStore";
 import * as formatDateUtils from "@/utils/formatDate";
 import { mount } from "@vue/test-utils";
@@ -16,7 +16,7 @@ vi.mock("@/utils/formatDate", () => ({
   formatDateToList: vi.fn().mockReturnValue(["2026", "10", "01"]),
 }));
 
-describe("ViewSingleArticleComponent", () => {
+describe("ViewSingleItemComponent", () => {
   let store: ReturnType<typeof useItemTypeStore>;
 
   beforeEach(() => {
@@ -34,7 +34,7 @@ describe("ViewSingleArticleComponent", () => {
 
   it("renders correctly in view mode", () => {
     vi.spyOn(store, "isEditMode", "get").mockReturnValue(false);
-    const wrapper = mount(ViewSingleArticleComponent);
+    const wrapper = mount(ViewSingleItemComponent);
 
     // Component
     expect(wrapper.find("h1").text()).toBe("Informasjon om artikkel");
@@ -58,7 +58,7 @@ describe("ViewSingleArticleComponent", () => {
 
   it("renders correctly in edit mode", () => {
     vi.spyOn(store, "isEditMode", "get").mockReturnValue(true);
-    const wrapper = mount(ViewSingleArticleComponent);
+    const wrapper = mount(ViewSingleItemComponent);
 
     // Component
     expect(wrapper.find("h1").text()).toBe("Informasjon om artikkel");
@@ -80,7 +80,7 @@ describe("ViewSingleArticleComponent", () => {
   it("handles delete item functionality", async () => {
     vi.spyOn(store, "isEditMode", "get").mockReturnValue(true);
     const deleteItemSpy = vi.fn();
-    const wrapper = mount(ViewSingleArticleComponent);
+    const wrapper = mount(ViewSingleItemComponent);
     wrapper.vm.deleteItem = deleteItemSpy;
 
     // Click delete button and check if method was called
@@ -90,13 +90,13 @@ describe("ViewSingleArticleComponent", () => {
 
   it("displays formatted dates correctly", () => {
     vi.spyOn(store, "isEditMode", "get").mockReturnValue(false);
-    mount(ViewSingleArticleComponent);
+    mount(ViewSingleItemComponent);
     expect(formatDateUtils.formatDate).toHaveBeenCalledWith(expect.any(Date));
   });
 
   it("shows date inputs with correct values in edit mode", () => {
     vi.spyOn(store, "isEditMode", "get").mockReturnValue(true);
-    const wrapper = mount(ViewSingleArticleComponent);
+    const wrapper = mount(ViewSingleItemComponent);
     expect(formatDateUtils.formatDateToList).toHaveBeenCalledWith(
       expect.any(Date)
     );
