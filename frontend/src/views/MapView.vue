@@ -291,5 +291,10 @@ function addEvents(map: L.Map) {
   .icons-box li {
     font-size: var(--font-size-small);
   }
+
+  .crisis-alert {
+    padding: 0 20px;
+    font-size: var(--font-size-small);
+  }
 }
 </style>
