@@ -114,7 +114,6 @@ public class AddressController {
    * Endpoint to update an existing address.
    * @param id the ID of the address to update.
    * @param address the updated address data as a DTO.
-   * @throws IllegalArgumentException if the address data is invalid or missing required fields.
    * @return {@code ResponseEntity} containing the updated address, or a 404 Not Found status if not found.
    */
   @Operation(
@@ -137,8 +136,8 @@ public class AddressController {
     try {
       AddressResponseDTO updatedAddress = addressService.updateAddress(id, address);
       return ResponseEntity.ok(updatedAddress);
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.badRequest().header("Error message", e.getMessage()).build();
+    } catch (RuntimeException e) {
+      return ResponseEntity.notFound().header("Error message", e.getMessage()).build();
     } catch (Exception e) {
       return ResponseEntity.badRequest().header("Error message", e.getMessage()).build();
     }
