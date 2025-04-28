@@ -7,7 +7,7 @@ interface Household {
     addressId: string
 }
 
-export const householdStore = defineStore('household', {
+export const useHouseholdStore = defineStore('household', {
     state: () => ({
         id: null as number | null,
         name: '',
@@ -28,5 +28,8 @@ export const householdStore = defineStore('household', {
             this.memberCount = 0;
             this.addressId = '';
         },
+        addMember() {
+            this.memberCount++;
+        }
     }
 })
