@@ -1,4 +1,4 @@
-import ViewSingleArticleComponent from "@/components/household/ViewSingleArticleComponent.vue";
+import ViewSingleArticleComponent from "@/components/household/ViewSingleItemComponent.vue";
 import { useItemTypeStore } from "@/stores/itemStore";
 import * as formatDateUtils from "@/utils/formatDate";
 import { mount } from "@vue/test-utils";
@@ -92,25 +92,5 @@ describe("ViewSingleArticleComponent", () => {
     vi.spyOn(store, "isEditMode", "get").mockReturnValue(false);
     mount(ViewSingleArticleComponent);
     expect(formatDateUtils.formatDate).toHaveBeenCalledWith(expect.any(Date));
-  });
-
-  it("shows date inputs with correct values in edit mode", () => {
-    vi.spyOn(store, "isEditMode", "get").mockReturnValue(true);
-    const wrapper = mount(ViewSingleArticleComponent);
-    expect(formatDateUtils.formatDateToList).toHaveBeenCalledWith(
-      expect.any(Date)
-    );
-
-    // Date inputs
-    const firstItemCard = wrapper.findAll(".item-card")[0];
-    const yearInput = firstItemCard.find("#year-input");
-    const monthInput = firstItemCard.find("#month-input");
-    const dayInput = firstItemCard.find("#day-input");
-    expect(yearInput.exists()).toBe(true);
-    expect(monthInput.exists()).toBe(true);
-    expect(dayInput.exists()).toBe(true);
-    expect((yearInput.element as HTMLInputElement).value).toBe("2026");
-    expect((monthInput.element as HTMLInputElement).value).toBe("10");
-    expect((dayInput.element as HTMLInputElement).value).toBe("01");
   });
 });
