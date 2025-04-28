@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import NewItemComponent from '@/components/household/NewItemComponent.vue';
+import ViewMembersComponent from '@/components/household/ViewMembersComponent.vue';
 import ViewSingleItemComponent from '@/components/household/ViewSingleItemComponent.vue';
 import ViewSuppliesComponent from '@/components/household/ViewSuppliesComponent.vue';
 import { ref } from 'vue';
@@ -14,14 +15,21 @@ const toggleNewItemBox = () => {
 
 <template>
   	<div class="page-container">
-    	<div class="column">
-      		<ViewSuppliesComponent @show-new-item-box="toggleNewItemBox" @hide-new-item-box="isBoxVisible = false" />
-    	</div>
-    	<div class="column">
-      		<ViewSingleItemComponent />
-    	</div>
-		<div class="new-item-box">
-			<NewItemComponent v-if="isBoxVisible" @hide-new-item-box="toggleNewItemBox"/>
+		<h1>Min husstand</h1>
+		<div class="members-container">
+			<ViewMembersComponent />
+	  	</div>
+
+		<div class="items-container">
+			<div class="items-column">
+				<ViewSuppliesComponent @show-new-item-box="toggleNewItemBox" @hide-new-item-box="isBoxVisible = false" />
+			</div>
+			<div class="items-column">
+				<ViewSingleItemComponent />
+			</div>
+			<div class="new-item-box">
+				<NewItemComponent v-if="isBoxVisible" @hide-new-item-box="toggleNewItemBox"/>
+			</div>
 		</div>
   	</div>
 </template>
@@ -29,18 +37,22 @@ const toggleNewItemBox = () => {
 <style scoped>
 	.page-container {
 		display: flex;
+		flex-direction: column;
+		gap: 2rem;
+		padding: 1rem;
+	}
+	.items-container {
+		display: flex;
 		flex-direction: row;
 		gap: 2rem;
 		padding: 1rem;
 	}
-	.column {
+	.items-column {
 		display: flex;
   		flex-direction: column;
   		gap: 1rem;
 	}
 	.new-item-box {
-		position: absolute;
-		bottom: 24.5rem;
-		right: 8.5rem;
+		margin-top: 4.75rem;
 	}
 </style>
