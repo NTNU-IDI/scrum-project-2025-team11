@@ -93,27 +93,4 @@ describe("ViewSingleItemComponent", () => {
     mount(ViewSingleItemComponent);
     expect(formatDateUtils.formatDate).toHaveBeenCalledWith(expect.any(Date));
   });
-<<<<<<< HEAD:frontend/src/components/__tests__/ViewSingleArticleComponent.spec.ts
-=======
-
-  it("shows date inputs with correct values in edit mode", () => {
-    vi.spyOn(store, "isEditMode", "get").mockReturnValue(true);
-    const wrapper = mount(ViewSingleItemComponent);
-    expect(formatDateUtils.formatDateToList).toHaveBeenCalledWith(
-      expect.any(Date)
-    );
-
-    // Date inputs
-    const firstItemCard = wrapper.findAll(".item-card")[0];
-    const yearInput = firstItemCard.find("#year-input");
-    const monthInput = firstItemCard.find("#month-input");
-    const dayInput = firstItemCard.find("#day-input");
-    expect(yearInput.exists()).toBe(true);
-    expect(monthInput.exists()).toBe(true);
-    expect(dayInput.exists()).toBe(true);
-    expect((yearInput.element as HTMLInputElement).value).toBe("2026");
-    expect((monthInput.element as HTMLInputElement).value).toBe("10");
-    expect((dayInput.element as HTMLInputElement).value).toBe("01");
-  });
->>>>>>> 6fb2c01cf406bfc83fbebfebd10fdebe13474b52:frontend/src/components/__tests__/ViewSingleItemComponent.spec.ts
 });
