@@ -1,42 +1,43 @@
 <template>
-<div class="flex flex-col min-h-screen">
-    <Header />
+<div class="home">
+  <Header />
 
-    <main class="flex-1 px-8 py-6 bg-white">
-      <div class="info-header">
-        <h1 class="text-4xl font-bold mb-4">Velkommen til Krisefikseren!</h1>
-        <p class="text-3xl font-bold mb-2">Nedenfor finner du en oversikt over de ulikene tjenestene vi kan tilby.</p>
-      </div>
+  <main class="main-content">
+    <div class="info-header">
+      <h1>Velkommen til Krisefikseren!</h1>
+      <p>Nedenfor finner du en oversikt over de ulike tjenestene vi kan tilby.</p>
+    </div>
 
-      <div class="grid-container">
-        <router-link to="/map" class="box">
-          <h3 class="text-xl font-semibold mb-2">Finn tilfluktsrom</h3>
-          <p>Se oversikt over tilfluktsrom i nærheten.</p>
-        </router-link>
-        
-        <router-link to="/beredskap" class="box">
-          <h3 class="text-xl font-semibold mb-2">Beredskapsråd</h3>
-          <p>Lær hvordan du forbereder deg på kriser.</p>
-        </router-link>
+    <div class="grid-container">
+      <router-link to="/map" class="box">
+        <h3>Finn tilfluktsrom</h3>
+        <p>Se oversikt over tilfluktsrom i nærheten.</p>
+      </router-link>
 
-        <router-link to="/nyheter" class="box">
-          <h3 class="text-xl font-semibold mb-2">Nyheter</h3>
-          <p>Hold deg oppdatert på relevante hendelser.</p>
-        </router-link>
+      <router-link to="/beredskap" class="box">
+        <h3>Beredskapsråd</h3>
+        <p>Lær hvordan du forbereder deg på kriser.</p>
+      </router-link>
 
-        <router-link to="/kart" class="box">
-          <h3 class="text-xl font-semibold mb-2">Tjenestekart</h3>
-          <p>Se hvor du finner hjelp i ditt område.</p>
-        </router-link>
+      <router-link to="/nyheter" class="box">
+        <h3>Nyheter</h3>
+        <p>Hold deg oppdatert på relevante hendelser.</p>
+      </router-link>
 
-        <router-link to="/kontakt" class="box">
-          <h3 class="text-xl font-semibold mb-2">Kontakt</h3>
-          <p>Kom i kontakt med driverne av nettstedet.</p>
-        </router-link>
-      </div>
-    </main>
-    <Footer />
-  </div>
+      <router-link to="/kart" class="box">
+        <h3>Tjenestekart</h3>
+        <p>Se hvor du finner hjelp i ditt område.</p>
+      </router-link>
+
+      <router-link to="/kontakt" class="box">
+        <h3>Kontakt</h3>
+        <p>Kom i kontakt med driverne av nettstedet.</p>
+      </router-link>
+    </div>
+  </main>
+
+  <Footer />
+</div>
 </template>
 
 <script lang="ts" setup>
@@ -44,27 +45,39 @@ import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 </script>
 
-
 <style scoped>
+.home {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: white;
+}
+
+.main-content {
+  flex: 1;
+  padding: 48px 32px;
+  background-color: white;
+}
+
 .info-header {
   background-color: #ffffff;
   color: var(--darkest-blue);
   padding: 24px;
   border-radius: 8px;
   margin: 40px 125px;
-  
+  text-align: center;
 }
+
 .info-header h1 {
-  margin: 0;
+  margin: 0 0 16px 0;
   font-size: 2.5rem;
+  font-weight: bold;
 }
-.info-header h2 {
-  margin: 0;
-  font-size: 2rem;
-}
+
 .info-header p {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
+  font-weight: 500;
 }
 
 .grid-container {
@@ -79,7 +92,7 @@ import Footer from '@/components/Footer.vue'
 
 .box {
   background-color: var(--light-blue);
-  border-color: var(--light-blue);
+  border: 2px solid var(--light-blue);
   color: white;
   padding: 24px;
   border-radius: 8px;
@@ -87,11 +100,13 @@ import Footer from '@/components/Footer.vue'
   box-shadow: 0 4px 6px rgba(0.5, 0, 0, 0.5);
   text-decoration: none;
   display: block;
+  text-align: center;
 }
 
 .box h3 {
-  margin: 0;
+  margin: 0 0 8px 0;
   font-size: 1.5rem;
+  font-weight: bold;
 }
 
 .box p {
@@ -105,5 +120,3 @@ import Footer from '@/components/Footer.vue'
   cursor: pointer;
 }
 </style>
-
-
