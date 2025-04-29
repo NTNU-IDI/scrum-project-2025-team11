@@ -37,9 +37,9 @@ watch(postalCode, (newPostalCode) => {
   newPostalCode = newPostalCode.replace(/[^0-9]/g, '')
 
   if (newPostalCode.length === 4) {
-    errorMessage.value = '';
+    //errorMessage.value = '';
   } else {
-    errorMessage.value = 'Postkoden må bestå av fire sifre.';
+    //errorMessage.value = 'Postkoden må bestå av fire sifre.';
   }
 })
 
@@ -62,16 +62,17 @@ onMounted(() => {
         <input type="password" placeholder="Passord" required>
         <input type="password" placeholder="Gjenta passord" required>
       </div>
-      <label><input type="radio" v-model="householdChoice" value="new" @change="handleHouseholdChoice"> Ny husstand </label>
-      <input type="text" id="iptHouseholdCode" v-if="hasChosenNewHousehold" placeholder="Husstandsskode" required><br>
-      <label><input type="radio" v-model="householdChoice" value="existing" @change="handleHouseholdChoice"> Eksisterende husstand</label> <br>
-      <div id="divPlaceInfo" v-if="!hasChosenNewHousehold">
+      <label><input type="radio" v-model="householdChoice" value="new" @change="handleHouseholdChoice"> Ny husstand</label> <br>
+      <div id="divPlaceInfo" v-if="hasChosenNewHousehold">
         <input type="text" placeholder="Adresse" required>
         <input type="text" placeholder="Postkode" v-model="postalCode" required>
       </div>
-      <p id="error">{{errorMessage}}</p>
-      <br>
+      <label><input type="radio" v-model="householdChoice" value="existing" @change="handleHouseholdChoice"> Eksisterende husstand </label>
+      <input type="text" id="iptHouseholdCode" v-if="!hasChosenNewHousehold" placeholder="Husstandsskode" required><br><br>
+      <label><input type="checkbox" required>
+        Jeg godtar og har lest <a href="/personvern" target="_blank" class="link"> personvernerklæringen</a> </label> <br>
       <button class="good-button" type="submit"> Registrer </button>
+      <p id="error">{{errorMessage}}</p>
     </form>
     <p class="register-login-text">
       Har du allerede en bruker? <a href="/login" class="link">Logg inn her</a>
@@ -87,7 +88,11 @@ onMounted(() => {
   grid-template-rows: repeat(8, auto);
 }
 
-input[type="radio"] {
+input[type="radio"], input[type="checkbox"]{
+  width: auto;
+}
+
+label {
   width: auto;
 }
 
