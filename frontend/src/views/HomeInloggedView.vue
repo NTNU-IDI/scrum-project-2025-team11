@@ -22,28 +22,28 @@
           <div class="info-header">
             <h1 class="text-4xl font-bold mb-4">Andre tjenester</h1>
           </div>
-          <div class="grid-container">
-        <div>
-          <h3 class="text-xl font-semibold mb-2">Finn tilfluktsrom</h3>
-          <p>Se oversikt over tilfluktsrom i nærheten.</p>
-        </div>
-        <div>
-          <h3 class="text-xl font-semibold mb-2">Beredskapsråd</h3>
-          <p>Lær hvordan du forbereder deg på kriser.</p>
-        </div>
-        <div>
-          <h3 class="text-xl font-semibold mb-2">Nyheter</h3>
-          <p>Hold deg oppdatert på relevante hendelser.</p>
-        </div>
-        <div>
-          <h3 class="text-xl font-semibold mb-2">Tjenestekart</h3>
-          <p>Se hvor du finner hjelp i ditt område.</p>
-        </div>
-        <div>
-          <h3 class="text-xl font-semibold mb-2">Kontakt</h3>
-          <p>Kom i kontakt med driverne av nettstedet.</p>
-        </div>
-      </div>
+            <div class="grid-container">
+                <div>
+                    <h3 class="text-xl font-semibold mb-2">Finn tilfluktsrom</h3>
+                    <p>Se oversikt over tilfluktsrom i nærheten.</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-2">Beredskapsråd</h3>
+                    <p>Lær hvordan du forbereder deg på kriser.</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-2">Nyheter</h3>
+                    <p>Hold deg oppdatert på relevante hendelser.</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-2">Tjenestekart</h3>
+                    <p>Se hvor du finner hjelp i ditt område.</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-2">Kontakt</h3>
+                    <p>Kom i kontakt med driverne av nettstedet.</p>
+                </div>
+            </div>
         </main>
         <Footer />
       </div>

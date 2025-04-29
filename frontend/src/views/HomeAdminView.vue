@@ -5,14 +5,14 @@
         <main class="flex-1 px-8 py-6 bg-white">
           <div class="info-header">
             <h1 class="text-4xl font-bold mb-4">Administrasjon av krisefikseren.no</h1>
-            <p class="text-3xl font-bold mb-2">Husk at du gjennom dette grensesnittet har tilgang til krtiske opplysninger.</p>
+            <p class="text-3xl font-bold mb-2">Husk at du gjennom dette grensesnittet har tilgang til kritiske opplysninger.</p>
             <p class="text-3xl font-bold mb-2">Vennligst ta ansvaret som følger med det.</p>
           </div>
     
           <div class="grid-container">
             <div>
               <h3 class="text-xl font-semibold mb-2">Krisehendelser</h3>
-                <p>Her kan du adminsitrere opplysninger om hendelsene</p>
+                <p>Her kan du adminsitrere opplysninger om hendelsene.</p>
             </div>
             <div>
               <h3 class="text-xl font-semibold mb-2">Kartopplysninger</h3>
