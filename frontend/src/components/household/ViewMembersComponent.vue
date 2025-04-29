@@ -114,6 +114,7 @@ const changeMemberCount = () => {
         height: 3.5rem;
         width: 9rem;
         margin: 1rem;
+        background-color: var(--light-blue);
     }
 
     .dark-button:disabled {
@@ -122,6 +123,6 @@ const changeMemberCount = () => {
     }
 
     #invite-button {
-        background-color: var(--orange);
+        background-color: var(--dark-blue);
     }
 </style>
