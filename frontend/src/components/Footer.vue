@@ -7,7 +7,9 @@
     <!-- Her er to lenker til om oss og personvern rett under andre tjenester i mindre skrift-->
     <p class="text-sm">
         <a href="/about" class="text-white hover:text-gray-300">Om oss</a> |
-        <a href="/privacy" class="text-white hover:text-gray-300">Personvern</a>
+        <a href="/privacy" class="text-white hover:text-gray-300">Personvern</a> |
+        <a href="/userhome" class="text-white hover:text-gray-300">User home</a> |
+        <a href="/admin" class="text-white hover:text-gray-300">Admin</a> |
         <br>
         <br>
         <br>
@@ -20,7 +22,20 @@
 export default {
     name: 'Footer'
 }
+/* Link to userhome and admin is added to footer  for testing purposes. */
+import { useRouter } from 'vue-router'
+const router = useRouter()
+const goToHome = () => {
+  router.push('/')
+}
+const goToUserHome = () => {
+  router.push('/userhome')
+}
+const goToAdmin = () => {
+  router.push('/admin')
+}
 </script>
+
 
 <style scoped>
 /* Definerer bakrgunnen til footeren */

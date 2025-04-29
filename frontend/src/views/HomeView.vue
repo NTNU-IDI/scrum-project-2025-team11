@@ -26,12 +26,8 @@
           <p>Se hvor du finner hjelp i ditt område.</p>
         </div>
         <div>
-          <h3 class="text-xl font-semibold mb-2">Varslingssystem</h3>
-          <p>Få varsler ved kritiske hendelser i nærheten.</p>
-        </div>
-        <div>
           <h3 class="text-xl font-semibold mb-2">Kontakt</h3>
-          <p>Kom i kontakt med vår beredskapsgruppe.</p>
+          <p>Kom i kontakt med driverne av nettstedet.</p>
         </div>
       </div>
     </main>
@@ -42,6 +38,14 @@
 <script lang="ts" setup>
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
+import { useRouter } from 'vue-router'
+const router = useRouter()
+const goToHome = () => {
+  router.push('/')
+}
+const goToLogin = () => {
+  router.push('/login')
+}
 </script>
 
 
