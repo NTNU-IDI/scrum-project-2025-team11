@@ -2,9 +2,9 @@
 <header class="bg-[#1b263b] text-white p-4">
     <div class="container mx-auto flex justify-between items-center">
       <div class="flex items-center space-x-4">
-      <a href="/" class="button other">// Sett inn logo</a>
-
-    </div>
+        <img src="../assets/invertednew.png" alt="Logo" class="h-12 w-12" @click="goToHome" style="width: 100px; height: auto;" />
+        <a href="/" class="button other">Hjem</a>
+      </div>
       <nav class="space-x-4">
         <a href="/login" class="button login">Logg inn</a>
       </nav>
