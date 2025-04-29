@@ -1,31 +1,23 @@
 <template>
-<footer class="p-4 bg-[var(--light-blue)] text-white">
-    <!-- Her er footeren -->
-    <br>
-    <h1 class="text-l font-bold mb-2">Andre tjenester</h1>
+  <footer class="footer">
+    <div class="footer-content">
+      <h1>Andre tjenester</h1>
 
-    <!-- Her er to lenker til om oss og personvern rett under andre tjenester i mindre skrift-->
-    <p class="text-sm">
-        <a href="/about" class="text-white hover:text-gray-300">Om oss</a> |
-        <a href="/privacy" class="text-white hover:text-gray-300">Personvern</a> |
-        <a href="/userhome" class="text-white hover:text-gray-300">User home</a> |
-        <a href="/admin" class="text-white hover:text-gray-300">Admin</a> |
-        <button @click="openPDF" class="text-white hover:text-gray-300">Personvernsærklering</button>
-        <br>
-        <br>
-        <br>
-    </p>
-
+      <div class="footer-links">
+        <a href="/about">Om oss</a> |
+        <a href="/privacy">Personvern</a> |
+        <a href="/userhome">User home (for testing)</a> |
+        <a href="/admin">Admin (for testing)</a> |
+        <button @click="openPDF" class="link-button">Personvernerklæring</button>
+      </div>
+    </div>
   </footer>
 </template>
 
-<script>
-export default {
-    name: 'Footer'
-}
-/* Link to userhome and admin is added to footer  for testing purposes. */
+<script lang="ts" setup>
 import { useRouter } from 'vue-router'
 const router = useRouter()
+
 const goToHome = () => {
   router.push('/')
 }
@@ -36,30 +28,67 @@ const goToAdmin = () => {
   router.push('/admin')
 }
 const openPDF = () => {
-  window.open('/path/to/your-file.pdf', '_blank');
+  window.open('../assets/privacy_page.pdf', '_blank')
 }
-
 </script>
 
-
 <style scoped>
-/* Definerer bakrgunnen til footeren */
-footer {
-  background-color: #0d1b2a;
+.footer {
+  background-color: var(--darkest-blue);
+  color: white;
+  padding: 20px;
+}
+
+/** The footer title  h1*/
+.footer h1 {
+  font-size: 32px;
+  font-weight: bold;
+  text-align: left;
+  margin-bottom: 12px;
   color: white;
 }
-/* Definerer fargen på overskriften i footeren og flytter den til venstre*/
-footer h1 {
-  color: #ffffff;
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-content h1 {
+  font-size: 20px;
+  font-weight: bold;
   text-align: left;
-  margin-left: 20px;
+  margin-bottom: 12px;
 }
-/* Definerer fargen på lenkene i footeren og flytter dem til venstre*/
-footer a {
-  color: #ffffff;
+
+.footer-links {
+  font-size: 14px;
+  text-align: left;
+  margin-top: 8px;
+}
+
+.footer-links a {
+  color: white;
   text-decoration: none;
-  margin-left: 20px;
+  margin-right: 12px;
+  transition: color 0.3s ease;
 }
 
+.footer-links a:hover {
+  color: #d1d5db;
+}
 
+.link-button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 12px;
+  transition: color 0.3s ease;
+  padding: 0;
+}
+
+.link-button:hover {
+  color: #d1d5db;
+}
 </style>
