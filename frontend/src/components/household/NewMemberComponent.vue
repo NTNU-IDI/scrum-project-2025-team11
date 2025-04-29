@@ -76,7 +76,7 @@ const sendInvitationLink = () => {
     }
 
     #invite-button {
-        background-color: var(--light-blue);
+        background-color: var(--orange);
         width: auto;
     }
 
