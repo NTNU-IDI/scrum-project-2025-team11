@@ -108,4 +108,13 @@ public class InventoryServiceImpl implements InventoryService {
         }
         hiRepo.deleteById(id);
     }
+
+    @Override
+    public void removeAll(Integer householdId, Integer itemId) {
+        var all = hiRepo.findByHouseholdIdAndItemId(householdId, itemId);
+        if (all.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No purchases found");
+        }
+        hiRepo.deleteAll(all);
+}
 }

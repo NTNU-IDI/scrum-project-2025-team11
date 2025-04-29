@@ -13,4 +13,5 @@ public interface InventoryService {
     HouseholdItemResponse add(Integer householdId, HouseholdItemRequest req);
     HouseholdItemResponse update(Integer householdId, Integer itemId, HouseholdItemRequest req);
     void remove(Integer householdId, Integer itemId, LocalDate acquiredDate);
+    void removeAll(Integer householdId, Integer itemId);
 }

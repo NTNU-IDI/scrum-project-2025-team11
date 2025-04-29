@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
@@ -33,7 +34,9 @@ public class InventoryController {
         @ApiResponse(responseCode = "200", description = "Successfully retrieved list of items")
     })
     public List<HouseholdItemResponse> list(
-        @PathVariable Integer hhId
+        @PathVariable Integer hhId,
+        @Parameter(description = "ID of the item to filter by", required = false)
+        @RequestParam(required = false) Integer itemId
     ) {
         return service.list(hhId);
     }
@@ -78,13 +81,33 @@ public class InventoryController {
         return service.update(hhId, itemId, req);
     }
 
+    /**  
+     * Delete *all* purchase‐entries for this item  
+     */
+    @DeleteMapping("/{itemId}")
+    @Operation(summary = "Remove *all* purchases of an item")
+    @ApiResponses({
+      @ApiResponse(responseCode = "204", description = "All purchases removed"),
+      @ApiResponse(responseCode = "404", description = "No purchases found for that item")
+    })
+    public ResponseEntity<Void> removeAll(
+        @PathVariable Integer hhId,
+        @PathVariable Integer itemId
+    ) {
+        service.removeAll(hhId, itemId);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**  
+     * Delete one specific purchase (by date)  
+     */
     @DeleteMapping("/{itemId}/{acquiredDate}")
     @Operation(summary = "Remove a specific purchase of an item")
     @ApiResponses({
-        @ApiResponse(responseCode = "204", description = "Item successfully removed"),
-        @ApiResponse(responseCode = "404", description = "Inventory entry not found")
+      @ApiResponse(responseCode = "204", description = "Purchase removed"),
+      @ApiResponse(responseCode = "404", description = "Inventory entry not found")
     })
-    public ResponseEntity<Void> remove(
+    public ResponseEntity<Void> removeOne(
         @PathVariable Integer hhId,
         @PathVariable Integer itemId,
         @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate acquiredDate

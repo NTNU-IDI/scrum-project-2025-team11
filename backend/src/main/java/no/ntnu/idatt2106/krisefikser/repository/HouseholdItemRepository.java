@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface HouseholdItemRepository extends JpaRepository<HouseholdItem, HouseholdItemId> {
     List<HouseholdItem> findByHouseholdId(Integer householdId);
+    List<HouseholdItem> findByHouseholdIdAndItemId(Integer householdId, Integer itemId);
 }
