@@ -22,8 +22,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
-import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
-import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
 import no.ntnu.idatt2106.krisefikser.model.Address;
 import no.ntnu.idatt2106.krisefikser.service.AddressService;
 
@@ -53,8 +51,8 @@ public class AddressController {
     @ApiResponse(responseCode = "204", description = "No addresses found")
   })
   @GetMapping
-  public ResponseEntity<List<Address>> getAllAddresses() {
-    List<Address> addresses = addressService.findAll();
+  public ResponseEntity<List<AddressResponseDTO>> getAllAddresses() {
+    List<AddressResponseDTO> addresses = addressService.findAllAddresses();
     if (addresses.isEmpty()) {
       return ResponseEntity.noContent().build();
     } else {
@@ -115,7 +113,7 @@ public class AddressController {
   /**
    * Endpoint to update an existing address.
    * @param id the ID of the address to update.
-   * @param address the updated address information.
+   * @param address the updated address data as a DTO.
    * @return {@code ResponseEntity} containing the updated address, or a 404 Not Found status if not found.
    */
   @Operation(
@@ -130,16 +128,19 @@ public class AddressController {
     @ApiResponse(responseCode = "400", description = "Invalid address data, for example, missing required fields")
   })
   @PutMapping("/{id}")
-  public ResponseEntity<Address> updateAddress(
+  public ResponseEntity<AddressResponseDTO> updateAddress(
     @Parameter (description = "ID of the address to update", example = "1", required = true)
     @PathVariable int id, 
     @Parameter (description = "Updated address object", required = true)
-    @RequestBody Address address) {
-    if (!addressService.existsById(id)) {
-      return ResponseEntity.notFound().build();
+    @RequestBody AddressRequestDTO address) {
+    try {
+      AddressResponseDTO updatedAddress = addressService.updateAddress(id, address);
+      return ResponseEntity.ok(updatedAddress);
+    } catch (RuntimeException e) {
+      return ResponseEntity.notFound().header("Error message", e.getMessage()).build();
+    } catch (Exception e) {
+      return ResponseEntity.badRequest().header("Error message", e.getMessage()).build();
     }
-    Address updatedAddress = addressService.updateAddress(id, address);
-    return ResponseEntity.ok(updatedAddress);
   }
 
   /**
@@ -159,10 +160,13 @@ public class AddressController {
   public ResponseEntity<Void> deleteAddress(
     @Parameter (description = "ID of the address to delete", example = "1", required = true)
     @PathVariable int id) {
-    if (!addressService.existsById(id)) {
-      return ResponseEntity.notFound().build();
+    try {
+      addressService.deleteById(id);
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.notFound().header("Error message", e.getMessage()).build();
+    } catch (Exception e) {
+      return ResponseEntity.notFound().header("Error message", e.getMessage()).build();
     }
-    addressService.deleteById(id);
     return ResponseEntity.noContent().build();
   }
   

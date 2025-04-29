@@ -1,10 +1,15 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
 import { validateFirstName, validateLastName } from '@/utils/validationService';
+import { useHouseholdStore } from '@/stores/householdStore';    
+
+const householdStore = useHouseholdStore();
 
 const newFirstName = ref('');
 const newLastName = ref('');
 const errorMsg = ref('');
+
+const emit = defineEmits(['hide-new-member-box']);
 
 const addMember = () => {
     if(!validateFirstName(newFirstName.value)) {
@@ -20,6 +25,10 @@ const addMember = () => {
         return;
     }
 
+    householdStore.addMember()
+
+
+    emit('hide-new-member-box');
     // TODO: add item to list
     // TODO: hide component
 }
@@ -35,10 +44,9 @@ const sendInvitationLink = () => {
 </script>
 <template>
     <div class="grey-container">
-
         <div class="header-container">
             <h1 class="medium-header">Nytt medlem</h1>
-            <button class="cancel-button" @click="cancel, $emit('hide-new-member-box')">X</button> 
+            <button class="cancel-button" @click="() => { cancel(); $emit('hide-new-member-box'); }">X</button> 
         </div>
 
         <div class="member-input">
@@ -47,7 +55,7 @@ const sendInvitationLink = () => {
         </div>
 
         <div class="button-container">
-            <button class="dark-button" @click="addMember, $emit('hide-new-member-box')">Legg til</button>
+            <button class="dark-button" @click="addMember">Legg til</button>
         </div>
 
         <p>Eller</p>
