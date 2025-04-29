@@ -3,15 +3,13 @@
     <div class="header-container">
       <div class="header-icons">
         <img src="../assets/invertednew.png" alt="Logo" class="logo" @click="goToHome" />
-
-        <img src="../assets/ikon/house-line-fill.png" alt="Home" class="icon" @click="goToHome" />
-
         <img src="../assets/ikon/map-trifold-fill.png" alt="Map" class="icon" @click="goToMap" />
 
         <img src="../assets/ikon/lightbulb-fill.png" alt="Information" class="icon" @click="goToInformation" />
       </div>
 
       <nav class="nav-buttons">
+        
         <a href="/login" class="button login">Logg inn</a>
       </nav>
     </div>
@@ -69,6 +67,10 @@ const goToInformation = () => {
   height: 55px;
   width: 55px;
   cursor: pointer;
+}
+
+.icon:hover {
+  transform: scale(1.1);
 }
 
 /* --- Navigasjonsknapper --- */

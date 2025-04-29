@@ -3,13 +3,15 @@
     <div class="header-container">
       <div class="header-left">
         <img src="../assets/invertednew.png" alt="Logo" class="logo" @click="goToHome" />
-        <a href="/" class="button other">Hjem</a>
       </div>
 
-      <nav class="nav-buttons">
-        <img src="../assets/ikon/lightbulb-fill.png" alt="Information" class="icon" @click="goToInformation" />
-        <a href="/" class="button login">Logg ut</a>
-      </nav>
+      <div class="header-right">
+        <img src="../assets/ikon/house-line-fill.png" alt="Home" class="icon" @click="goToHousehold" />
+        <img src="../assets/ikon/list-plus-fill.png" alt="Home" class="icon" @click="goToStorage" />
+
+
+        <a href="/" class="button login" @click.prevent="goToLogout">Logg ut</a>
+      </div>
     </div>
   </header>
 </template>
@@ -23,13 +25,15 @@ const goToHome = () => {
 const goToLogout = () => {
   router.push('/')
 }
-const goToInformation = () => {
-  router.push('/information')
+const goToStorage = () => {
+  router.push('/storage')
+}
+const goToHousehold = () => {
+  router.push('/household')
 }
 </script>
 
 <style scoped>
-/* --- Header styling --- */
 .header {
   background-color: #1b263b;
   color: white;
@@ -44,11 +48,16 @@ const goToInformation = () => {
   align-items: center;
 }
 
-/* --- Venstre del: logo + "Hjem" --- */
 .header-left {
   display: flex;
   align-items: center;
-  gap: 32px; /* tidligere space-x-4, nå tydeligere kontrollert */
+  gap: 32px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 32px;
 }
 
 .logo {
@@ -57,13 +66,17 @@ const goToInformation = () => {
   cursor: pointer;
 }
 
-/* --- Navigasjonsknapper --- */
-.nav-buttons {
-  display: flex;
-  gap: 32px; /* tilsvarer tidligere space-x-4 */
+.icon {
+  height: 55px;
+  width: 55px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
 }
 
-/* --- Felles knappestil --- */
+.icon:hover {
+  transform: scale(1.1);
+}
+
 .button {
   display: inline-block;
   padding: 10px 20px;
@@ -75,12 +88,11 @@ const goToInformation = () => {
   transition: all 0.4s ease;
   text-decoration: none;
   font-weight: 500;
-  margin: 10px 10px; /* justert litt ned for bedre sentrering */
+  margin: 10px 10px;
   background-color: var(--light-blue);
   color: #ffffff;
 }
 
-/* --- Logout-knapp (rød variant) --- */
 .button.login {
   background-color: var(--bad-red);
   border-color: var(--bad-red);
@@ -93,7 +105,6 @@ const goToInformation = () => {
   color: var(--bad-red);
 }
 
-/* --- Other-knapp (f.eks. "Hjem") --- */
 .button.other {
   background-color: var(--light-blue);
   border-color: var(--light-blue);
