@@ -57,6 +57,11 @@ const toggleNewMemberBox = () => {
 		font-size: var(--font-size-xxlarge);
 		font-weight: normal;
 	}
+
+	.new-member-box { 
+        align-self: center;
+	}
+
 	.items-container {
 		display: flex;
 		flex-direction: row;

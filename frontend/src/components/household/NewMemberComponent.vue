@@ -1,64 +1,42 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
-import { validateFirstName, validateLastName } from '@/utils/validationService';
+import { validateEmail } from '@/utils/validationService';
 import { useHouseholdStore } from '@/stores/householdStore';    
 
 const householdStore = useHouseholdStore();
 
-const newFirstName = ref('');
-const newLastName = ref('');
+const email = ref('');
 const errorMsg = ref('');
 
 const emit = defineEmits(['hide-new-member-box']);
 
-const addMember = () => {
-    if(!validateFirstName(newFirstName.value)) {
-        errorMsg.value = 'Vennligst skriv inn et gyldig fornavn';
-        console.log(errorMsg.value);
-        alert(errorMsg.value);
-        return;
-    }
-    if(!validateLastName(newLastName.value)) {
-        errorMsg.value = 'Vennligst skriv inn et gyldig etternavn';
-        console.log(errorMsg.value);
-        alert(errorMsg.value);
-        return;
-    }
-
-    householdStore.addMember()
-
-
-    emit('hide-new-member-box');
-    // TODO: add item to list
-    // TODO: hide component
-}
-
-const cancel = () => {
-    // TODO: hide component
-}
-
 const sendInvitationLink = () => {
     // TODO: send invitation link
+
+    // TODO: make email validation
+    
+    if(!validateEmail(email.value)) {
+        errorMsg.value = 'Vennligst skriv inn en gyldig e-postadresse';
+        console.log(errorMsg.value);
+        alert(errorMsg.value);
+        return;
+    }
+    
+
+    emit('hide-new-member-box');
 }
 
 </script>
 <template>
     <div class="grey-container">
         <div class="header-container">
-            <h1 class="medium-header">Nytt medlem</h1>
-            <button class="cancel-button" @click="() => { cancel(); $emit('hide-new-member-box'); }">X</button> 
+            <h1 class="medium-header">Inviter nytt medlem</h1>
+            <button class="cancel-button" @click="$emit('hide-new-member-box')">X</button> 
         </div>
 
         <div class="member-input">
-            <input type="text" class="edit-input" placeholder="Fornavn" v-model="newFirstName" />
-            <input type="text" class="edit-input" placeholder="Etternavn" v-model="newLastName" />
+            <input type="text" class="edit-input" placeholder="E-mail" v-model="email" />
         </div>
-
-        <div class="button-container">
-            <button class="dark-button" @click="addMember">Legg til</button>
-        </div>
-
-        <p>Eller</p>
 
         <div class="button-container">
             <button class="dark-button" id="invite-button" @click="sendInvitationLink">Send invitasjonslink</button>
@@ -68,7 +46,7 @@ const sendInvitationLink = () => {
 <style scoped>
     .grey-container {
         width: 20rem;
-        height: 22rem;
+        height: 12rem;
     }
 
     .header-container {
