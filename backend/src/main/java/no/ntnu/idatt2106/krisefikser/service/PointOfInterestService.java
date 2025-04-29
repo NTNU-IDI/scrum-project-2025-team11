@@ -3,7 +3,6 @@ package no.ntnu.idatt2106.krisefikser.service;
 import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.dto.PointOfInterestRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.PointOfInterestResponseDTO;
-import no.ntnu.idatt2106.krisefikser.mapper.HouseholdMapper;
 import no.ntnu.idatt2106.krisefikser.mapper.PointOfInterestMapper;
 import no.ntnu.idatt2106.krisefikser.model.Enums;
 import no.ntnu.idatt2106.krisefikser.model.PointOfInterest;
@@ -91,6 +90,28 @@ public class PointOfInterestService {
                 .stream()
                 .map(PointOfInterestMapper::toResponseDTO)
                 .toList();
+    }
+
+    public PointOfInterestResponseDTO updatePointOfInterest(int id, PointOfInterestRequestDTO requestDto) {
+        PointOfInterest currentPointOfInterest = pointOfInterestRepository.findById(id).orElseThrow(() -> new RuntimeException("Point of interest id not found"));
+        if (requestDto.getName() != null) {
+            currentPointOfInterest.setName(requestDto.getName());
+        }
+        if (requestDto.getIconType() != null) {
+            currentPointOfInterest.setIconType(requestDto.getIconType());
+        }
+        if (requestDto.getDescription() != null) {
+            currentPointOfInterest.setDescription(requestDto.getDescription());
+        }
+        if (requestDto.getLatitude() != null) {
+            currentPointOfInterest.setLatitude(requestDto.getLatitude());
+        }
+        if (requestDto.getLongitude() != null) {
+            currentPointOfInterest.setLongitude(requestDto.getLongitude());
+        }
+    
+        PointOfInterest updatedPointOfInterest = pointOfInterestRepository.save(currentPointOfInterest);
+        return PointOfInterestMapper.toResponseDTO(updatedPointOfInterest);
     }
 
     /**

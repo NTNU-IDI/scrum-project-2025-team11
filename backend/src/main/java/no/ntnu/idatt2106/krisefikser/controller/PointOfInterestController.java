@@ -109,4 +109,14 @@ public class PointOfInterestController {
         pointOfInterestService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PointOfInterestResponseDTO> updatePointOfInterest(
+        @PathVariable int id, @RequestBody PointOfInterestRequestDTO updatedPoint) {
+        if (!pointOfInterestService.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        PointOfInterestResponseDTO pointOfInterestResponse = pointOfInterestService.updatePointOfInterest(id, updatedPoint);
+        return ResponseEntity.ok(pointOfInterestResponse);
+    }
 }
