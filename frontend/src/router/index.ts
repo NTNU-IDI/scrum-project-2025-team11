@@ -3,6 +3,7 @@ import LogInView from "@/views/LogInView.vue";
 import MapView from "@/views/MapView.vue";
 import RegisterView from "@/views/RegisterView.vue";
 import HouseholdView from '@/views/household/HouseholdView.vue'
+import PrivacyPolicyView from "@/views/PrivacyPolicyView.vue";
 import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
 
@@ -31,6 +32,11 @@ const routes: Array<RouteRecordRaw> = [
       path: '/household',
       name: 'Household',
       component: HouseholdView,
+  },
+  {
+    path: '/personvern',
+    name: 'PrivacyPolicy',
+    component: PrivacyPolicyView,
   },
 ];
 
