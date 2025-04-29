@@ -4,6 +4,7 @@
     <ul>
       <li><span class="icon star"></span> Tilfluktsrom</li>
       <li><span class="icon meetup"></span> Møteplass</li>
+      <li><span class="icon medical"></span> Medisinks hjelp</li>
       <li><span class="icon danger severe"></span> Alvorlig kriseberørt område</li>
       <li><span class="icon danger moderate"></span> Moderat kriseberørt område</li>
       <li><span class="icon danger mild"></span> Lett kriseberørt område</li>
@@ -51,6 +52,14 @@
   background: url('/yellow-star-fill-border.svg') no-repeat center center / contain;
 }
 
+.icon.meetup {
+  background: url('/lightest-blue-triangle-fill-border.svg') no-repeat center center / contain;
+}
+
+.icon.medical {
+  background: url('/bad-red-medical-fill-border.svg') no-repeat center center / contain;
+}
+
 .icon.danger {
   border-radius: 50%;
   width: 20px;
@@ -71,10 +80,6 @@
 .icon.danger.mild {
   background-color: var(--yellow-opacity);
   border: 1px solid var(--yellow);
-}
-
-.icon.meetup {
-  background: url('/lightest-blue-triangle-fill-border.svg') no-repeat center center / contain;
 }
 
 @media (max-width: 768px) {
