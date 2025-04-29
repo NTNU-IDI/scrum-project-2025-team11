@@ -9,26 +9,30 @@
       </div>
 
       <div class="grid-container">
-        <div>
+        <router-link to="/map" class="box">
           <h3 class="text-xl font-semibold mb-2">Finn tilfluktsrom</h3>
           <p>Se oversikt over tilfluktsrom i nærheten.</p>
-        </div>
-        <div>
+        </router-link>
+        
+        <router-link to="/beredskap" class="box">
           <h3 class="text-xl font-semibold mb-2">Beredskapsråd</h3>
           <p>Lær hvordan du forbereder deg på kriser.</p>
-        </div>
-        <div>
+        </router-link>
+
+        <router-link to="/nyheter" class="box">
           <h3 class="text-xl font-semibold mb-2">Nyheter</h3>
           <p>Hold deg oppdatert på relevante hendelser.</p>
-        </div>
-        <div>
+        </router-link>
+
+        <router-link to="/kart" class="box">
           <h3 class="text-xl font-semibold mb-2">Tjenestekart</h3>
           <p>Se hvor du finner hjelp i ditt område.</p>
-        </div>
-        <div>
+        </router-link>
+
+        <router-link to="/kontakt" class="box">
           <h3 class="text-xl font-semibold mb-2">Kontakt</h3>
           <p>Kom i kontakt med driverne av nettstedet.</p>
-        </div>
+        </router-link>
       </div>
     </main>
     <Footer />
@@ -38,14 +42,6 @@
 <script lang="ts" setup>
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
-import { useRouter } from 'vue-router'
-const router = useRouter()
-const goToHome = () => {
-  router.push('/')
-}
-const goToLogin = () => {
-  router.push('/login')
-}
 </script>
 
 
@@ -81,7 +77,7 @@ const goToLogin = () => {
   margin: 40px 100px;
 }
 
-.grid-container > div {
+.box {
   background-color: var(--light-blue);
   border-color: var(--light-blue);
   color: white;
@@ -89,24 +85,25 @@ const goToLogin = () => {
   border-radius: 8px;
   transition: background-color 0.4s ease;
   box-shadow: 0 4px 6px rgba(0.5, 0, 0, 0.5);
-  
+  text-decoration: none;
+  display: block;
 }
-.grid-container > div h3 {
+
+.box h3 {
   margin: 0;
   font-size: 1.5rem;
 }
-.grid-container > div p {
+
+.box p {
   margin: 0;
   font-size: 1rem;
 }
 
-.grid-container > div:hover {
+.box:hover {
   background-color: rgb(169, 184, 203);
-  border-color: var(--light-blue);
   color: var(--darkest-blue);
   cursor: pointer;
 }
-
 </style>
 
 
