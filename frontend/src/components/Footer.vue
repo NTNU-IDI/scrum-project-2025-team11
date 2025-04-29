@@ -10,6 +10,7 @@
         <a href="/privacy" class="text-white hover:text-gray-300">Personvern</a> |
         <a href="/userhome" class="text-white hover:text-gray-300">User home</a> |
         <a href="/admin" class="text-white hover:text-gray-300">Admin</a> |
+        <button @click="openPDF" class="text-white hover:text-gray-300">Personvernsærklering</button>
         <br>
         <br>
         <br>
@@ -34,6 +35,10 @@ const goToUserHome = () => {
 const goToAdmin = () => {
   router.push('/admin')
 }
+const openPDF = () => {
+  window.open('/path/to/your-file.pdf', '_blank');
+}
+
 </script>
 
 
