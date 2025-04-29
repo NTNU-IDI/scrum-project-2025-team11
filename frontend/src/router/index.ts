@@ -2,6 +2,9 @@ import HomeView from "@/views/HomeView.vue";
 import LogInView from "@/views/LogInView.vue";
 import MapView from "@/views/MapView.vue";
 import RegisterView from "@/views/RegisterView.vue";
+import UserHomeView from "@/views/HomeInloggedView.vue";
+import AdminView from "@/views/HomeAdminView.vue";
+
 import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
 
@@ -25,6 +28,16 @@ const routes: Array<RouteRecordRaw> = [
     path: "/map",
     name: "MapView",
     component: MapView,
+  },
+  {
+    path: "/userhome",
+    name: "UserHomeView",
+    component: UserHomeView,
+  },
+  {
+    path: "/admin",
+    name: "AdminHomeView",
+    component: AdminView,
   },
 ];
 
