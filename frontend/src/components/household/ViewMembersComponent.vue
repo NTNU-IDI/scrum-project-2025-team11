@@ -1,29 +1,16 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
 import { useUserStore } from '@/stores/userStore';
+import { useHouseholdStore } from '@/stores/householdStore';
+import { storeToRefs } from 'pinia';
 
 const userStore = useUserStore();
-// TODO: change store or get user by token
+// Remove later
+userStore.setUsername('Madde')
 
-const myName = ref('Madde');
-const householdMembers = ref([
-    { id: 1, name: 'Lars Larsen' },
-    { id: 2, name: 'Mamma Mammasen' },
-    { id: 3, name: 'Pappa Papapp' },
-    { id: 4, name: 'Søster Søster' },
-    { id: 5, name: 'Bror Bror' },
-    { id: 6, name: 'Bestemor Bestemor' },
-    { id: 7, name: 'Bestefar Bestefar' },
-    { id: 8, name: 'Onkel Onkel' },
-    { id: 9, name: 'Tante Tante' },
-    { id: 10, name: 'Fetter Fetter' },
-    { id: 11, name: 'Kusine Kusine' },
-    { id: 12, name: 'Sønn Sønn' },
-    { id: 13, name: 'Datter Datter' },
-    { id: 14, name: 'Barnebarn Barnebarn' },
-    { id: 15, name: 'Oldefar Oldefar' },
-    { id: 16, name: 'Oldemor Oldemor' },
-]);
+const useHousehold = useHouseholdStore();
+// Remove later
+useHousehold.setHousehold({id: 1, name: 'Familien Larsen', memberCount: 5, addressId: '1'});
 
 const addMember = () => {
     //TODO: add member to household
@@ -35,16 +22,14 @@ const addMember = () => {
         <div class="members-container">
             <div class="me-container">
                 <h1 class="medium-header">Deg</h1>
-                <div class="article-card">{{ myName }}</div>
+                <div class="article-card">
+                    <p>{{ userStore.username }}</p>
+                </div>
             </div>
 
             <div class="other-members-container">
-                <h1 class="medium-header">Andre medlemmer</h1>
-                <div class="other-members-cards">
-                    <div v-for="member in householdMembers" :key="member.id" class="article-card">
-                        <p>{{ member.name }}</p>
-                    </div>
-                </div>
+                <h1 class="medium-header">Antall medlemmer</h1>
+                <p>{{ useHousehold.memberCount }}</p>
             </div>
             <button class="dark-button" @click="() => { addMember(); $emit('show-new-member-box'); }">+</button>
         </div>    
@@ -71,17 +56,6 @@ const addMember = () => {
         flex-direction: column;
         gap: 1rem;
     }      
-
-    .other-members-cards {
-        display: flex;
-        flex-direction: row;
-        gap: 1rem;
-        overflow-x: auto;
-        max-width: 50rem;
-        height: 5rem;
-        padding: 0.5rem;
-        scrollbar-width: thin;
-    }
 
     .article-card {
         background-color: var(--grey);

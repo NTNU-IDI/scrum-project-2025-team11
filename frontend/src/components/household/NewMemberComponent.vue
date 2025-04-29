@@ -1,6 +1,9 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
 import { validateFirstName, validateLastName } from '@/utils/validationService';
+import { useHouseholdStore } from '@/stores/householdStore';    
+
+const householdStore = useHouseholdStore();
 
 const newFirstName = ref('');
 const newLastName = ref('');
@@ -21,6 +24,9 @@ const addMember = () => {
         alert(errorMsg.value);
         return;
     }
+
+    householdStore.addMember()
+
 
     emit('hide-new-member-box');
     // TODO: add item to list
