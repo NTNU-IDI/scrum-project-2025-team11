@@ -25,7 +25,7 @@ jobs:
           cache: maven                          # speeds up next run
 
       - name: Build & test
-        run: mvn -B verify                      # compile + tests
+        run: ./mvnw -B verify                      # compile + tests
 
       - name: Package JAR
         run: mvn -B package -DskipTests
