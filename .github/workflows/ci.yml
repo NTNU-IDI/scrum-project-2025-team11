@@ -11,7 +11,7 @@ jobs:
 # 1) BACK-END  (build & unit tests)                            │
 # ──────────────────────────────────────────────────────────────
   backend:
-    runs-on: [ self-hosted, ubuntu-arm64 ]
+    runs-on: [ self-hosted, X64, Linux ]
     defaults:
       run: { working-directory: backend }
     steps:
