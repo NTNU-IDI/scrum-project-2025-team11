@@ -62,7 +62,6 @@ class UserControllerTest {
         UserRequest userRequest = new UserRequest();
         userRequest.setUsername("Jonas");
         userRequest.setEmail("jon@mail.com");
-        userRequest.setPassword("password");
         userRequest.setFirstName("Jonas");
         userRequest.setLastName("Jonassen");
         userRequest.setHouseholdId(123); // Assuming the household ID is 123
