@@ -30,6 +30,6 @@ export class InventoryService {
     }
     
     static async remove(householdId: number, itemId: number, acquiredDate: string): Promise<void> {
-        await axios.delete(`${BASE_API_URL}/households/${householdId}/items/${itemId}?acquiredDate=${acquiredDate}`);
+        await axios.delete(`${BASE_API_URL}/households/${householdId}/items/${itemId}/${acquiredDate}`);
     }
 }
