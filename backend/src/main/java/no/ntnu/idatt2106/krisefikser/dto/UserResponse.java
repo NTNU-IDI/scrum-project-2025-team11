@@ -26,9 +26,6 @@ public class UserResponse {
     @Schema(description = "Last name of the user.", example = "Trump")
     private String lastName;
 
-    @Schema(description = "Password of the user.", example = "password123")
-    private String password;
-
     @Schema(description = "Role of the user.", example = "normal")
     private String role;
     
