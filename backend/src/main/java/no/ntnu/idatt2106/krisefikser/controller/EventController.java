@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.dto.EventRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.EventResponseDTO;
@@ -257,7 +258,7 @@ public class EventController {
   @PostMapping
   public ResponseEntity<EventResponseDTO> saveEvent(
     @Parameter (description = "the event to save", required = true)
-    @RequestBody EventRequestDTO event) {
+    @Valid @RequestBody EventRequestDTO event) {
     EventResponseDTO savedEvent = eventService.saveEvent(event);
     return ResponseEntity.ok(savedEvent);
   }
@@ -283,7 +284,7 @@ public class EventController {
     @Parameter (description = "the ID of the event to update", required = true, example = "1")
     @PathVariable int id,
     @Parameter (description = "the updated event data", required = true)
-    @RequestBody EventRequestDTO event) {
+    @Valid @RequestBody EventRequestDTO event) {
     return ResponseEntity.ok(eventService.updateEvent(id, event));
   }
   
