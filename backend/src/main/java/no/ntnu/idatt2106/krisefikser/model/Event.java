@@ -45,7 +45,7 @@ public class Event {
    * Type of the event. This field is used to determine the icon to be displayed on the map.
    * This field cannot be null and is stored as a string in the database.
    */
-  private enum iconType {
+  public enum IconType {
     NONE,
     POINT,
     NORMAL,
@@ -56,7 +56,7 @@ public class Event {
     OTHER
   }
   @Enumerated(EnumType.STRING)
-  private iconType icon;
+  private IconType iconType;
 
   /**
    * Start time of the event.
