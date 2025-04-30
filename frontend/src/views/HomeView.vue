@@ -41,25 +41,31 @@
         <p>Se oversikt over tilfluktsrom i nærheten.</p>
       </router-link>
 
-      <router-link to="/beredskap" class="box">
-        <h3>Beredskapsråd</h3>
-        <p>Lær hvordan du forbereder deg på kriser.</p>
+      <router-link to="/map" class="box">
+        <h3>Møtesteder</h3>
+        <p>Se hvor du kan møte andre dersom en krise skulle intreffe.</p>
       </router-link>
 
-      <router-link to="/nyheter" class="box">
+      <div class="box unavailable" data-tooltip="Tjenesten er ikke tilgjengelig enda.">
         <h3>Nyheter</h3>
         <p>Hold deg oppdatert på relevante hendelser.</p>
+      </div>
+
+      <router-link to="/login" class="box unavailable" data-tooltip="Logg inn for å få tilgang til denne tjenesten.">
+        <h3>Husstand</h3>
+        <p>Se oversikt over medlemmene i din husstand.</p>
       </router-link>
 
-      <router-link to="/kart" class="box">
-        <h3>Tjenestekart</h3>
-        <p>Se hvor du finner hjelp i ditt område.</p>
+      <router-link to="/login" class="box unavailable" data-tooltip="Logg inn for å få tilgang til denne tjenesten.">
+        <h3>Beredskapslager</h3>
+        <p>Se om du har nok mat og drikke til en eventuell krisesituasjon.</p>
       </router-link>
 
-      <router-link to="/kontakt" class="box">
-        <h3>Kontakt</h3>
-        <p>Kom i kontakt med driverne av nettstedet.</p>
+      <router-link to="/login" class="box unavailable" data-tooltip="Logg inn for å få tilgang til denne tjenesten.">
+        <h3>Erfaringer fra en krise?</h3>
+        <p>Skriv et notat fra en krise du har opplevd, og del den med andre!</p>
       </router-link>
+
     </div>
   </main>
 
@@ -89,9 +95,9 @@ import Footer from '@/components/Footer.vue'
 .info-header {
   background-color: #ffffff;
   color: var(--darkest-blue);
-  padding: 24px;
+  padding: 6px;
   border-radius: 8px;
-  margin: 40px 125px;
+  margin: 10px 125px;
   text-align: center;
 }
 
@@ -128,6 +134,44 @@ import Footer from '@/components/Footer.vue'
   text-decoration: none;
   display: block;
   text-align: center;
+}
+
+.box.unavailable {
+  background-color: var(--lightest-blue);
+  border: 2px solid var(--lightest-blue);
+  color: white;
+  position: relative;
+}
+
+.box.unavailable:hover {
+  background-color: var(--lightest-blue);
+  color: white;
+  transform: scale(1);
+  cursor: not-allowed;
+}
+
+/* Tooltip, ikke rør!!! */
+.box.unavailable::after {
+  content: attr(data-tooltip);
+  position: center;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--bad-red);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+
+/* Vis tooltip på hover */
+.box.unavailable:hover::after {
+  opacity: 1;
 }
 
 .box h3 {

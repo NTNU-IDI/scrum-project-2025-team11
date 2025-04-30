@@ -9,14 +9,22 @@
       </div>
 
       <div class="grid-container">
-        <div class="box">
-          <h3>Min husstand</h3>
+
+        <router-link to="/household" class="box registered">
+          <h3>Husstand</h3>
           <p>Se oversikt over medlemmene i din husstand.</p>
-        </div>
-        <div class="box">
-          <h3>Mitt beredskapslager</h3>
+        </router-link>
+
+        <router-link to="/storage" class="box registered">
+          <h3>Beredskapslager</h3>
           <p>Se om du har nok mat og drikke til en eventuell krisesituasjon.</p>
-        </div>
+        </router-link>
+
+        <router-link to="/notes" class="box registered">
+        <h3>Erfaringer fra en krise?</h3>
+        <p>Skriv et notat fra en krise du har opplevd, og del den med andre!</p>
+        </router-link>
+
       </div>
 
       <div class="info-header">
@@ -24,27 +32,22 @@
       </div>
 
       <div class="grid-container">
-        <div class="box">
-          <h3>Finn tilfluktsrom</h3>
-          <p>Se oversikt over tilfluktsrom i nærheten.</p>
-        </div>
-        <div class="box">
-          <h3>Beredskapsråd</h3>
-          <p>Lær hvordan du forbereder deg på kriser.</p>
-        </div>
-        <div class="box">
-          <h3>Nyheter</h3>
-          <p>Hold deg oppdatert på relevante hendelser.</p>
-        </div>
-        <div class="box">
-          <h3>Tjenestekart</h3>
-          <p>Se hvor du finner hjelp i ditt område.</p>
-        </div>
-        <div class="box">
-          <h3>Kontakt</h3>
-          <p>Kom i kontakt med driverne av nettstedet.</p>
-        </div>
-      </div>
+      <router-link to="/map" class="box">
+        <h3>Finn tilfluktsrom</h3>
+        <p>Se oversikt over tilfluktsrom i nærheten.</p>
+      </router-link>
+
+
+      <router-link to="/news" class="box">
+        <h3>Nyheter</h3>
+        <p>Hold deg oppdatert på relevante hendelser.</p>
+      </router-link>
+
+      <router-link to="/map" class="box">
+        <h3>Tjenestekart</h3>
+        <p>Se hvor du finner hjelp i ditt område.</p>
+      </router-link>
+    </div>
     </main>
 
     <Footer />
@@ -68,7 +71,6 @@ const goToLogin = () => {
 </script>
 
 <style scoped>
-/* --- Hele siden --- */
 .beredskap-page {
   display: flex;
   flex-direction: column;
@@ -82,13 +84,12 @@ const goToLogin = () => {
   background-color: white;
 }
 
-/* --- Info-header på toppen av seksjoner --- */
 .info-header {
   background-color: #ffffff;
   color: var(--darkest-blue);
   padding: 24px;
   border-radius: 8px;
-  margin: 40px 125px 20px 125px;
+  margin: 4px 125px 20px 125px;
   text-align: center;
 }
 
@@ -104,7 +105,6 @@ const goToLogin = () => {
   font-weight: 500;
 }
 
-/* --- Grid container --- */
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -115,7 +115,6 @@ const goToLogin = () => {
   margin: 20px 100px;
 }
 
-/* --- Boksene --- */
 .box {
   background-color: var(--light-blue);
   border: 2px solid var(--light-blue);
@@ -125,6 +124,11 @@ const goToLogin = () => {
   transition: background-color 0.4s ease, transform 0.4s ease;
   box-shadow: 0 4px 6px rgba(0.5, 0, 0, 0.5);
   text-align: center;
+}
+
+.box.registered {
+  background-color: var(--good-green);
+  border: 2px solid var(--good-green);
 }
 
 .box h3 {
@@ -141,6 +145,13 @@ const goToLogin = () => {
 .box:hover {
   background-color: rgb(169, 184, 203);
   color: var(--darkest-blue);
+  transform: scale(1.02);
+  cursor: pointer;
+}
+
+.box.registered:hover {
+  background-color: var(--good-green);
+  color: white;
   transform: scale(1.02);
   cursor: pointer;
 }

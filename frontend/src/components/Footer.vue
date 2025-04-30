@@ -3,33 +3,23 @@
     <div class="footer-content">
       <h1>Andre tjenester</h1>
 
-      <div class="footer-links">
-        <a href="/about">Om oss</a> |
+      <div class="footer-links" data-tooltip="Disse tjenestene er ikke tilgjengelige enda.">
+        |
+        <a href="/about">Om oss </a> |
         <a href="/privacy">Personvern</a> |
+        <a href="/contact">Kontakt oss</a> |
         <a href="/userhome">User home (for testing)</a> |
-        <a href="/admin">Admin (for testing)</a> |
-        <button @click="openPDF" class="link-button">Personvernerklæring</button>
+        <a href="/admin">Admin (for testing)</a>
+        <br />
+        <br />
+        <br />
       </div>
     </div>
   </footer>
 </template>
 
 <script lang="ts" setup>
-import { useRouter } from 'vue-router'
-const router = useRouter()
 
-const goToHome = () => {
-  router.push('/')
-}
-const goToUserHome = () => {
-  router.push('/userhome')
-}
-const goToAdmin = () => {
-  router.push('/admin')
-}
-const openPDF = () => {
-  window.open('../assets/privacy_page.pdf', '_blank')
-}
 </script>
 
 <style scoped>
@@ -65,6 +55,19 @@ const openPDF = () => {
   text-align: left;
   margin-top: 8px;
 }
+.footer-links:hover {
+  cursor: pointer;
+}
+.footer-links:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  background-color: #ff0000;
+  color: #fff;
+  padding: 5px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+}
 
 .footer-links a {
   color: white;
@@ -91,4 +94,6 @@ const openPDF = () => {
 .link-button:hover {
   color: #d1d5db;
 }
+
+
 </style>
