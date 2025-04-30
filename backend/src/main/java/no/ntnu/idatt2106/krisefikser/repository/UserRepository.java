@@ -4,6 +4,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import no.ntnu.idatt2106.krisefikser.model.User;
 
+/**
+ * Repository interface for User entity.
+ * This interface extends JpaRepository to provide CRUD operations for User.
+ * 
+ * @see JpaRepository
+ */
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
 

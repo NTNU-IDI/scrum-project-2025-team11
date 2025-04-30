@@ -5,6 +5,9 @@ import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+/**
+ * DTO for representing a household item in the response.
+ */
 @Getter
 @AllArgsConstructor
 public class HouseholdItemResponse {
