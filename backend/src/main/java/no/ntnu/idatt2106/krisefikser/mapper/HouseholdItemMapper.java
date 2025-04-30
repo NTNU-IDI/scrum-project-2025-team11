@@ -8,6 +8,9 @@ import no.ntnu.idatt2106.krisefikser.model.HouseholdItemId;
 import no.ntnu.idatt2106.krisefikser.model.Item;
 import org.springframework.stereotype.Component;
 
+/**
+ * Mapper class for converting between HouseholdItem entities and DTOs.
+ */
 @Component
 public class HouseholdItemMapper {
 

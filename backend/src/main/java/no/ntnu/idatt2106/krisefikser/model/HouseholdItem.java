@@ -1,6 +1,5 @@
-// src/main/java/no/ntnu/idatt2106/krisefikser/model/HouseholdItem.java
-
 package no.ntnu.idatt2106.krisefikser.model;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,6 +7,11 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * Represents an item in a household's inventory.
+ * This entity is linked to both the Household and Item entities.
+ * It contains information about the quantity, unit, and expiration date of the item.
+ */
 @Entity
 @Table(name = "HOUSEHOLD_ITEMS")
 @Getter @Setter @NoArgsConstructor

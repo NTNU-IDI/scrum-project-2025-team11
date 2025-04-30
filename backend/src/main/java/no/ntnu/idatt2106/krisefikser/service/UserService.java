@@ -15,6 +15,10 @@ import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.model.User.Role;
 import no.ntnu.idatt2106.krisefikser.repository.UserRepository;
 
+/**
+ * Service class for managing user-related operations.
+ * This class provides methods for creating, updating, deleting, and retrieving users.
+ */
 @Service
 @Transactional
 @RequiredArgsConstructor

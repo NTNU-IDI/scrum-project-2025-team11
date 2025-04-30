@@ -16,6 +16,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Service class for managing household inventory items.
+ * Provides methods to list, add, update, and remove items from a household's inventory.
+ */
 @Service
 @Transactional
 public class InventoryServiceImpl implements InventoryService {
@@ -108,4 +112,13 @@ public class InventoryServiceImpl implements InventoryService {
         }
         hiRepo.deleteById(id);
     }
+
+    @Override
+    public void removeAll(Integer householdId, Integer itemId) {
+        var all = hiRepo.findByHouseholdIdAndItemId(householdId, itemId);
+        if (all.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No purchases found");
+        }
+        hiRepo.deleteAll(all);
+}
 }
