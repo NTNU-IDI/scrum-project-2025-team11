@@ -24,6 +24,12 @@ jobs:
           java-version: 21
           cache: maven                          # speeds up next run
 
+      - name: Debug backend dir
+        run: |
+          pwd
+          ls -la .
+          ls -la ../mvnw || true
+
       - name: Build & test
         run: ./mvnw -B verify                      # compile + tests
 
