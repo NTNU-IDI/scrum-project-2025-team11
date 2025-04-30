@@ -26,3 +26,8 @@ export interface UpsertInventoryRequest {
     acquiredDate: string;
     expirationDate?: string;
 }
+
+export interface EditableItem extends HouseholdItemResponse {
+    dirty?: boolean;
+}
+  
