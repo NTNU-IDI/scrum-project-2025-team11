@@ -115,7 +115,7 @@ public class PointOfInterestController {
         description = "Uses an Id to find and alter a tuple in the point of interest table"
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Point successfully updated"),
+        @ApiResponse(responseCode = "204", description = "Point successfully updated"),
         @ApiResponse(responseCode = "400", description = "Point could not be updated, check if the syntax is correct")
     })
     @PutMapping("/{id}")
