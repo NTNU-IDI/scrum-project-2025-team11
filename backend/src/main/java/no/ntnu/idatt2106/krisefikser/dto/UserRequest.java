@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter @Setter @NoArgsConstructor
-@Schema(description = "Payload for creating or updating an Item")
+@Schema(description = "Payload for creating or updating an user")
 public class UserRequest {
 
     @Schema(description = "Email address of the user.", example ="trump@mail.com")
@@ -20,9 +20,6 @@ public class UserRequest {
 
     @Schema(description = "Last name of the user.", example = "Trump")
     private String lastName;
-
-    @Schema(description = "Password of the user.", example = "password123")
-    private String password;
 
     @Schema(description = "Household ID of the user.", example = "1")
     private int householdId;

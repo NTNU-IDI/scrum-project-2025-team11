@@ -26,13 +26,13 @@ public class UserResponse {
     @Schema(description = "Last name of the user.", example = "Trump")
     private String lastName;
 
-    @Schema(description = "Password of the user.", example = "password123")
-    private String password;
-
-    @Schema(description = "Role of the user.", example = "admin")
+    @Schema(description = "Role of the user.", example = "normal")
     private String role;
     
     @Schema(description = "Household ID of the user.", example = "1")
     private int householdId;
+
+    @Schema(description = "Household name of the user.", example = "Household 1")
+    private String householdName;
 
 }
