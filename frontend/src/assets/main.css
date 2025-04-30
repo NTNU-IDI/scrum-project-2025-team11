@@ -146,3 +146,23 @@ button:hover {
   margin-right: 1rem;
   cursor: pointer;
 }
+
+.map-icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 0.5rem;
+}
+
+.map-icon.star {
+  background: url('/yellow-star-fill-border.svg') no-repeat center center / contain;
+}
+
+.map-icon.meetup {
+  background: url('/lightest-blue-triangle-fill-border.svg') no-repeat center center / contain;
+}
+
+.map-icon.medical {
+  background: url('/bad-red-medical-fill-border.svg') no-repeat center center / contain;
+}
+

@@ -1,6 +1,10 @@
 <template>
   <div class="map-page">
-    <IconsOverview />
+    <div class="corner-container">
+      <IconsOverview />
+      <button class="button" @click="findNearestShelter">Finn nærmeste tilfluktsrom</button>
+    </div>
+
     <div id="map" class="map"></div>
 
     <div v-if="showCrisisAlert" class="crisis-alert">
@@ -12,11 +16,30 @@
 <script setup lang="ts">
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet-routing-machine';
 import IconsOverview from '../../components/map/IconsOverview.vue';
 import { onMounted, ref } from 'vue';
+
+let map: L.Map;
 const showCrisisAlert = ref(false);
 
+declare global {
+  interface Window {
+    routingControl: any;
+  }
+}
+window.routingControl = null;
+
 // Test data
+type PointOfInterest = {
+  id: number;
+  name: string;
+  icon_type: string;
+  description: string;
+  latitude: number;
+  longitude: number;
+};
+
 const testPointsOfInterest = [
   {
     id: 1,
@@ -36,6 +59,19 @@ const testPointsOfInterest = [
   }
 ];
 
+type Event = {
+  id: number;
+  name: string;
+  description: string;
+  icon_type: string;
+  time_start: Date;
+  time_end: Date;
+  latitude: number;
+  longitude: number;
+  radius: number;
+  severity: number;
+};
+
 const testEvents = [
   {
     id: 1,
@@ -45,7 +81,7 @@ const testEvents = [
     time_start: new Date('2025-04-25'),
     time_end: new Date('2025-04-26'),
     latitude: 63.42,
-    langtitude: 10.38,
+    longitude: 10.38,
     radius: 1000,
     severity: 2 
   },
@@ -57,7 +93,7 @@ const testEvents = [
     time_start: new Date('2025-04-26'),
     time_end: new Date('2025-04-27'),
     latitude: 63.43,
-    langtitude: 10.39,
+    longitude: 10.39,
     radius: 1500,
     severity: 1 
   },
@@ -69,7 +105,7 @@ const testEvents = [
     time_start: new Date('2025-04-26'),
     time_end: new Date('2025-04-27'),
     latitude: 63.42,
-    langtitude: 10.42,
+    longitude: 10.42,
     radius: 800,
     severity: 0 
   }
@@ -77,7 +113,7 @@ const testEvents = [
 
 onMounted(() => {
   // Init map
-  const map = L.map('map', {
+  map = L.map('map', {
     zoomControl: false
   }).setView([63.4305, 10.3951], 12);
   L.control.zoom({ position: 'topright' }).addTo(map);
@@ -121,7 +157,7 @@ function getUserLocation(map: L.Map) {
 
 function checkIfInCrisisArea(userLatitude: number, userLongitude: number) {
   testEvents.forEach(event => {
-    const distance = calculateDistance(userLatitude, userLongitude, event.latitude, event.langtitude);
+    const distance = calculateDistance(userLatitude, userLongitude, event.latitude, event.longitude);
     
     if (distance <= event.radius) {
       showCrisisAlert.value = true;
@@ -148,7 +184,7 @@ function toRadians(degrees: number): number {
 function addPointsOfInterest(map: L.Map) {
   testPointsOfInterest.forEach(point => {
     const customIcon = L.divIcon({
-      html: `<div class="icon ${point.icon_type}" style="margin: 0;"></div>`,
+      html: `<div class="map-icon ${point.icon_type}" style="margin: 0;"></div>`,
       className: '',
       iconSize: [20, 20],
       iconAnchor: [10, 10]
@@ -173,7 +209,7 @@ function addEvents(map: L.Map) {
       fillColor = 'var(--yellow)';
     }
 
-    L.circle([event.latitude, event.langtitude], {
+    L.circle([event.latitude, event.longitude], {
       color: circleColor,
       fillColor: fillColor,
       weight: 1,
@@ -182,9 +218,71 @@ function addEvents(map: L.Map) {
     }).addTo(map).bindPopup(`<strong>${event.name}</strong><br>${event.description}`);
   });
 }
+
+async function findNearestShelter() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const userLatitude = position.coords.latitude;
+      const userLongitude = position.coords.longitude;
+
+      const nearestShelter = getNearestShelter(userLatitude, userLongitude);
+      
+      if (nearestShelter) {
+        // Remove previous route
+        if (window.routingControl) {
+          map.removeControl(window.routingControl);
+        }
+        // Show route
+        L.Routing.control({
+          waypoints: [
+            L.latLng(userLatitude, userLongitude),
+            L.latLng(nearestShelter.latitude, nearestShelter.longitude)
+          ],
+          routeWhileDragging: false,
+        }).addTo(map);
+      }
+    });
+  }
+}
+
+function getNearestShelter(userLatitude: number, userLongitude: number): PointOfInterest | null {
+  let nearestShelter: PointOfInterest | null = null;
+  let minDistance = Infinity;
+
+  testPointsOfInterest.forEach(point => {
+    const distance = calculateDistance(userLatitude, userLongitude, point.latitude, point.longitude);
+    if (distance < minDistance) {
+      minDistance = distance;
+      nearestShelter = point;
+    }
+  });
+
+  return nearestShelter;
+}
 </script>
 
 <style>
+.corner-container {
+  position: absolute;
+  top: 30px;
+  left: 20px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.button {
+  background-color: var(--dark-blue);
+  color: var(--white);
+  font-size: var(--font-size-small);
+  padding: 13px;
+}
+
+.button:hover {
+  background-color: var(--darkest-blue);
+}
+
 .map-page {
   display: flex;
   height: 100vh; 
@@ -211,6 +309,16 @@ function addEvents(map: L.Map) {
   align-items: center;
   justify-content: center;
   z-index: 2;
+}
+
+.leaflet-touch .leaflet-control-attribution, .leaflet-touch .leaflet-control-layers, .leaflet-touch .leaflet-bar {
+    display: none;
+}
+
+.leaflet-marker-icon.leaflet-interactive, .leaflet-image-layer.leaflet-interactive, .leaflet-pane > svg path.leaflet-interactive, svg.leaflet-image-layer.leaflet-interactive path {
+    display: block;
+    visibility: visible;
+    pointer-events: auto;
 }
 
 @media (max-width: 768px) {
