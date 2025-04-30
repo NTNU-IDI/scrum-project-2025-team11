@@ -78,6 +78,9 @@ class UserServiceTest {
         u.setLastName("Wonder");
         u.setPassword("hash");
         u.setRole(Role.normal);
+        u.setHousehold(new Household());
+        u.getHousehold().setId(123);
+        u.getHousehold().setName("Wonderland");
 
         when(userRepository.findById(10)).thenReturn(u);
 
@@ -99,6 +102,9 @@ class UserServiceTest {
         existing.setLastName("Name");
         existing.setPassword("oldPwd");
         existing.setRole(Role.normal);
+        existing.setHousehold(new Household());
+        existing.getHousehold().setId(123);
+        existing.getHousehold().setName("OldHouse");
 
         when(userRepository.findById(5)).thenReturn(existing);
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -128,8 +134,8 @@ class UserServiceTest {
     @Test
     @DisplayName("findAll maps list of entities → list of DTOs")
     void testFindAll() {
-        User u1 = new User(); u1.setId(1); u1.setUsername("a"); u1.setEmail("a@b.c"); u1.setRole(Role.normal);
-        User u2 = new User(); u2.setId(2); u2.setUsername("b"); u2.setEmail("b@b.c"); u2.setRole(Role.normal);
+        User u1 = new User(); u1.setId(1); u1.setUsername("a"); u1.setEmail("a@b.c"); u1.setRole(Role.normal); u1.setHousehold(new Household());
+        User u2 = new User(); u2.setId(2); u2.setUsername("b"); u2.setEmail("b@b.c"); u2.setRole(Role.normal); u2.setHousehold(new Household());
 
         when(userRepository.findAll()).thenReturn(List.of(u1, u2));
 
