@@ -1,8 +1,9 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, h, onMounted, ref } from 'vue';
 import { useUserStore } from '@/stores/userStore';
 import { useHouseholdStore } from '@/stores/householdStore';
 import { storeToRefs } from 'pinia';
+import { HouseholdService } from '@/api/HouseholdService';
 
 //User store
 const userStore = useUserStore();
@@ -11,21 +12,34 @@ userStore.setUsername('Madde')
 
 //Household store
 const useHousehold = useHouseholdStore();
-// Remove later
-useHousehold.setHousehold({id: 1, name: 'Familien Larsen', memberCount: 5, addressId: '1'});
-
 const newMemberCount = ref(0);
 
-onMounted(() => {
-  newMemberCount.value = useHousehold.memberCount;
+onMounted( async () => {
+    // TODO: Get actual household ID from the store
+    const household = await HouseholdService.findById(1);
+    useHousehold.setHousehold({id: household.id, name: household.name, memberCount: household.memberCount, addressId: household.address.id.toString()});
+
+    newMemberCount.value = useHousehold.memberCount;
 });
 
 const hasChanges = computed(() => {
   return newMemberCount.value !== useHousehold.memberCount;
 });
 
-const changeMemberCount = () => {
-    //TODO: change memberCount 
+const changeMemberCount = async () => {
+    try{
+        if(!useHousehold.id){
+            console.error('Household ID is not available');
+            return;
+        }
+        await HouseholdService.update(useHousehold.id,{
+            ...useHousehold,
+            memberCount: newMemberCount.value
+        }); 
+    } catch (error) {
+        console.error('Failed to update household:', error);
+    }
+    
     useHousehold.memberCount = newMemberCount.value;
 }
 
