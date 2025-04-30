@@ -17,29 +17,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install Maven
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y maven
+
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
-          cache: maven                          # speeds up next run
-
-      - name: Debug backend dir
-        run: |
-          pwd
-          ls -la .
-          ls -la ../mvnw || true
+          cache: maven
 
       - name: Build & test
-        run: ./mvnw -B verify                      # compile + tests
+        run: mvn -B verify
 
       - name: Package JAR
         run: mvn -B package -DskipTests
 
-      - uses: actions/upload-artifact@v4        # hand jar to later jobs
+      - uses: actions/upload-artifact@v4
         with:
           name: spring-jar
-          path: backend/target/*.jar
+          path: target/*.jar
 
 # ──────────────────────────────────────────────────────────────
 # 2) FRONT-END  (Vue lint, unit test, build)                   │
