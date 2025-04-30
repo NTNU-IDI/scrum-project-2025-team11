@@ -111,6 +111,8 @@ public class UserService {
         response.setLastName(user.getLastName());
         response.setPassword(user.getPassword());
         response.setRole(user.getRole().toString());
+        response.setHouseholdId(user.getHousehold().getId());
+        response.setHouseholdName(user.getHousehold().getName());
         return response;
     }
 
