@@ -3,11 +3,18 @@ package no.ntnu.idatt2106.krisefikser.service;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.SimpleMailMessage;
 import no.ntnu.idatt2106.krisefikser.model.User;
 
 @Service
+@Profile("dev") // Only active in the "dev" profile
+/**
+ * Service class for sending emails.
+ * This class uses JavaMailSender to send emails.
+ * It is currently only active in the "dev" profile.
+ */
 public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
