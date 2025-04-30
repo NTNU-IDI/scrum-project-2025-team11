@@ -92,6 +92,13 @@ public class PointOfInterestService {
                 .toList();
     }
 
+    /**
+     * Updates an already existing point of interest
+     * @param id Unique identifier used to make a lookup in the table point of interest
+     * @param requestDto A format for how data should be sent when making the api call
+     * @return returns a PointOfInterestResponseDTO which has the updated and non updated fields
+     * of the changed entry.
+     */
     public PointOfInterestResponseDTO updatePointOfInterest(int id, PointOfInterestRequestDTO requestDto) {
         PointOfInterest currentPointOfInterest = pointOfInterestRepository.findById(id).orElseThrow(() -> new RuntimeException("Point of interest id not found"));
         if (requestDto.getName() != null) {

@@ -110,6 +110,14 @@ public class PointOfInterestController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(
+        summary = "Updates a point of interest",
+        description = "Uses an Id to find and alter a tuple in the point of interest table"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Point successfully updated"),
+        @ApiResponse(responseCode = "400", description = "Point could not be updated, check if the syntax is correct")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<PointOfInterestResponseDTO> updatePointOfInterest(
         @PathVariable int id, @RequestBody PointOfInterestRequestDTO updatedPoint) {
