@@ -19,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/households/{hhId}/items")
+@CrossOrigin(origins = "*")
 @Tag(name = "Inventory API", description = "Operations for managing household inventory items")
 public class InventoryController {
     private final InventoryService service;

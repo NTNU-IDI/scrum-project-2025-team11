@@ -16,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/items")
+@CrossOrigin(origins = "*")
 @Tag(name = "Item API")
 public class ItemController {
 
