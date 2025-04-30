@@ -221,8 +221,5 @@ public ResponseEntity<UserResponse> register(
     @RequestBody UserRequest user) {
     UserResponse updatedUser = userService.updateUser(id, user);
     return ResponseEntity.ok(updatedUser);
-  }
-
-  
-    
+  }  
 }

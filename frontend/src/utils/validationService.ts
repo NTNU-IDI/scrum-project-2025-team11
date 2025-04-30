@@ -41,3 +41,10 @@ export function validateLastName(name: string): boolean {
     if(!name) return false;
     return lastNameRegex.test(name);
 }
+
+// Function to validate email
+export function validateEmail(email: string): boolean {
+    if(!email) return false;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
