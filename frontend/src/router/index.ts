@@ -1,10 +1,9 @@
 import HomeView from "@/views/HomeView.vue";
 import LogInView from "@/views/LogInView.vue";
-import MapView from "@/views/MapView.vue";
+import MapView from "@/views/map/MapView.vue";
 import RegisterView from "@/views/RegisterView.vue";
-import UserHomeView from "@/views/HomeInloggedView.vue";
-import AdminView from "@/views/HomeAdminView.vue";
-
+import HouseholdView from "@/views/household/HouseholdView.vue";
+import PrivacyPolicyView from "@/views/PrivacyPolicyView.vue";
 import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
 
@@ -30,14 +29,14 @@ const routes: Array<RouteRecordRaw> = [
     component: MapView,
   },
   {
-    path: "/userhome",
-    name: "UserHomeView",
-    component: UserHomeView,
+    path: "/household",
+    name: "Household",
+    component: HouseholdView,
   },
   {
-    path: "/admin",
-    name: "AdminHomeView",
-    component: AdminView,
+    path: '/personvern',
+    name: 'PrivacyPolicy',
+    component: PrivacyPolicyView,
   },
 ];
 

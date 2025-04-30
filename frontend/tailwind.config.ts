@@ -9,13 +9,8 @@ const config: Config = {
         "dark-blue": "#1B263B",
         "light-blue": "#415A77",
         "lightest-blue": "#778DA9",
-<<<<<<< HEAD
         "grey": "#E0E1DD",
         "orange": "#EB5E28",
-=======
-        grey: "#E0E1DD",
-        orange: "#EB5E28",
->>>>>>> c6e4a1f5a1c34fac7a07ec3b4d409cddf548fd2b
         "good-green": "#3D9C5A",
         "bad-red": "#BF0603",
       },

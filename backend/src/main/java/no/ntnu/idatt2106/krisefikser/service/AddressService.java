@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
+import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
 import no.ntnu.idatt2106.krisefikser.model.Address;
 import no.ntnu.idatt2106.krisefikser.repository.AddressRepository;
 
@@ -19,6 +21,17 @@ import no.ntnu.idatt2106.krisefikser.repository.AddressRepository;
 public class AddressService {
   private final AddressRepository addressRepository;
 
+  private AddressResponseDTO mapToResponseDTO(Address address) {
+    AddressResponseDTO dto = new AddressResponseDTO();
+    dto.setId(address.getId());
+    dto.setStreet(address.getStreet());
+    dto.setPostalCode(address.getPostalCode());
+    dto.setCity(address.getCity());
+    dto.setLatitude(address.getLatitude());
+    dto.setLongitude(address.getLongitude());
+    return dto;
+  }
+
   // Add methods for creating, updating, deleting, and retrieving addresses here.
 
   public Optional<Address> findById(int id) {
@@ -27,47 +40,72 @@ public class AddressService {
 
   /**
    * Saves a new address to the database.
-   * @param address the address to save.
+   * @param addressDTO the address to save.
    * @return the saved address.
    * @throws Exception if the address is invalid or cannot be saved.
    */
-  public Address save(Address address) throws Exception {
-    if (address.getStreet() == null || address.getPostalCode() == null || address.getCity() == null) {
+  public AddressResponseDTO save(AddressRequestDTO addressDTO) throws Exception {
+    if (addressDTO.getStreet() == null || addressDTO.getPostalCode() == null || addressDTO.getCity() == null) {
       throw new IllegalArgumentException("Street, postal code, and city cannot be null");
     }
-    return addressRepository.save(address);
+
+    Address address = new Address();
+    address.setStreet(addressDTO.getStreet());
+    address.setPostalCode(addressDTO.getPostalCode());
+    address.setCity(addressDTO.getCity());
+    address.setLatitude(addressDTO.getLatitude());
+    address.setLongitude(addressDTO.getLongitude());
+
+    Address savedAddress = addressRepository.save(address);
+    return mapToResponseDTO(savedAddress);
+    
   }
 
-  public Address updateAddress(int id, Address updatedAddress) {
-    Address existingAddress = addressRepository.findById(id).orElseThrow(() -> new RuntimeException("Address not found"));
-    if (updatedAddress.getStreet() != null) {
-      existingAddress.setStreet(updatedAddress.getStreet());
+  /**
+   * Updates an existing address in the database.
+   * @param id the ID of the address to update.
+   * @param addressDTO the new address data.
+   * @return the updated address.
+   * @throws Exception if the address is not found or fields are invalid
+   */
+  public AddressResponseDTO updateAddress(int id, AddressRequestDTO addressDTO) throws Exception {
+    Address existingAddress = addressRepository.findById(id).orElseThrow(() -> new RuntimeException("Address not found with id: " + id));
+
+    if (addressDTO.getStreet() == null || addressDTO.getPostalCode() == null || addressDTO.getCity() == null) {
+      throw new IllegalArgumentException("Street, postal code, and city cannot be null");
     }
-    if (updatedAddress.getPostalCode() != null) {
-      existingAddress.setPostalCode(updatedAddress.getPostalCode());
-    }
-    if (updatedAddress.getCity() != null) {
-      existingAddress.setCity(updatedAddress.getCity());
-    }
-    if (updatedAddress.getLatitude() != null) {
-      existingAddress.setLatitude(updatedAddress.getLatitude());
-    }
-    if (updatedAddress.getLongitude() != null) {
-      existingAddress.setLongitude(updatedAddress.getLongitude());
-    }
-    return addressRepository.save(existingAddress);
+
+    existingAddress.setStreet(addressDTO.getStreet());
+    existingAddress.setPostalCode(addressDTO.getPostalCode());
+    existingAddress.setCity(addressDTO.getCity());
+    existingAddress.setLatitude(addressDTO.getLatitude());
+    existingAddress.setLongitude(addressDTO.getLongitude());
+
+    Address updatedAddress = addressRepository.save(existingAddress);
+    return mapToResponseDTO(updatedAddress);
   }
 
-  public void deleteById(int id) {
+  /**
+   * Deletes an address by its ID.
+   * @param id the ID of the address to delete.
+   * @throws RuntimeException if the address to delete is not found.
+   */
+  public void deleteById(int id) throws RuntimeException {
+    if (!addressRepository.existsById(id)) {
+      throw new RuntimeException("Address not found with id: " + id);
+    }
     addressRepository.deleteById(id);
   }
 
-  public boolean existsById(int id) {
-    return addressRepository.existsById(id);
-  }
-
-  public List<Address> findAll() {
-    return addressRepository.findAll();
+  /**
+   * Retrieves all addresses from the database.
+   * @return a list of all addresses.
+   */
+  public List<AddressResponseDTO> findAllAddresses() {
+    List<Address> addresses = addressRepository.findAll();
+    return addresses.stream()
+        .map(this::mapToResponseDTO)
+        .toList();
   }
 
   

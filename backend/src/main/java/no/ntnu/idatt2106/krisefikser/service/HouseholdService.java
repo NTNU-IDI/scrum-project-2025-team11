@@ -1,11 +1,19 @@
 package no.ntnu.idatt2106.krisefikser.service;
 
 import lombok.RequiredArgsConstructor;
+import no.ntnu.idatt2106.krisefikser.mapper.HouseholdMapper;
 import no.ntnu.idatt2106.krisefikser.repository.HouseholdRepository;
+import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
+import no.ntnu.idatt2106.krisefikser.dto.HouseholdRequestDTO;
+import no.ntnu.idatt2106.krisefikser.dto.HouseholdResponseDTO;
+import no.ntnu.idatt2106.krisefikser.dto.HouseholdUpdateDTO;
+import no.ntnu.idatt2106.krisefikser.model.Address;
 import no.ntnu.idatt2106.krisefikser.model.Household;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Service class for managing households.
@@ -19,6 +27,7 @@ public class HouseholdService {
      * Repository for performing CRUD operations on Household entities.
      */
     private final HouseholdRepository householdRepository;
+    private final AddressService addressService;
 
     public Optional<Household> findById(int id) {
         return householdRepository.findById(id);
@@ -28,19 +37,20 @@ public class HouseholdService {
      * Updates an existing household with new data.
      *
      * @param id        The ID of the household to update.
-     * @param household The new household data to update with.
+     * @param newHousehold The new household data to update with.
      * @return The updated household entity.
      * @throws RuntimeException if the household with the given ID is not found.
      */
-    public Household updateHousehold(int id, Household household) {
+    public HouseholdResponseDTO updateHousehold(int id, HouseholdUpdateDTO newHousehold) {
         Household currentHousehold = householdRepository.findById(id).orElseThrow(() -> new RuntimeException("Household id not found"));
-        if (household.getMemberCount() != null) {
-            currentHousehold.setMemberCount(household.getMemberCount());
+        if (newHousehold.getMemberCount() != 0) {
+            currentHousehold.setMemberCount(newHousehold.getMemberCount());
         }
-        if (household.getName() != null) {
-            currentHousehold.setName(household.getName());
+        if (newHousehold.getName() != null) {
+            currentHousehold.setName(newHousehold.getName());
         }
-        return householdRepository.save(currentHousehold);
+        Household updatedHousehold = householdRepository.save(currentHousehold);
+        return HouseholdMapper.toResponseDTO(updatedHousehold);
     }
 
     /**
@@ -49,9 +59,23 @@ public class HouseholdService {
      * @param newHousehold The household entity to save.
      * @return The saved household entity.
      */
-    public Household save(Household newHousehold) {
-        // TODO make checks to see if household is valid
-        return householdRepository.save(newHousehold);
+    public HouseholdResponseDTO save(HouseholdRequestDTO newHousehold) throws Exception {
+        Household household = new Household();
+        if (newHousehold.getName() == null) {
+            throw new IllegalArgumentException("Name is missing");
+        }
+        if (newHousehold.getMemberCount() == 0) {
+            throw new IllegalArgumentException("Member count is missing");
+        }
+        if (newHousehold.getAddress() == null) {
+            throw new IllegalArgumentException("Invalid address format, make sure to fill all fields");
+        }
+        AddressResponseDTO addressResponseDTO = addressService.save(newHousehold.getAddress());
+        household.setName(newHousehold.getName());
+        household.setMemberCount(newHousehold.getMemberCount());
+        household.setAddress(addressService.findById(addressResponseDTO.getId()).orElseThrow(() -> new RuntimeException("Address id not found")));
+        Household savedHousehold = householdRepository.save(household);
+        return HouseholdMapper.toResponseDTO(savedHousehold);
     }
 
     /**
@@ -62,6 +86,21 @@ public class HouseholdService {
      */
     public boolean existsById(int id) {
         return householdRepository.existsById(id);
-    } 
-    
+    }
+
+    /**
+     * Delete a household entry in the household
+     * table based on the given id
+     * @param id The id of the household we wish to delete.
+     */
+    public void deleteById(int id) {
+        householdRepository.deleteById(id);
+    }
+
+    public List<HouseholdResponseDTO> findAll() {
+        return householdRepository.findAll()
+                .stream()
+                .map(HouseholdMapper::toResponseDTO)
+                .toList();
+    }
 }
