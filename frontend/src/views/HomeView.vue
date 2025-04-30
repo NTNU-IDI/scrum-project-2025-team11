@@ -5,6 +5,33 @@
   <main class="main-content">
     <div class="info-header">
       <h1>Velkommen til Krisefikseren!</h1>
+    </div>
+
+    <div clasS="info-header">
+      <p>Vet du hva du bør gjøre FØR, UNDER og ETTER en krise?</p>
+    </div>
+
+    <div class="grid-container">
+      <router-link to="/beredskap" class="box">
+        <h3>FØR</h3>
+        <p>Før en krise bør du forberede deg.</p>
+        <p>Da kan det være lurt å finne lokale møtesteder, fylle opp beredskapslageret ditt og sjekke nærområdet ditt.</p>
+      </router-link>
+
+      <router-link to="/beredskap" class="box">
+        <h3>UNDER</h3>
+        <p>Under en krise er det viktig å holde seg oppdatert.</p>
+        <p>Da kan det være lurt å følge med på nyheter og lokale varsler.</p>
+      </router-link>
+      <router-link to="/beredskap" class="box">
+        <h3>ETTER</h3>
+        <p>Etter en krise er det viktig å vite hva du skal gjøre.</p>
+        <p>Da kan det være lurt å sjekke med lokale myndigheter og følge med på nyheter, og kanskje notere hva du lærte for</p>
+        <p>å være bedre forberedt neste gang.</p>
+      </router-link>
+    </div>
+
+    <div class="info-header">
       <p>Nedenfor finner du en oversikt over de ulike tjenestene vi kan tilby.</p>
     </div>
 
@@ -117,6 +144,7 @@ import Footer from '@/components/Footer.vue'
 .box:hover {
   background-color: rgb(169, 184, 203);
   color: var(--darkest-blue);
+  transform: scale(1.02);
   cursor: pointer;
 }
 </style>
