@@ -12,17 +12,17 @@ body {
 }
 
 .grey-container {
-    background-color: var(--grey);
-    color: var(--darkest-blue);
-    padding: 1rem;
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    width: 400px;
-    height : 100%;
-    font-weight: normal;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  background-color: var(--grey);
+  color: var(--darkest-blue);
+  padding: 1rem;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 400px;
+  height: 100%;
+  font-weight: normal;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .dark-button {
@@ -153,15 +153,17 @@ button:hover {
   margin-right: 0.5rem;
 }
 
-.map-icon.star {
-  background: url('/yellow-star-fill-border.svg') no-repeat center center / contain;
+.map-icon.shelter {
+  background: url("/yellow-star-fill-border.svg") no-repeat center center /
+    contain;
 }
 
-.map-icon.meetup {
-  background: url('/lightest-blue-triangle-fill-border.svg') no-repeat center center / contain;
+.map-icon.assembly_point {
+  background: url("/lightest-blue-triangle-fill-border.svg") no-repeat center
+    center / contain;
 }
 
 .map-icon.medical {
-  background: url('/bad-red-medical-fill-border.svg') no-repeat center center / contain;
+  background: url("/bad-red-medical-fill-border.svg") no-repeat center center /
+    contain;
 }
-

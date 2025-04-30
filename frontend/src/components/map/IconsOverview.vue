@@ -2,8 +2,8 @@
   <div class="icons-box">
     <h1 class="title">Ikoner</h1>
     <ul class="descriptions">
-      <li><span class="map-icon star"></span> Tilfluktsrom</li>
-      <li><span class="map-icon meetup"></span> Møteplass</li>
+      <li><span class="map-icon shelter"></span> Tilfluktsrom</li>
+      <li><span class="map-icon assembly_point"></span> Møteplass</li>
       <li><span class="map-icon medical"></span> Medisinks hjelp</li>
       <li><span class="map-icon danger severe"></span> Alvorlig kriseberørt område</li>
       <li><span class="map-icon danger moderate"></span> Moderat kriseberørt område</li>

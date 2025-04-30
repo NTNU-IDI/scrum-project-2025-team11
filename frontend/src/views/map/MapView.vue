@@ -34,30 +34,12 @@ window.routingControl = null;
 type PointOfInterest = {
   id: number;
   name: string;
-  icon_type: string;
+  iconType: string;
   description: string;
   latitude: number;
   longitude: number;
 };
-
-const testPointsOfInterest = [
-  {
-    id: 1,
-    name: 'Tilfluktsrom Sentrum',
-    icon_type: 'star',
-    description: 'Offentlig tilfluktsrom i sentrum.',
-    latitude: 63.432,
-    longitude: 10.393
-  },
-  {
-    id: 2,
-    name: 'Møteplass Elgeseter',
-    icon_type: 'meetup',
-    description: 'Samleplass ved Elgeseter gate.',
-    latitude: 63.434,
-    longitude: 10.399,
-  }
-];
+const pointsOfInterest = ref<PointOfInterest[]>([]);
 
 type Event = {
   id: number;
@@ -120,7 +102,9 @@ onMounted(() => {
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
   // Add points of interest
-  addPointsOfInterest(map);
+  fetchAllPoints().then(() => {
+    addPointsOfInterest(map);
+  });
 
   // Add events
   addEvents(map);
@@ -128,6 +112,21 @@ onMounted(() => {
   // Get user location
   getUserLocation(map);
 });
+
+async function fetchAllPoints() {
+  try {
+    const response = await fetch('http://localhost:8080/api/interest');
+    console.log(response);
+    if (!response.ok) {
+      throw new Error("Failed to fetch all points");
+    }
+    const data: PointOfInterest[] = await response.json();
+    console.log("Points of interest data:", data);
+    pointsOfInterest.value = data;
+  } catch (error) {
+    console.error("Error fetching all points:", error);
+  }
+}
 
 function getUserLocation(map: L.Map) {
   if (navigator.geolocation) {
@@ -182,9 +181,9 @@ function toRadians(degrees: number): number {
 }
 
 function addPointsOfInterest(map: L.Map) {
-  testPointsOfInterest.forEach(point => {
+  pointsOfInterest.value.forEach(point => {
     const customIcon = L.divIcon({
-      html: `<div class="map-icon ${point.icon_type}" style="margin: 0;"></div>`,
+      html: `<div class="map-icon ${point.iconType}" style="margin: 0;"></div>`,
       className: '',
       iconSize: [20, 20],
       iconAnchor: [10, 10]
@@ -249,7 +248,7 @@ function getNearestShelter(userLatitude: number, userLongitude: number): PointOf
   let nearestShelter: PointOfInterest | null = null;
   let minDistance = Infinity;
 
-  testPointsOfInterest.forEach(point => {
+  pointsOfInterest.value.forEach(point => {
     const distance = calculateDistance(userLatitude, userLongitude, point.latitude, point.longitude);
     if (distance < minDistance) {
       minDistance = distance;
