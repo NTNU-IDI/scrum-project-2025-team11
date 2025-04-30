@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
@@ -17,6 +18,12 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 
+
+/**
+ * Controller class for managing household inventory items.
+ * This class handles HTTP requests related to inventory operations, such as creating, 
+ * updating, deleting, and retrieving items in a household's inventory.
+ */
 @RestController
 @RequestMapping("/api/households/{hhId}/items")
 @Tag(name = "Inventory API", description = "Operations for managing household inventory items")
@@ -27,17 +34,33 @@ public class InventoryController {
         this.service = service;
     }
 
+    /**
+     * Retrieves a list of all items in a household's inventory.
+     *
+     * @param hhId the ID of the household
+     * @param itemId optional ID of the item to filter by
+     * @return a list of {@link HouseholdItemResponse} objects representing all items in the household's inventory
+     */
     @GetMapping
     @Operation(summary = "List all items in a household's inventory")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Successfully retrieved list of items")
     })
     public List<HouseholdItemResponse> list(
-        @PathVariable Integer hhId
+        @PathVariable Integer hhId,
+        @Parameter(description = "ID of the item to filter by", required = false)
+        @RequestParam(required = false) Integer itemId
     ) {
         return service.list(hhId);
     }
 
+    /**
+     * Adds a new item to a household's inventory.
+     *
+     * @param hhId the ID of the household
+     * @param req the request body containing item details
+     * @return a {@link ResponseEntity} containing the created item
+     */
     @PostMapping
     @Operation(summary = "Add a new item to a household's inventory")
     @ApiResponses({
@@ -59,6 +82,15 @@ public class InventoryController {
         return ResponseEntity.created(location).body(created);
     }
 
+    /**
+     * Updates an existing item in a household's inventory by purchase date.
+     *
+     * @param hhId the ID of the household
+     * @param itemId the ID of the item to update
+     * @param acquiredDate the date when the item was acquired
+     * @param req the request body containing updated item details
+     * @return a {@link HouseholdItemResponse} object representing the updated item
+     */
     @PutMapping("/{itemId}/{acquiredDate}")
     @Operation(summary = "Update an existing item by purchase date")
     @ApiResponses({
@@ -78,13 +110,42 @@ public class InventoryController {
         return service.update(hhId, itemId, req);
     }
 
+    /**
+     * Deletes all purchases of an item in a household's inventory.
+     *
+     * @param hhId the ID of the household
+     * @param itemId the ID of the item to delete
+     * @return a {@link ResponseEntity} indicating the result of the operation
+     */
+    @DeleteMapping("/{itemId}")
+    @Operation(summary = "Remove *all* purchases of an item")
+    @ApiResponses({
+      @ApiResponse(responseCode = "204", description = "All purchases removed"),
+      @ApiResponse(responseCode = "404", description = "No purchases found for that item")
+    })
+    public ResponseEntity<Void> removeAll(
+        @PathVariable Integer hhId,
+        @PathVariable Integer itemId
+    ) {
+        service.removeAll(hhId, itemId);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Deletes a specific purchase of an item in a household's inventory.
+     *
+     * @param hhId the ID of the household
+     * @param itemId the ID of the item to delete
+     * @param acquiredDate the date when the item was acquired
+     * @return a {@link ResponseEntity} indicating the result of the operation
+     */
     @DeleteMapping("/{itemId}/{acquiredDate}")
     @Operation(summary = "Remove a specific purchase of an item")
     @ApiResponses({
-        @ApiResponse(responseCode = "204", description = "Item successfully removed"),
-        @ApiResponse(responseCode = "404", description = "Inventory entry not found")
+      @ApiResponse(responseCode = "204", description = "Purchase removed"),
+      @ApiResponse(responseCode = "404", description = "Inventory entry not found")
     })
-    public ResponseEntity<Void> remove(
+    public ResponseEntity<Void> removeOne(
         @PathVariable Integer hhId,
         @PathVariable Integer itemId,
         @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate acquiredDate
@@ -93,6 +154,13 @@ public class InventoryController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Creates or links an item and adds it to a household's inventory in one call.
+     *
+     * @param hhId the ID of the household
+     * @param req the request body containing item details
+     * @return a {@link ResponseEntity} containing the created item
+     */
     @PostMapping("/upsert")
     @Operation(summary = "Create or link an item and add to inventory in one call")
     @ApiResponses({

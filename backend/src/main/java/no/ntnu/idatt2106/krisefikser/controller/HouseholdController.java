@@ -19,7 +19,6 @@ import no.ntnu.idatt2106.krisefikser.dto.HouseholdUpdateDTO;
 import no.ntnu.idatt2106.krisefikser.model.Household;
 import no.ntnu.idatt2106.krisefikser.service.HouseholdService;
 
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/household")

@@ -6,6 +6,9 @@ import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * DTO for creating or updating a household item.
+ */
 @Getter
 @Setter
 public class HouseholdItemRequest {

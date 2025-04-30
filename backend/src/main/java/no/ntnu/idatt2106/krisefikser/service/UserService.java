@@ -15,6 +15,10 @@ import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.model.User.Role;
 import no.ntnu.idatt2106.krisefikser.repository.UserRepository;
 
+/**
+ * Service class for managing user-related operations.
+ * This class provides methods for creating, updating, deleting, and retrieving users.
+ */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -93,7 +97,6 @@ public class UserService {
       
       Household household = householdService.findById(user.getHouseholdId()).orElseThrow(() -> new RuntimeException("Household not found"));
       newUser.setHousehold(household);
-      newUser.setPassword(user.getPassword()); // Hash the password before saving
 
       newUser.setRole(Role.normal);
       User savedUser = userRepository.save(newUser);
@@ -109,8 +112,9 @@ public class UserService {
         response.setUsername(user.getUsername());
         response.setFirstName(user.getFirstName());
         response.setLastName(user.getLastName());
-        response.setPassword(user.getPassword());
         response.setRole(user.getRole().toString());
+        response.setHouseholdId(user.getHousehold().getId());
+        response.setHouseholdName(user.getHousehold().getName());
         return response;
     }
 
@@ -137,7 +141,6 @@ public class UserService {
       if (updated.getEmail()    != null)  existing.setEmail(updated.getEmail());
       if (updated.getFirstName()!= null)  existing.setFirstName(updated.getFirstName());
       if (updated.getLastName() != null)  existing.setLastName(updated.getLastName());
-      if (updated.getPassword() != null)  existing.setPassword(updated.getPassword()); // husk hashing
       
       User saved = userRepository.save(existing);   // lagrer entiteten
   
