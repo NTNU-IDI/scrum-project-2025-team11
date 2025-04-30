@@ -2,6 +2,7 @@ package no.ntnu.idatt2106.krisefikser.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class EventService {
   
   private final EventRepository eventRepository;
   private final EventMapper mapper;
+  private static final double EARTH_RADIUS_M = 6_371_000;
 
   /**
    * Retrieves an event by its ID.
@@ -155,5 +157,41 @@ public class EventService {
               )
           );
       });
+  }
+
+ /**
+   * Returns all events whose circle of influence (center + radius)
+   * contains the given (lat, lon) point.
+   */
+  public List<EventResponseDTO> getEventsNear(double lat, double lon) {
+    // size a bounding-box around (lat, lon)
+    int maxRadiusM = eventRepository.findMaxRadius();        // e.g. 500 meters, or larger
+    double radiusKm = maxRadiusM / 1_000.0;       // convert to km
+    double degLat = radiusKm / 110.574;          // ~km per degree latitude
+    double degLon = radiusKm / (111.320 * Math.cos(Math.toRadians(lat)));   // ~km per degree longitude
+
+    // fetch only events whose centers lie in that box
+    List<Event> candidates = eventRepository.findAllInBox(lat, lon, degLat, degLon);
+
+    // exact Haversine check per event 
+    return candidates.stream()
+      .filter(e -> haversine(lat, lon, e.getLatitude(), e.getLongitude())
+                    <= e.getRadius())
+      .map(mapper::toResponseDTO)
+      .collect(Collectors.toList());
+  }
+
+  // === Haversine distance in meters ===
+  private static double haversine(double lat1, double lon1, double lat2, double lon2) {
+    double φ1 = Math.toRadians(lat1);
+    double φ2 = Math.toRadians(lat2);
+    double Δφ = Math.toRadians(lat2 - lat1);
+    double Δλ = Math.toRadians(lon2 - lon1);
+
+    double a = Math.sin(Δφ/2) * Math.sin(Δφ/2)
+             + Math.cos(φ1) * Math.cos(φ2)
+             * Math.sin(Δλ/2) * Math.sin(Δλ/2);
+    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return EARTH_RADIUS_M * c;
   }
 }
