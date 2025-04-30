@@ -20,7 +20,7 @@ export class InventoryService {
     }
 
     static async update(householdId: number, itemId: number, item: HouseholdItemRequest): Promise<HouseholdItemResponse> {
-        const res = await axios.put(`${BASE_API_URL}/households/${householdId}/items/${itemId}`, item);
+        const res = await axios.put(`${BASE_API_URL}/households/${householdId}/items/${itemId}/${item.acquiredDate}`, item);
         return res.data;
     }
     
