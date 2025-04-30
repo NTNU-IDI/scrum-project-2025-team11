@@ -175,6 +175,7 @@ const handleKeydown = (event: KeyboardEvent, name: string) => {
     .dark-button {
         width: 10rem; 
         height: 3rem; 
+        background-color: var(--orange);
     }
 
     .cancel-button {
