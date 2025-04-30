@@ -7,7 +7,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 
 /**
- * 
+ * Data Transfer Object (DTO) for creating or updating an event.
  */
 @Data
 public class EventRequestDTO {

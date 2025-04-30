@@ -44,5 +44,5 @@ public class EventMapper {
     event.setRadius(dto.getRadius());
     event.setSeverity(dto.getSeverity());
     return event;
-}
+  }
 }
