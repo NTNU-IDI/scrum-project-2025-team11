@@ -98,7 +98,7 @@ public class PointOfInterestController {
             description = "Delete a point based on a given Id "
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Point successfully deleted"),
+            @ApiResponse(responseCode = "204", description = "Point successfully deleted"),
             @ApiResponse(responseCode = "400", description = "Point could not be deleted, does this point even exist?")
     })
     @DeleteMapping("/{id}")
@@ -115,7 +115,7 @@ public class PointOfInterestController {
         description = "Uses an Id to find and alter a tuple in the point of interest table"
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "204", description = "Point successfully updated"),
+        @ApiResponse(responseCode = "201", description = "Point successfully updated"),
         @ApiResponse(responseCode = "400", description = "Point could not be updated, check if the syntax is correct")
     })
     @PutMapping("/{id}")
