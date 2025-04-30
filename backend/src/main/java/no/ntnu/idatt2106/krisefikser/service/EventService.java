@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.persistence.criteria.Expression;
 import lombok.RequiredArgsConstructor;
+import no.ntnu.idatt2106.krisefikser.dto.EventRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.EventResponseDTO;
 import no.ntnu.idatt2106.krisefikser.mapper.EventMapper;
 import no.ntnu.idatt2106.krisefikser.model.Event;
@@ -181,7 +182,7 @@ public class EventService {
       .collect(Collectors.toList());
   }
 
-  // === Haversine distance in meters ===
+  // Haversine distance in meters
   private static double haversine(double lat1, double lon1, double lat2, double lon2) {
     double φ1 = Math.toRadians(lat1);
     double φ2 = Math.toRadians(lat2);
@@ -193,5 +194,36 @@ public class EventService {
              * Math.sin(Δλ/2) * Math.sin(Δλ/2);
     double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return EARTH_RADIUS_M * c;
+  }
+
+  /**
+   * Saves a new event to the database.
+   * @param event the Event request as a {@link EventRequestDTO} object
+   * @return the saved Event as a response DTO {@link EventResponseDTO}
+   */
+  public EventResponseDTO saveEvent(EventRequestDTO event) {
+    Event entity = mapper.toEntity(event);
+    Event savedEvent = eventRepository.save(entity);
+    return mapper.toResponseDTO(savedEvent);
+  }
+
+  /**
+   * Updates an existing event in the database.
+   * @param id the ID of the event to update
+   * @param event the updated Event request as a {@link EventRequestDTO} object
+   * @return the updated Event as a response DTO {@link EventResponseDTO}
+   */
+  public EventResponseDTO updateEvent(int id, EventRequestDTO event) {
+    Event entity = mapper.toEntity(event);
+    Event updatedEvent = eventRepository.save(entity);
+    return mapper.toResponseDTO(updatedEvent);
+  }
+
+  /**
+   * Deletes an event from the database by its ID.
+   * @param id the ID of the event to delete
+   */
+  public void deleteEvent(int id) {
+    eventRepository.deleteById(id);
   }
 }
