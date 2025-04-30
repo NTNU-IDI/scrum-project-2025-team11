@@ -3,6 +3,8 @@ package no.ntnu.idatt2106.krisefikser.mapper;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.springframework.stereotype.Component;
+
 import no.ntnu.idatt2106.krisefikser.dto.EventRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.EventResponseDTO;
 import no.ntnu.idatt2106.krisefikser.model.Event;
@@ -10,6 +12,7 @@ import no.ntnu.idatt2106.krisefikser.model.Event;
 /**
  * This mapper class is responsible for mapping data between the Event entity and its corresponding DTOs.
  */
+@Component
 public class EventMapper {
   public EventResponseDTO toResponseDTO(Event entity) {
     EventResponseDTO dto = new EventResponseDTO();
