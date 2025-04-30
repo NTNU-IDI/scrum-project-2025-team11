@@ -1,57 +1,67 @@
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useItemTypeStore } from '@/stores/itemStore';
 import { InventoryService } from '@/api/InventoryService';
 import { useHouseholdStore } from '@/stores/householdStore';
-import { HouseholdService } from '@/api/HouseholdService';
 import { ItemService } from '@/api/ItemService';
-import type { HouseholdItemRequest } from '@/types/Inventory';
-import { formatDate } from '@/utils/formatDate';
+import { useInventoryStore } from '@/stores/inventoryStore';
 
+// Store imports
 const householdStore = useHouseholdStore();
-
+const inventoryStore = useInventoryStore();
 const itemTypeStore = useItemTypeStore();
-// Id of the selected item type
+
+// Props
 const selectedTypeId = ref<number | null>(null)
-// Is edit mode enabled
 const isEditMode = ref(false);
-// List of items in the inventory
 const list = ref<{ id: number; name: string; quantity: number; unit: string; acquiredDate: string }[]>([]);
 
-onMounted( async () => {
-    try {
-        // Get actual household id from the store
-        const household = await HouseholdService.findById(1);
-        householdStore.setHousehold({id: household.id, name: household.name, memberCount: household.memberCount, addressId: household.address.id.toString()});
-        
-        if (!household) {
-            console.error('Household ID is not available');
-            return [];
-        }
+// Fetch inventory items
+const loadInventory = async () => {
+    // TODO: Get actual household id from the store
+    await householdStore.setHousehold(1); 
 
-        // Fetch inventory items from the service
-        const items = await InventoryService.list(household.id);
-        if (!items) {
-            console.error('No items found in the inventory');
-            return [];
-        }
-
-        // Fetch item names for each item in the inventory
-        const itemTypes = await Promise.all(
-            items.map(item => ItemService.findById(item.itemId))
-        )
-
-        list.value = items.map((item, index) => ({
-            id: item.itemId,
-            name: itemTypes[index].name,
-            quantity: item.quantity,
-            unit: item.unit,
-            acquiredDate: item.acquiredDate
-        }));
-    } catch (error) {
-        console.error('Failed to load inventory:', error);
+    if(!householdStore.id) {
+        console.error('Household ID is not available');
+        return [];
     }
+    await inventoryStore.fetchInventory(householdStore.id);
+}
+
+// Fetch inventory items when the component is mounted
+onMounted( async () => {
+    await loadInventory();
 });
+
+
+// Watch for changes in the inventory and update the list
+watch(() => inventoryStore.inventory, async (newItems) => {
+    const grouped: Record<number, { quantity: number; unit: string }> = {};
+  
+    for (const item of newItems) {
+        if (grouped[item.itemId]) {
+            grouped[item.itemId].quantity += item.quantity;
+        } else {
+            grouped[item.itemId] = {
+                quantity: item.quantity,
+                unit: item.unit
+            };
+        }
+    }
+
+    const uniqueItemIds = Object.keys(grouped).map(Number);
+    const itemNames = await Promise.all(
+        uniqueItemIds.map(id => ItemService.findById(id))
+    );
+
+    list.value = uniqueItemIds.map((id, index) => ({
+        id,
+        name: itemNames[index].name,
+        quantity: grouped[id].quantity,
+        unit: grouped[id].unit,
+        acquiredDate: newItems.find(item => item.itemId === id)?.acquiredDate || ''
+    }));
+}, { immediate: true });
 
 // Choose an item in the supply
 const chooseItemType = (itemTypeId: any, name: string) => {
@@ -66,17 +76,16 @@ const toggleEditMode = () => {
 }
 
 // Delete an item from the inventory
-const deleteItem = (itemId: number, acquiredDate: string) => {
-    try {
+const deleteItem =  (itemId: number) => {
+    list.value.forEach(async item => {
         if (!householdStore.id) {
             console.error('Household ID is not available');
             return;
         }
-        InventoryService.remove(householdStore.id, itemId, acquiredDate);
-        list.value = list.value.filter(item => item.id !== itemId);
-    } catch (error) {
-        console.error('Failed to delete item:', error);
-    }
+        if (item.id === itemId) {
+            await inventoryStore.deleteItem(householdStore.id, itemId, item.acquiredDate);
+        }
+    });
 }
 </script>
 <template>
@@ -84,7 +93,7 @@ const deleteItem = (itemId: number, acquiredDate: string) => {
 
     <div class="grey-container">
         <div v-for="item in list" :key="item.id" class="item-card">
-            <div v-if="isEditMode" class="delete-button" @click="deleteItem(item.id, item.acquiredDate)">X</div>
+            <div v-if="isEditMode" class="delete-button" @click="deleteItem(item.id)">X</div>
             <div :class="['article-card', { active: item.id === selectedTypeId }]" @click="chooseItemType(item.id, item.name)">
                 <div class="quantity">{{ item.quantity }} {{ item.unit }}</div>
                 <div class="info">
@@ -105,7 +114,7 @@ const deleteItem = (itemId: number, acquiredDate: string) => {
     }
 
     .dark-button {
-        height: 6rem;
+        height: 5rem;
         width: 9rem;
     }
     .dark-button.active {

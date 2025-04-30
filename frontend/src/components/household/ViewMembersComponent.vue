@@ -11,36 +11,30 @@ const userStore = useUserStore();
 userStore.setUsername('Madde')
 
 //Household store
-const useHousehold = useHouseholdStore();
+const householdStore = useHouseholdStore();
 const newMemberCount = ref(0);
 
 onMounted( async () => {
     // TODO: Get actual household ID from the store
-    const household = await HouseholdService.findById(1);
-    useHousehold.setHousehold({id: household.id, name: household.name, memberCount: household.memberCount, addressId: household.address.id.toString()});
+    await householdStore.setHousehold(1);
 
-    newMemberCount.value = useHousehold.memberCount;
+    newMemberCount.value = householdStore.memberCount;
 });
 
 const hasChanges = computed(() => {
-  return newMemberCount.value !== useHousehold.memberCount;
+  return newMemberCount.value !== householdStore.memberCount;
 });
 
 const changeMemberCount = async () => {
     try{
-        if(!useHousehold.id){
+        if(!householdStore.id){
             console.error('Household ID is not available');
             return;
         }
-        await HouseholdService.update(useHousehold.id,{
-            ...useHousehold,
-            memberCount: newMemberCount.value
-        }); 
+        await householdStore.addMember(newMemberCount.value); 
     } catch (error) {
         console.error('Failed to update household:', error);
     }
-    
-    useHousehold.memberCount = newMemberCount.value;
 }
 
 </script>
