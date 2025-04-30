@@ -3,6 +3,7 @@
     <div class="corner-container">
       <IconsOverview />
       <button class="button" @click="findNearestShelter">Finn nærmeste tilfluktsrom</button>
+      <EditPoint v-if="showEditPoint" :selectedPoint="selectedPoint" @close="showEditPoint = false"/>
     </div>
 
     <div id="map" class="map"></div>
@@ -18,12 +19,16 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine';
 import IconsOverview from '../../components/map/IconsOverview.vue';
+import EditPoint from '../../components/map/EditPoint.vue';
 import { onMounted, ref } from 'vue';
 import { usePointStore, type PointOfInterest } from '@/stores/pointStore';
 
 const pointStore = usePointStore(); 
-let map: L.Map;
 const showCrisisAlert = ref(false);
+const showEditPoint = ref(false);
+const selectedPoint = ref(<PointOfInterest | null>(null));
+
+let map: L.Map;
 
 declare global {
   interface Window {
@@ -170,7 +175,12 @@ function addPointsOfInterest(map: L.Map) {
     // Add point to map
     L.marker([point.latitude, point.longitude], {
       icon: customIcon
-    }).addTo(map).bindPopup(`<strong>${point.name}</strong><br>${point.description}`);
+    }).addTo(map).bindPopup(`<strong>${point.name}</strong><br>${point.description}`)
+      .on('click', () => {
+        selectedPoint.value = point;   
+        console.log(selectedPoint);
+        showEditPoint.value = true;     
+    });
   });
 }
 

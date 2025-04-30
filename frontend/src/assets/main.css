@@ -75,6 +75,17 @@ input {
   box-sizing: border-box;
 }
 
+select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--grey);
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
 button {
   width: 100%;
   padding: 0.5rem;
@@ -92,6 +103,11 @@ button:hover {
 
 .good-button {
   background-color: var(--good-green);
+}
+
+.grey-button {
+  background-color: var(--grey);
+  color: var(--darkest-blue);
 }
 
 .register-login-text {
@@ -166,4 +182,15 @@ button:hover {
 .map-icon.medical {
   background: url("/bad-red-medical-fill-border.svg") no-repeat center center /
     contain;
+}
+
+.title-map {
+  font-size: var(--font-size-xlarge);
+  margin: 7px 0 10px 0;
+}
+
+@media (max-width: 768px) {
+  .title-map {
+    font-size: var(--font-size-large);
+  }
 }
