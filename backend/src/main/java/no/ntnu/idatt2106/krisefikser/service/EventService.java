@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import jakarta.persistence.criteria.Expression;
 import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.dto.EventRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.EventResponseDTO;
@@ -35,14 +34,23 @@ public class EventService {
 
   /**
    * Retrieves an event by its name.
-   * @param name the name of the event to retrieve
+   * @param name the name of the event to retrieve. It can be a partial match, and is case-insensitive.   * 
    * @return an Optional containing the EventResponseDTO if found, or an empty Optional if not found
    */
   public Optional<EventResponseDTO> getEventByName(String name) {
     return Optional.ofNullable(eventRepository.findByName(name)).map(mapper::toResponseDTO);
   }
 
-  public List<EventResponseDTO> getfilteredEvents(String name, String iconType, String startTime, String endTime, int severity) {
+  /**
+   * Retrieves a list of events filtered by various criteria.
+   * @param name the name of the event to filter by (optional)
+   * @param iconType the icon type of the event to filter by (optional)
+   * @param startTime the time you want to filter to get all events starting after this time (optional)
+   * @param endTime the time you want to filter to get all events ending before this time (optional)
+   * @param severity the severity level of the event to filter by (0-5, optional)
+   * @return a list of EventResponseDTOs matching the specified criteria
+   */
+  public List<EventResponseDTO> getFilteredEvents(String name, String iconType, String startTime, String endTime, int severity) throws IllegalArgumentException{
     Specification<Event> spec = Specification.where(null);
 
     if (name != null) {
@@ -71,7 +79,10 @@ public class EventService {
 
   public List<EventResponseDTO> getActiveEvents() {
     return eventRepository.findAll((root, query, cb) -> 
+      cb.and(
+      cb.lessThanOrEqualTo(root.get("startTime"), cb.currentTimestamp()),
       cb.greaterThanOrEqualTo(root.get("endTime"), cb.currentTimestamp()))
+      )
       .stream()
       .map(mapper::toResponseDTO)
       .toList();
@@ -97,67 +108,6 @@ public class EventService {
     return eventRepository.findByIconTypeOrderByStartTimeDesc(iconType)
         .stream()
         .toList();
-  }
-
-  /**
-   * Retrieves a list of events near a specified location within a given radius.
-   * @param lat the latitude of the location
-   * @param lon the longitude of the location
-   * @param radius the radius in meters within which to search for events
-   * @return a list of EventResponseDTOs representing the events found within the specified radius
-   */
-    public List<EventResponseDTO> getEventsNear(double lat, double lon, int radius) {
-      List<Event> events;
-      if (radius <= 20000) { // Short distances up to 20 km
-          events = getEventsNearShortDistance(lat, lon, radius);
-      } else { // Longer distances
-          events = getEventsNearLongDistance(lat, lon, radius);
-      }
-      // Map the raw Event entities to EventResponseDTOs
-      return events.stream()
-                   .map(mapper::toResponseDTO)
-                   .toList();
-  }
-  
-  private List<Event> getEventsNearShortDistance(double lat, double lon, int radius) {
-      return eventRepository.findAll((root, query, cb) -> {
-          return cb.and(
-              cb.lessThanOrEqualTo(root.get("latitude"), lat + radius / 111320.0),
-              cb.greaterThanOrEqualTo(root.get("latitude"), lat - radius / 111320.0),
-              cb.lessThanOrEqualTo(root.get("longitude"), lon + radius / (111320.0 * Math.cos(Math.toRadians(lat)))),
-              cb.greaterThanOrEqualTo(root.get("longitude"), lon - radius / (111320.0 * Math.cos(Math.toRadians(lat))))
-          );
-      });
-  }
-  
-    private List<Event> getEventsNearLongDistance(double lat, double lon, int radius) {
-      double earthRadius = 6371000; // Earth's radius in meters
-  
-      // Convert radius from meters to radians
-      double radiusInRadians = radius / earthRadius;
-  
-      // Use the Haversine formula to filter events
-      return eventRepository.findAll((root, query, cb) -> {
-          // Expressions for Haversine formula components
-          Expression<Double> cosLat1 = cb.function("cos", Double.class, cb.function("radians", Double.class, cb.literal(lat)));
-          Expression<Double> cosLat2 = cb.function("cos", Double.class, cb.function("radians", Double.class, root.get("latitude")));
-          Expression<Double> sinLat1 = cb.function("sin", Double.class, cb.function("radians", Double.class, cb.literal(lat)));
-          Expression<Double> sinLat2 = cb.function("sin", Double.class, cb.function("radians", Double.class, root.get("latitude")));
-          Expression<Double> cosLonDiff = cb.function("cos", Double.class, cb.function("radians", Double.class, cb.diff(root.get("longitude"), lon)));
-  
-          // Break the summation into steps
-          Expression<Double> firstPart = cb.prod(cosLat1, cosLat2);
-          Expression<Double> secondPart = cb.prod(sinLat1, sinLat2);
-          Expression<Double> totalSum = cb.sum(firstPart, cb.prod(cosLat2, cosLonDiff));
-  
-          // Final Haversine formula
-          return cb.and(
-              cb.lessThanOrEqualTo(
-                  cb.function("acos", Double.class, cb.sum(totalSum, secondPart)),
-                  radiusInRadians
-              )
-          );
-      });
   }
 
  /**
