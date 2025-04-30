@@ -11,7 +11,7 @@ jobs:
 # 1) BACK-END  (build & unit tests)                            │
 # ──────────────────────────────────────────────────────────────
   backend:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     defaults:
       run: { working-directory: backend }
     steps:
@@ -39,7 +39,7 @@ jobs:
 # 2) FRONT-END  (Vue lint, unit test, build)                   │
 # ──────────────────────────────────────────────────────────────
   frontend:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     defaults:
       run: { working-directory: frontend }
     steps:
