@@ -2,15 +2,14 @@
   <header class="header">
     <div class="header-container">
       <div class="header-icons">
-        <img src="../assets/invertednew.png" alt="Logo" class="logo" @click="goToHome" />
-        <img src="../assets/ikon/map-trifold-fill.png" alt="Map" class="icon" @click="goToMap" />
+        <img src="../assets/invertednew.png" alt="Logo" class="logo" @click="goToHome" data-tooltip="Til hjemmesiden" />
+        <img src="../assets/ikon/map-trifold-fill.png" alt="Map" class="icon" @click="goToMap" data-tooltip="Til kartet"/>
 
-        <img src="../assets/ikon/lightbulb-fill.png" alt="Information" class="icon" @click="goToInformation" />
+        <img src="../assets/ikon/lightbulb-fill.png" alt="Information" class="icon" @click="goToInformation" data-tooltip="Til beredskapssiden"/>
       </div>
 
       <nav class="nav-buttons">
-        
-        <a href="/login" class="button login">Logg inn</a>
+        <a href="/login" class="button login"> Logg inn </a>
       </nav>
     </div>
   </header>
@@ -49,7 +48,6 @@ const goToInformation = () => {
   align-items: center;
 }
 
-/* --- Logo and icons --- */
 .header-icons {
   display: flex;
   align-items: center;
@@ -62,7 +60,6 @@ const goToInformation = () => {
   cursor: pointer;
 }
 
-/* Alle ikoner */
 .icon {
   height: 55px;
   width: 55px;
@@ -73,13 +70,12 @@ const goToInformation = () => {
   transform: scale(1.1);
 }
 
-/* --- Navigasjonsknapper --- */
+
 .nav-buttons {
   display: flex;
-  gap: 32px; /* tilsvarer space-x-8 */
+  gap: 32px; 
 }
 
-/* --- Knappestil --- */
 .button {
   display: inline-block;
   padding: 10px 20px;
@@ -95,7 +91,6 @@ const goToInformation = () => {
   color: #ffffff;
 }
 
-/* Login-variant */
 .button.login {
   background-color: var(--good-green);
   border-color: var(--good-green);
@@ -108,7 +103,6 @@ const goToInformation = () => {
   color: var(--good-green);
 }
 
-/* Other-variant */
 .button.other {
   background-color: var(--light-blue);
   border-color: var(--light-blue);
