@@ -40,6 +40,7 @@ const toggleNewMemberBox = () => {
 			<div class="new-item-box">
 				<NewItemComponent v-if="isItemBoxVisible" @hide-new-item-box="isItemBoxVisible = false"/>
 			</div>
+			<button class="dark-button" id="add-button" @click="toggleNewItemBox">+</button>
 		</div>
   	</div>
 </template>
@@ -56,6 +57,11 @@ const toggleNewMemberBox = () => {
 		font-size: var(--font-size-xxlarge);
 		font-weight: normal;
 	}
+
+	.new-member-box { 
+        align-self: center;
+	}
+
 	.items-container {
 		display: flex;
 		flex-direction: row;
@@ -70,4 +76,15 @@ const toggleNewMemberBox = () => {
 	.new-item-box {
 		margin-top: 4.75rem;
 	}
+
+	#add-button {
+        display: flex;
+        align-items: center; 
+        justify-content: center; 
+        width: 3rem; 
+        height: 3rem; 
+        font-size: var(--font-size-xlarge);
+        margin-left: auto;
+        margin-top: 4.75rem;
+    }
 </style>
