@@ -87,7 +87,7 @@ class UserRepositoryTest {
         user1.setHousehold(household);
         userRepository.save(user1);
         // When
-        User foundUser = userRepository.findByUsername("user1");
+        User foundUser = userRepository.findByUsername("user1").orElse(null);
         // Then
         assertThat(foundUser).isNotNull();
         assertThat(foundUser.getUsername()).isEqualTo("user1");

@@ -1,0 +1,13 @@
+CREATE TABLE REFRESH_TOKEN (
+    id              INT PRIMARY KEY AUTO_INCREMENT,
+    token           VARCHAR(512) NOT NULL UNIQUE,
+    user_id         INT NOT NULL,
+    created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expiration_date TIMESTAMP NOT NULL,
+    revoked         BOOLEAN NOT NULL DEFAULT FALSE,
+    CONSTRAINT FK_RT_USER FOREIGN KEY (user_id) REFERENCES USER_ACCOUNT(id)
+);
+
+INSERT INTO `REFRESH_TOKEN` (token, user_id, created_at, expiration_date, revoked) VALUES
+    ('hufeksdhuhfenfefue', 1, CURRENT_TIMESTAMP, DATEADD(DAY, 7, CURRENT_TIMESTAMP), FALSE),
+    ('token-2', 2, CURRENT_TIMESTAMP, DATEADD(DAY, 14, CURRENT_TIMESTAMP), TRUE);

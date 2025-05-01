@@ -1,0 +1,12 @@
+<svg width="120" height="120" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .cross {
+      fill: #bf0603;
+      stroke: black;
+      stroke-width: 4;
+    }
+  </style>
+  <path class="cross" d="
+    M 40 10 H 60 V 40 H 90 V 60 H 60 V 90 H 40 V 60 H 10 V 40 H 40 Z
+  "></path>
+</svg>

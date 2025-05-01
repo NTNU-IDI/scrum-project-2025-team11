@@ -1,29 +1,109 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useItemTypeStore } from '@/stores/itemStore';
 import { formatDate, formatDateToList } from '@/utils/formatDate';
+import { InventoryService } from '@/api/InventoryService';
+import { useHouseholdStore } from '@/stores/householdStore';
+import { HouseholdService } from '@/api/HouseholdService';
+import type { HouseholdItemRequest, EditableItem } from '@/types/Inventory';
+import { useInventoryStore } from '@/stores/inventoryStore';
+import { ItemService } from '@/api/ItemService';
 
-// Remove later
-const itemsDummy = ref([
-    { name: 'Hermetiske tomater', quantity: 6, unit: 'kg', expirationDate: new Date('2026-10-01') },
-    { name: 'Hermetiske tomater', quantity: 1, unit: 'kg', expirationDate: new Date('2026-05-01') },
-]);
-
+// Store imports
+const householdStore = useHouseholdStore();
 const itemTypeStore = useItemTypeStore();
+const inventoryStore = useInventoryStore();
+
+// Props
 const itemTypeId = computed(() => itemTypeStore.id);
 const itemTypeName = computed(() => itemTypeStore.name);
-const items = computed(() => itemTypeStore.items);
-//const isEditMode = itemTypeStore.isEditMode;
+const items = ref<EditableItem[]>([]);
+const allTypeItems = ref<EditableItem[]>([]);
 const isEditMode = computed(() => itemTypeStore.isEditMode);
 
-// TODO: get household items by type
-// const items = getHouseholdItems(itemTypeId)
+// Load all items of the selected type
+const loadItems = async () => {
+    // Get actual household id from the store
+    await householdStore.setHousehold(1);
+    
+    if (!householdStore.id) {
+        console.error('Household ID is not available');
+        return;
+    }
+    await inventoryStore.fetchInventory(householdStore.id);
+}
 
+onMounted( async () => {
+    await loadItems();
+});
 
-// TODO: updateItems
+// Watch for changes in the inventory and update the list
+watch(() => inventoryStore.inventory, async (newItems) => {
+    allTypeItems.value = newItems;
+    if (itemTypeId.value) {
+        filterItems();
+    }
+}, { immediate: true });
 
-const deleteItem = () => {
-    // TODO: deleteItem
+watch(itemTypeId, (newId) => {
+    if (newId) {
+        filterItems();
+    }
+});
+
+watch(isEditMode, (newValue, oldValue) => {
+    if (oldValue && !newValue) {
+        updateItems();
+    }
+});
+
+function filterItems() {
+    items.value = allTypeItems.value
+        .filter(item => item.itemId === itemTypeId.value)
+        .map(item => ({
+            householdId: item.householdId,
+            itemId: item.itemId,
+            itemName: item.itemName,
+            quantity: item.quantity,
+            unit: item.unit,
+            expirationDate: item.expirationDate || '',
+            acquiredDate: item.acquiredDate,
+            dirty: false,
+        }));
+}
+
+const updateItems = async () => {
+    for (const item of items.value) {
+        if (item.dirty) {
+            const updatedItem: HouseholdItemRequest = {
+                itemId: item.itemId,
+                quantity: item.quantity,
+                unit: item.unit,
+                expirationDate: item.expirationDate || '',
+                acquiredDate: item.acquiredDate,
+            };
+            await inventoryStore.updateItem(item.householdId, updatedItem)
+            item.dirty = false;
+        }
+    }
+};
+
+const deleteItem = async (item: EditableItem) => {
+    if (!householdStore.id) {
+        console.error('Household ID is not available');
+        return;
+    }
+    if (!itemTypeId.value) {
+        console.error('Item type ID is not available');
+        return;
+    }
+    await inventoryStore.deleteItem(householdStore.id, itemTypeId.value, item.acquiredDate)
+        .then(() => {
+            items.value = items.value.filter(item => item.itemId !== itemTypeId.value);
+        })
+        .catch(error => {
+            console.error('Error deleting item:', error);
+        });
 }
 
 </script>
@@ -33,15 +113,15 @@ const deleteItem = () => {
     <!-- Edit mode -->
     <div class="grey-container" v-if="isEditMode">
         <h2 class="small-header">{{ itemTypeName }}</h2>
-        <div v-for="item in items" :key="item.expirationDate.toLocaleDateString" class="item-card">
-            <div class="delete-button" @click="deleteItem()">X</div>
+        <div v-for="item in items" :key="item.expirationDate" class="item-card">
+            <div class="delete-button" @click="deleteItem(item)">X</div>
             <div class="article-card">
-                <input type="text" class="edit-input" id="quantity-input" v-model="item.quantity" /> 
-                <input type="text" class="edit-input" id="unit-input" v-model="item.unit" />
+                <input type="text" class="edit-input" id="quantity-input" @input="item.dirty = true" v-model="item.quantity" /> 
+                <input type="text" class="edit-input" id="unit-input" @input="item.dirty = true" v-model="item.unit" />
                 <div class="info">
                     <div class="exp-date">
                         <span class="grey-text">Utløper: </span> 
-                        <input type="date" class="edit-input" id="date-input" v-model="item.expirationDate.toISOString().split('T')[0]" />
+                        <input type="date" class="edit-input" id="date-input" @input="item.dirty = true" v-model="item.expirationDate" />
                     </div>
                 </div>
             </div>
@@ -51,12 +131,12 @@ const deleteItem = () => {
     <!-- View mode -->
     <div class="grey-container" v-else>
         <h2 class="small-header">{{ itemTypeName }}</h2>
-        <div v-for="item in items" :key="item.expirationDate.toLocaleDateString" class="item-card">
+        <div v-for="item in items" :key="item.expirationDate" class="item-card">
             <div class="article-card">
                 <p>{{ item.quantity }} {{ item.unit }}</p>
                 <div class="info">
                     <div class="exp-date">
-                        <span class="grey-text">Utløper: </span> {{ formatDate(item.expirationDate) }}
+                        <span class="grey-text">Utløper: </span> {{ item.expirationDate }}
                     </div>
                 </div>
             </div>
