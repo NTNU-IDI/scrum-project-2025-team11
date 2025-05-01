@@ -1,6 +1,7 @@
 package no.ntnu.idatt2106.krisefikser.model;
 
 import java.sql.Date;
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -33,14 +34,14 @@ public class RefreshToken {
 
     @Schema(description = "Time stamp showing date and time of when the token was created",
             example = "2025-05-01T10:15:05")
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @Schema(description = "Time stamp showing date and time of when the token expires",
             example = "2025-05-08T10:15:05")
     private LocalDateTime expirationDate;
 
-    @Schema(description = "A boolean letting us know wether the token has expired",
+    @Schema(description = "A boolean letting us know wether the token is invalid",
             example = "FALSE")
-    private LocalDateTime revoked;
+    private Boolean revoked;
     
 }
