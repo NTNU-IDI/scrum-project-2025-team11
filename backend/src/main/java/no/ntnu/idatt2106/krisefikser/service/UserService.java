@@ -54,6 +54,9 @@ public class UserService {
     public UserResponseDTO changePassword(int id, PasswordChangeDTO password) {
       User existing = userRepository.findById(id)
         .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+      if (!existing.getPassword().equals(password.getCurrentPassword())) {
+        throw new RuntimeException("Old password is incorrect");
+      }
       existing.setPassword(password.getNewPassword()); // Remember to hash the password before saving
       User saved = userRepository.save(existing);
       return UserMapper.toResponseDTO(saved);

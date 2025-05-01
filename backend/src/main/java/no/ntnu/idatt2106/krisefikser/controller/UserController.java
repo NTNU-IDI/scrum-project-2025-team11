@@ -150,6 +150,20 @@ public class UserController {
       @PathVariable int id,
       @Parameter(description = "Password change payload", required = true)
       @RequestBody PasswordChangeDTO dto) {
+    User user = userService.getUserById(id).orElse(null);
+    if (user == null) {
+      return ResponseEntity.notFound().build();
+    }
+    if (!user.getPassword().equals(dto.getCurrentPassword())) {
+      return ResponseEntity
+          .status(HttpStatus.BAD_REQUEST) // Bad Request
+          .body(null);
+    }
+    if (dto.getNewPassword() == null || dto.getNewPassword().isEmpty()) {
+      return ResponseEntity
+          .status(HttpStatus.BAD_REQUEST) // Bad Request
+          .body(null);
+    }
 
     userService.changePassword(id, dto);
     return ResponseEntity.noContent().build();     // 204
