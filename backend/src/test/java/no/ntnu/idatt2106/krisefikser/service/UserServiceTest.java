@@ -1,3 +1,4 @@
+
     package no.ntnu.idatt2106.krisefikser.service;
 
     import static org.assertj.core.api.Assertions.*;
@@ -152,5 +153,5 @@
             userService.deleteAllUsers();
             verify(userRepository, times(1)).deleteAll();
         }
-    }
+
 
