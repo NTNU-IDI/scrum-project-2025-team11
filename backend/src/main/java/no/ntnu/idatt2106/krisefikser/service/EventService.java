@@ -116,7 +116,7 @@ public class EventService {
    * Returns all events whose circle of influence (center + radius)
    * contains the given (lat, lon) point.
    */
-  public List<EventResponseDTO> getEventsNear(double lat, double lon) {
+  public List<EventResponseDTO> getEventsAffectingLocation(double lat, double lon) {
     // size a bounding-box around (lat, lon)
     int maxRadiusM = eventRepository.findMaxRadius();        // e.g. 500 meters, or larger
     double radiusKm = maxRadiusM / 1_000.0;       // convert to km

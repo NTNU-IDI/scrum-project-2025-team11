@@ -209,30 +209,30 @@ public class EventController {
   }
 
   /**
-   * Retrieves all events near a specified location 
+   * Retrieves all events affecting a given location. 
    * The location is defined by latitude and longitude
    * The events that will return all events whose circle of influence (center + radius)
    * contains the given (latitude, longitude) point.
    * @param lat the latitude of the location
    * @param lon the longitude of the location
-   * @return a list of {@link EventResponseDTO} containing the events near the specified location, or a 204 No Content response if no events are found.
+   * @return a list of {@link EventResponseDTO} containing the events affecting the specified location, or a 204 No Content response if no events are found.
    */
   @Operation(
-    summary = "Get events near a location", 
-    description = "Retrieve events near a specified location"
+    summary = "Get events affecting location",
+    description = "Retrieve events affecting a specified location"
   )
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "Events found", 
                   content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EventResponseDTO.class)))), 
     @ApiResponse(responseCode = "204", description = "No events found")
   })
-  @GetMapping("/near")
-  public ResponseEntity<List<EventResponseDTO>> getEventsNear(
+  @GetMapping("/affecting")
+  public ResponseEntity<List<EventResponseDTO>> getEventsAffecting(
     @Parameter (description = "the latitude of the location", required = true, example = "60.39299")
     @RequestParam double lat,
     @Parameter (description = "the longitude of the location", required = true, example = "5.32415")
     @RequestParam double lon) {
-    List<EventResponseDTO> events = eventService.getEventsNear(lat, lon);
+    List<EventResponseDTO> events = eventService.getEventsAffectingLocation(lat, lon);
     if (!events.isEmpty()) {
       return ResponseEntity.ok(events);
     } else {
