@@ -4,6 +4,8 @@ import NewMemberComponent from '@/components/household/NewMemberComponent.vue';
 import ViewMembersComponent from '@/components/household/ViewMembersComponent.vue';
 import ViewSingleItemComponent from '@/components/household/ViewSingleItemComponent.vue';
 import ViewSuppliesComponent from '@/components/household/ViewSuppliesComponent.vue';
+import Header from '@/components/Header.vue';
+import Footer from '@/components/Footer.vue';
 import { ref } from 'vue';
 
 // Toggle new item component visibility
@@ -21,6 +23,7 @@ const toggleNewMemberBox = () => {
 </script>
 
 <template>
+	<Header />
   	<div class="page-container">
 		<h1>Min husstand</h1>
 		<div class="members-container">
@@ -43,6 +46,7 @@ const toggleNewMemberBox = () => {
 			<button class="dark-button" id="add-button" @click="toggleNewItemBox">+</button>
 		</div>
   	</div>
+	<Footer />
 </template>
 
 <style scoped>

@@ -21,8 +21,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdRequestDTO;
-import no.ntnu.idatt2106.krisefikser.dto.UserRequest;
-import no.ntnu.idatt2106.krisefikser.dto.UserResponse;
+import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
+import no.ntnu.idatt2106.krisefikser.dto.UserResponseDTO;
 import no.ntnu.idatt2106.krisefikser.service.UserService;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,7 +59,7 @@ class UserControllerTest {
         requestDTO.setMemberCount(1);
         requestDTO.setAddress(addressDTO);
 
-        UserRequest userRequest = new UserRequest();
+        UserRequestDTO userRequest = new UserRequestDTO();
         userRequest.setUsername("Jonas");
         userRequest.setEmail("jon@mail.com");
         userRequest.setFirstName("Jonas");
@@ -67,14 +67,14 @@ class UserControllerTest {
         userRequest.setHouseholdId(123); // Assuming the household ID is 123
 
         // Mock the service response
-        UserResponse responseDTO = new UserResponse();
+        UserResponseDTO responseDTO = new UserResponseDTO();
         responseDTO.setUsername("Jonas");
         responseDTO.setEmail("jon@mail.com");
         responseDTO.setFirstName("Jonas");
         responseDTO.setLastName("Jonassen");
         responseDTO.setHouseholdId(123); // Assuming the household ID is 123
 
-        when(userService.saveUser(any(UserRequest.class))).thenReturn(responseDTO);
+        when(userService.saveUser(any(UserRequestDTO.class))).thenReturn(responseDTO);
 
         // Perform the request
         mockMvc.perform(post("/api/users")
