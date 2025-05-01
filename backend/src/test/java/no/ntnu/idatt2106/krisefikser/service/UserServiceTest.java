@@ -69,7 +69,6 @@ class UserServiceTest {
         UserRequest req = new UserRequest();
         req.setUsername("Jonas");
         req.setEmail("jon@mail.com");
-        req.setPassword("secret");
         req.setFirstName("Jonas");
         req.setLastName("Jonassen");
         req.setHouseholdId(123);
