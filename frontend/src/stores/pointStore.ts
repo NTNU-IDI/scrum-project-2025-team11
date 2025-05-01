@@ -38,10 +38,35 @@ export const usePointStore = defineStore("pointStore", () => {
     }
   };
 
+  const updatePointById = async (point: PointOfInterest) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/interest/${point.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(point),
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to update point");
+
+      const updated = await response.json();
+      await fetchAllPoints();
+      return updated;
+    } catch (error) {
+      console.error("Error updating point:", error);
+      throw error;
+    }
+  };
+
   return {
     allPoints,
     shelters,
     fetchAllPoints,
     fetchShelters,
+    updatePointById,
   };
 });

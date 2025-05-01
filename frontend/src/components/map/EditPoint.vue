@@ -1,28 +1,32 @@
 <template>
-  <div class="register-login-container">
-    <h1 class="title-map">Endre punkt</h1>
+  <div class="point-card">
+    <span class="close-icon" @click="$emit('close')">×</span>
 
-    <input v-model="pointData.name" placeholder="Navn" />
+    <div class="point-card-content">
 
-    <select v-model="pointData.iconType">
-      <option disabled value="">Velg type punkt</option>
-      <option value="shelter">Tilfluktsrom</option>
-      <option value="assembly_point">Møteplass</option>
-      <option value="medical">Medisinsk hjelp</option>
-    </select>
+      <h1 class="title-map">Endre punkt</h1>
 
-    <input v-model="pointData.description" placeholder="Beskrivelse" />
+      <input v-model="pointData.name" placeholder="Navn" />
 
-    <div class="coordinates-input">
-      <input v-model="pointData.latitude" placeholder="Breddegrad" />
-      <input v-model="pointData.longitude" placeholder="Lengdegrad" />
+      <select v-model="pointData.iconType">
+        <option disabled value="">Velg type punkt</option>
+        <option value="shelter">Tilfluktsrom</option>
+        <option value="assembly_point">Møteplass</option>
+        <option value="medical">Medisinsk hjelp</option>
+      </select>
+
+      <input v-model="pointData.description" placeholder="Beskrivelse" />
+
+      <div class="coordinates-input">
+        <input v-model="pointData.latitude" placeholder="Breddegrad" />
+        <input v-model="pointData.longitude" placeholder="Lengdegrad" />
+      </div>
+
+      <div class="edit-buttons">
+        <button class="button" @click="savePoint">Lagre</button>
+        <button class="delete-button" @click="deletePoint">Slett</button>
+      </div>
     </div>
-
-    <div class="edit-buttons">
-      <button class="button" @click="savePoint">Lagre</button>
-      <button class="grey-button" @click="$emit('close')">Cancel</button>
-    </div>
-
   </div>
 </template>
 
@@ -57,9 +61,20 @@ watch(() => props.selectedPoint, (newPoint) => {
   }
 }, { immediate: true });
 
-const savePoint = () => {
-  // TODO: Call to pointStore -> call to backend
-}
+const savePoint = async () => {
+  try {
+    await pointStore.updatePointById(pointData.value);
+
+  } catch (error) {
+    alert("Kunne ikke oppdatere punktet.");
+  }
+};
+
+const deletePoint = async () => {
+  // TODO: Confirmation
+  // TODO: Pointstore -> backend
+};
+
 </script>
 
 <style scoped>
@@ -67,5 +82,19 @@ const savePoint = () => {
   display: flex;
   flex-direction: column;
   gap: 5px;
+}
+
+.close-icon {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  font-size: 24px;
+  color: black;
+  cursor: pointer;
+  user-select: none;
+}
+
+.close-icon:hover {
+  color: var(--bad-red, red);
 }
 </style>

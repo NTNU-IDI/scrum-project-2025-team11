@@ -189,6 +189,23 @@ button:hover {
   margin: 7px 0 10px 0;
 }
 
+.point-card {
+  position: relative;
+  background: var(--white);
+  border-radius: 10px;
+  width: 250px;
+}
+
+.point-card-content {
+  padding: 1.2rem;
+  text-align: left;
+}
+
+.point-card input,
+select {
+  font-size: var(--font-size-small);
+}
+
 @media (max-width: 768px) {
   .title-map {
     font-size: var(--font-size-large);
