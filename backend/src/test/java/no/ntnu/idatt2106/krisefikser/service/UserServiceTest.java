@@ -153,5 +153,6 @@
             userService.deleteAllUsers();
             verify(userRepository, times(1)).deleteAll();
         }
+    }
 
 
