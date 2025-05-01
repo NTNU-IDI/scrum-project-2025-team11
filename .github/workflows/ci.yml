@@ -7,9 +7,9 @@ on:
     branches: [ main, dev ]
 
 jobs:
-# ──────────────────────────────────────────────────────────────
-# 1) BACK-END  (build & unit tests)                            │
-# ──────────────────────────────────────────────────────────────
+  # ──────────────────────────────────────────────────────────────
+  # 1) BACK-END  (build & unit tests)                            │
+  # ──────────────────────────────────────────────────────────────
   backend:
     runs-on: [ self-hosted, X64, Linux ]
     defaults:
@@ -17,10 +17,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Maven
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y maven
+      - name: Make Maven Wrapper executable
+        run: chmod +x ../mvnw
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -29,20 +27,20 @@ jobs:
           java-version: 21
           cache: maven
 
-      - name: Build & test
-        run: mvn -B verify
+      - name: Clean, Build & test
+        run: ../mvnw clean verify -B
 
       - name: Package JAR
-        run: mvn -B package -DskipTests
+        run: ../mvnw package -DskipTests -B
 
       - uses: actions/upload-artifact@v4
         with:
           name: spring-jar
           path: target/*.jar
 
-# ──────────────────────────────────────────────────────────────
-# 2) FRONT-END  (Vue lint, unit test, build)                   │
-# ──────────────────────────────────────────────────────────────
+  # ──────────────────────────────────────────────────────────────
+  # 2) FRONT-END  (Vue lint, unit test, build)                   │
+  # ──────────────────────────────────────────────────────────────
   frontend:
     runs-on: [ self-hosted, X64, Linux ]
     defaults:
@@ -61,7 +59,7 @@ jobs:
         run: npm ci
 
       - name: Lint & unit tests
-        run: npm run test:unit --if-present     # optional
+        run: npm run test:unit --if-present
 
       - name: Build production bundle
         run: npm run build
@@ -70,4 +68,3 @@ jobs:
         with:
           name: vue-dist
           path: frontend/dist
-
