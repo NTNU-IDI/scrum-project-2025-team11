@@ -60,7 +60,7 @@ public class AuthController {
     String username = loginRequest.getUsername();
     String password = loginRequest.getPassword();
 
-    User user = userService.getUserByUsername(username);
+    User user = userService.getUserByUsername(username).orElse(null);
     if (user == null || password != user.getPassword()) {
       return ResponseEntity.status(401).body("Invalid credentials");
     }
