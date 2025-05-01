@@ -32,7 +32,7 @@
 
 
 <script lang="ts" setup>
-import { defineProps, type PropType, ref, watch } from 'vue';
+import { defineProps, type PropType, ref, watch, computed } from 'vue';
 import { type PointOfInterest, usePointStore } from '@/stores/pointStore';
 
 const pointStore = usePointStore();
@@ -60,6 +60,10 @@ watch(() => props.selectedPoint, (newPoint) => {
     pointData.value = { ...newPoint };
   }
 }, { immediate: true });
+
+const formTitle = computed(() => props.selectedPoint ? 'Endre punkt' : 'Nytt punkt');
+const buttonText = computed(() => props.selectedPoint ? 'Lagre' : 'Opprett');
+const isEdit = computed(() => !!props.selectedPoint);
 
 const savePoint = async () => {
   try {

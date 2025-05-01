@@ -3,7 +3,8 @@
     <div class="corner-container">
       <IconsOverview />
       <button class="button" @click="findNearestShelter">Finn nærmeste tilfluktsrom</button>
-      <EditPoint v-if="showEditPoint" :selectedPoint="selectedPoint" @close="showEditPoint = false"/>
+      <PointForm v-if="showEditPoint && !showCreatePoint" :selectedPoint="selectedPoint" @close="showEditPoint = false" />
+      <PointForm v-if="showCreatePoint && !showEditPoint" :selectedPoint="selectedPoint" @close="showCreatePoint = false" />
     </div>
 
     <div id="map" class="map"></div>
@@ -19,13 +20,14 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine';
 import IconsOverview from '../../components/map/IconsOverview.vue';
-import EditPoint from '../../components/map/EditPoint.vue';
+import PointForm from '../../components/map/PointForm.vue';
 import { onMounted, ref } from 'vue';
 import { usePointStore, type PointOfInterest } from '@/stores/pointStore';
 
 const pointStore = usePointStore(); 
 const showCrisisAlert = ref(false);
 const showEditPoint = ref(false);
+const showCreatePoint = ref(false);
 const selectedPoint = ref(<PointOfInterest | null>(null));
 
 let map: L.Map;
@@ -111,6 +113,25 @@ onMounted(async () => {
     map.setView([lat, lon], 13);
     checkIfInCrisisArea(lat, lon);
   });
+
+  map.on('click', (e: L.LeafletMouseEvent) => {
+  const { lat, lng } = e.latlng;
+
+  // Create a new point structure with coordinates
+  const newPoint: PointOfInterest = {
+    id: -1,
+    name: '',
+    description: '',
+    iconType: 'default',
+    latitude: lat,
+    longitude: lng
+  };
+
+  selectedPoint.value = newPoint;
+  showEditPoint.value = false;
+  showCreatePoint.value = true;
+});
+
 });
 
 function getUserPosition(callback: (lat: number, lon: number) => void) {
@@ -178,7 +199,7 @@ function addPointsOfInterest(map: L.Map) {
     }).addTo(map).bindPopup(`<strong>${point.name}</strong><br>${point.description}`)
       .on('click', () => {
         selectedPoint.value = point;   
-        console.log(selectedPoint);
+        showCreatePoint.value = false;
         showEditPoint.value = true;     
     });
   });
