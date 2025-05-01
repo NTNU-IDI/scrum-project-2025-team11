@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.dto.PasswordChangeDTO;
 import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.UserResponseDTO;
+import no.ntnu.idatt2106.krisefikser.dto.UserUpdateDTO;
 import no.ntnu.idatt2106.krisefikser.mapper.UserMapper;
 import no.ntnu.idatt2106.krisefikser.model.Household;
 import no.ntnu.idatt2106.krisefikser.model.User;
@@ -121,7 +122,7 @@ public class UserService {
      * @param updatedUser
      * @return User object that was updated
      */
-    public UserResponseDTO updateUser(int id, UserRequestDTO updated) {
+    public UserResponseDTO updateUser(int id, UserUpdateDTO updated) {
 
       User existing = userRepository.findById(id)
           .orElseThrow(() -> new RuntimeException("User not found " + id));

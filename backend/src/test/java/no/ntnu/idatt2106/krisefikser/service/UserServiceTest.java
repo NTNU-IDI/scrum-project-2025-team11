@@ -16,6 +16,7 @@ import org.mockito.MockitoAnnotations;
 
 import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.UserResponseDTO;
+import no.ntnu.idatt2106.krisefikser.dto.UserUpdateDTO;
 import no.ntnu.idatt2106.krisefikser.mapper.UserMapper;
 import no.ntnu.idatt2106.krisefikser.model.Household;
 import no.ntnu.idatt2106.krisefikser.model.User;
@@ -110,7 +111,7 @@ class UserServiceTest {
         when(userRepository.findById(5)).thenReturn(Optional.of(existing));
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        UserRequestDTO patch = new UserRequestDTO();
+        UserUpdateDTO patch = new UserUpdateDTO();
         patch.setUsername("newName");
         patch.setEmail("new@mail.com");
 
@@ -126,7 +127,7 @@ class UserServiceTest {
     void testUpdateUserNotFound() {
         when(userRepository.findById(99)).thenReturn(Optional.empty());
 
-        UserRequestDTO patch = new UserRequestDTO();
+        UserUpdateDTO patch = new UserUpdateDTO();
         assertThatThrownBy(() -> userService.updateUser(99, patch))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("99");

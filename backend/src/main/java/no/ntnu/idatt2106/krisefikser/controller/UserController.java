@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.dto.PasswordChangeDTO;
 import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.UserResponseDTO;
+import no.ntnu.idatt2106.krisefikser.dto.UserUpdateDTO;
 import no.ntnu.idatt2106.krisefikser.mapper.UserMapper;
 import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.service.UserService;
@@ -209,7 +210,7 @@ public class UserController {
     @Parameter(description = "The unique identifier of the user", required = true)
     @PathVariable int id,
     @Parameter(description = "Updated user object", required = true)
-    @RequestBody UserRequestDTO user) {
+    @RequestBody UserUpdateDTO user) {
     User existingUser = userService.getUserById(id).orElse(null);
     if (existingUser == null) {
       return ResponseEntity.notFound().build();
