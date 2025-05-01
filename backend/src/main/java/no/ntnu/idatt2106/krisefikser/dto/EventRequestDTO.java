@@ -22,7 +22,7 @@ public class EventRequestDTO {
   @NotBlank(message = "Description is mandatory")
   private String description;
 
-  @Schema(description = "Type of the event. NORMAL, SHELTER, OTHER, etc", example = "MEDICAL")
+  @Schema(description = "Type of the event. NORMAL, SHELTER, OTHER, etc", example = "danger")
   @NotNull(message = "Icon type is mandatory")
   private String iconType;
 
@@ -51,5 +51,5 @@ public class EventRequestDTO {
   @NotNull(message = "Severity is mandatory")
   @Min(0)
   @Max(5)
-  private int severity;
+  private Integer severity;
 }

@@ -15,7 +15,7 @@ public class EventResponseDTO {
   @Schema(description = "Description of the event.", example = "Det har vært et kraftig jordskjelv i Trondheim.")
   private String description;
 
-  @Schema(description = "Type of the event. NORMAL, SHELTER, OTHER, etc", example = "MEDICAL")
+  @Schema(description = "Type of the event. Like 'normal', 'shelter', 'other', etc", example = "medical")
   private String iconType;
 
   @Schema(description = "Start time of the event.", example = "2023-10-01T12:00:00")
@@ -34,5 +34,5 @@ public class EventResponseDTO {
   private int radius;
 
   @Schema(description = "Severity level, from 0 (lowest) to 5 (highest)", example = "3")
-  private int severity;
+  private Integer severity;
 }

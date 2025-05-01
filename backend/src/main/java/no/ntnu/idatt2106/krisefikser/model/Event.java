@@ -46,14 +46,14 @@ public class Event {
    * This field cannot be null and is stored as a string in the database.
    */
   public enum IconType {
-    NONE,
-    POINT,
-    NORMAL,
-    DANGER,
-    ASSEMBLY_POINT,
-    MEDICAL,
-    SHELTER,
-    OTHER
+    none,
+    point,
+    normal,
+    danger,
+    assembly_point,
+    medical,
+    shelter,
+    other
   }
   @Enumerated(EnumType.STRING)
   private IconType iconType;
@@ -68,6 +68,7 @@ public class Event {
   /**
    * End time of the event.
    */
+  @Column(name = "end_time")
   private LocalDateTime endTime;
 
   /**
@@ -95,5 +96,5 @@ public class Event {
    * Severity of the event.
    * This field cannot be null and is stored as an integer in the database.
    */
-  private int severity;
+  private Integer severity;
 }
