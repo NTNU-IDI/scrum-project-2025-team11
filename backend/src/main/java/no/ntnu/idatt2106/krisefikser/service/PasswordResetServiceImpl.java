@@ -51,7 +51,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
      */
     @Override
     public void initiateReset(String email) {
-        User user = userService.findByEmail(email)
+        User user = userService.getUserByEmail(email)
             .orElseThrow(() -> new IllegalArgumentException("No user with email: " + email));
 
         // 1. clean up old tokens
@@ -92,7 +92,6 @@ public class PasswordResetServiceImpl implements PasswordResetService {
      * @param newPassword the new password to set for the user
      */
 
-    /**  
     @Override
     public void completeReset(String token, String newPassword) {
         PasswordResetToken prt = tokenRepo.findByToken(token)
@@ -106,7 +105,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
         User user = prt.getUser();
         userService.updatePassword(user, newPassword);
         tokenRepo.delete(prt);
-    }*/
+    }
 }
 
 

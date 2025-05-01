@@ -17,5 +17,5 @@ public interface PasswordResetService {
      * @param token the reset token
      * @param newPassword the new password to set
      */
-    //void completeReset(String token, String newPassword);
+    void completeReset(String token, String newPassword);
 }
