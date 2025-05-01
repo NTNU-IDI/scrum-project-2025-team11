@@ -3,7 +3,12 @@
     <div class="corner-container">
       <IconsOverview />
       <button class="button" @click="findNearestShelter">Finn nærmeste tilfluktsrom</button>
-      <EditPoint v-if="showEditPoint" :selectedPoint="selectedPoint" @close="showEditPoint = false"/>
+      <PointForm 
+        v-if="showPointForm" 
+        :selectedPoint="selectedPoint" 
+        :mode="formMode"
+        @close="closePointForm" 
+      />
     </div>
 
     <div id="map" class="map"></div>
@@ -19,14 +24,22 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine';
 import IconsOverview from '../../components/map/IconsOverview.vue';
-import EditPoint from '../../components/map/EditPoint.vue';
+import PointForm from '../../components/map/PointForm.vue';
 import { onMounted, ref } from 'vue';
 import { usePointStore, type PointOfInterest } from '@/stores/pointStore';
 
 const pointStore = usePointStore(); 
 const showCrisisAlert = ref(false);
-const showEditPoint = ref(false);
-const selectedPoint = ref(<PointOfInterest | null>(null));
+const showPointForm = ref(false);
+const formMode = ref<'edit' | 'create'>('create');
+const selectedPoint = ref<PointOfInterest>({
+  id: 0,
+  name: '',
+  description: '',
+  iconType: '',
+  latitude: 0,
+  longitude: 0,
+});
 
 let map: L.Map;
 
@@ -111,7 +124,28 @@ onMounted(async () => {
     map.setView([lat, lon], 13);
     checkIfInCrisisArea(lat, lon);
   });
+
+  map.on('click', (e: L.LeafletMouseEvent) => {
+  const { lat, lng } = e.latlng;
+
+  // Create a new point structure with coordinates
+  selectedPoint.value = {
+      id: 0,
+      name: '',
+      description: '',
+      iconType: 'default',
+      latitude: lat,
+      longitude: lng
+    };
+
+    formMode.value = 'create';
+    showPointForm.value = true;
+  });
 });
+
+function closePointForm() {
+  showPointForm.value = false;
+}
 
 function getUserPosition(callback: (lat: number, lon: number) => void) {
   // Return if browser does not support geolocation
@@ -177,9 +211,9 @@ function addPointsOfInterest(map: L.Map) {
       icon: customIcon
     }).addTo(map).bindPopup(`<strong>${point.name}</strong><br>${point.description}`)
       .on('click', () => {
-        selectedPoint.value = point;   
-        console.log(selectedPoint);
-        showEditPoint.value = true;     
+        selectedPoint.value = { ...point };
+        formMode.value = 'edit';
+        showPointForm.value = true; 
     });
   });
 }
