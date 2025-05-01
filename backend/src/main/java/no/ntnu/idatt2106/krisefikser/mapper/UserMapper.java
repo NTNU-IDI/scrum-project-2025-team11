@@ -16,6 +16,9 @@ public class UserMapper {
         dto.setEmail(user.getEmail());
         dto.setFirstName(user.getFirstName());
         dto.setLastName(user.getLastName());
+        dto.setRole(user.getRole().toString());
+        dto.setHouseholdId(user.getHousehold().getId());
+        dto.setHouseholdName(user.getHousehold().getName());
 
         Household household = user.getHousehold();
         HouseholdResponseDTO householdDTO = new HouseholdResponseDTO();
