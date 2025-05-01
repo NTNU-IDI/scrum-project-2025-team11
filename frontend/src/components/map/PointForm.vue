@@ -4,7 +4,7 @@
 
     <div class="point-card-content">
 
-      <h1 class="title-map">Endre punkt</h1>
+      <h1 class="title-map">{{ formTitle }}</h1>
 
       <input v-model="pointData.name" placeholder="Navn" />
 
@@ -23,8 +23,10 @@
       </div>
 
       <div class="edit-buttons">
-        <button class="button" @click="savePoint">Lagre</button>
-        <button class="delete-button" @click="deletePoint">Slett</button>
+        <!-- Save button for edit, Create button for create -->
+        <button class="button" @click="savePoint">{{ buttonText }}</button>
+        <!-- Delete button for edit -->
+        <button v-if="isEdit" class="delete-button" @click="deletePoint">Slett</button>
       </div>
     </div>
   </div>
@@ -32,15 +34,19 @@
 
 
 <script lang="ts" setup>
-import { defineProps, type PropType, ref, watch, computed } from 'vue';
 import { type PointOfInterest, usePointStore } from '@/stores/pointStore';
+import { computed, defineProps, type PropType, ref, watch } from 'vue';
 
 const pointStore = usePointStore();
 
 const props = defineProps({
   selectedPoint: {
-    type: Object as PropType<PointOfInterest | null>,
+    type: Object as PropType<PointOfInterest>,
     required: true,
+  },
+  mode: {
+    type: String as PropType<'edit' | 'create'>,
+    default: 'create'
   }
 });
 
@@ -56,14 +62,12 @@ const pointData = ref<PointOfInterest>({
 
 // Update data whenever prop changes
 watch(() => props.selectedPoint, (newPoint) => {
-  if (newPoint) {
-    pointData.value = { ...newPoint };
-  }
+  pointData.value = { ...newPoint };
 }, { immediate: true });
 
-const formTitle = computed(() => props.selectedPoint ? 'Endre punkt' : 'Nytt punkt');
-const buttonText = computed(() => props.selectedPoint ? 'Lagre' : 'Opprett');
-const isEdit = computed(() => !!props.selectedPoint);
+const isEdit = computed(() => props.mode === 'edit');
+const formTitle = computed(() => isEdit.value ? 'Endre punkt' : 'Nytt punkt');
+const buttonText = computed(() => isEdit.value ? 'Lagre' : 'Opprett');
 
 const savePoint = async () => {
   try {
