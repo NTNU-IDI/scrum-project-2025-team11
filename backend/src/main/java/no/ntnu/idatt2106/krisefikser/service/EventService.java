@@ -1,5 +1,7 @@
 package no.ntnu.idatt2106.krisefikser.service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -50,9 +52,9 @@ public class EventService {
    * @param severity the severity level of the event to filter by (0-5, optional)
    * @return a list of EventResponseDTOs matching the specified criteria
    */
-  public List<EventResponseDTO> getFilteredEvents(String name, String iconType, String startTime, String endTime, int severity) throws IllegalArgumentException{
+  public List<EventResponseDTO> getFilteredEvents(String name, String iconType, String startTime, String endTime, Integer severity) {
     Specification<Event> spec = Specification.where(null);
-
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
     if (name != null) {
       spec = spec.and((root, query, cb) -> cb.like(cb.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
     }
@@ -60,16 +62,16 @@ public class EventService {
       spec = spec.and((root, query, cb) -> cb.equal(root.get("iconType"), iconType));
     }
     if (startTime != null) {
-      spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("startTime"), startTime));
+      LocalDateTime startDateTime = LocalDateTime.parse(startTime, formatter);
+      spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("startTime"), startDateTime));
     }
     if (endTime != null) {
-      spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("endTime"), endTime));
+      LocalDateTime endDateTime = LocalDateTime.parse(endTime, formatter);
+      spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("endTime"), endDateTime));
     }
-    if (severity >= 0 && severity <= 5) {
+    if (severity != null) {
       spec = spec.and((root, query, cb) -> cb.equal(root.get("severity"), severity));
-    } else if (severity < 0) {
-      throw new IllegalArgumentException("Severity must be between 0 and 5");
-    }
+    } 
 
     return eventRepository.findAll(spec)
         .stream()
