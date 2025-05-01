@@ -1,12 +1,17 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, h, onMounted, ref } from 'vue';
 import { validateItemName, validateItemQuantity, validateItemUnit, validateItemExpirationDate } from '@/utils/validationService';
+import { ItemService } from '@/api/ItemService';
+import type { Item } from '@/types/Item';
+import { InventoryService } from '@/api/InventoryService';
+import { useHouseholdStore } from '@/stores/householdStore';
+import { useInventoryStore } from '@/stores/inventoryStore';
 
-//TODO: fetch existing item names from API
-//const existingItems = computed(() => {});
+// Household store
+const householdStore = useHouseholdStore();
+const inventoryStore = useInventoryStore();
 
-// Remove later
-const existingItems = ref(['Hermetiske tomater', 'Vann', 'Mel']);
+const existingTypes = ref<Item[]>([])
 
 const showDropdown = ref(false);
 const newName = ref('');
@@ -17,7 +22,15 @@ const errorMsg = ref('');
 
 const emit = defineEmits(['hide-new-item-box']);
 
-const addItem = () => {
+onMounted(async () => {
+    try {
+        existingTypes.value = await ItemService.findAll();
+    } catch (error) {
+        console.error('Failed to load items:', error);
+    }
+});
+
+const addItem = async () => {
     if(!validateItemName(newName.value)) {
         errorMsg.value = 'Vennligst skriv inn et gyldig navn';
         console.log(errorMsg.value);
@@ -42,20 +55,55 @@ const addItem = () => {
         alert(errorMsg.value);
         return;
     }
+    
+    const newItemId = existingTypes.value.find(item => item.name === newName.value)?.id;
+    if (!newItemId) {
+        errorMsg.value = 'Vennligst velg en eksisterende vare eller opprett en ny';
+        console.log(errorMsg.value);
+        alert(errorMsg.value);
+        return;
+    }
+    const newHouseholdItem = {
+        itemId: newItemId,
+        name: newName.value,
+        description: '',
+        quantity: parseInt(newQuantity.value),
+        unit: newUnit.value,
+        acquiredDate: new Date().toISOString().split('T')[0],
+        expirationDate: newExpirationDate.value
+    };
+    if(!householdStore.id) {
+        console.error('Household ID is not available');
+        return;
+    }
+    if(!newHouseholdItem) {
+        console.error('New household item is not available');
+        return;
+    }
+    if(!newHouseholdItem.itemId) {
+        console.error('Item ID is not available');
+        return;
+    }
+
+    await inventoryStore.upsertItem(householdStore.id, newHouseholdItem);
 
     emit('hide-new-item-box');
-    // TODO: add item to list
 }
 
 const selectOption = (itemName: string) => {
     newName.value = itemName;
     showDropdown.value = false;
 }
-const addItemOption = (newName: string) => {
-    if (newName && !existingItems.value.includes(newName)) {
-        existingItems.value.push(newName);
+
+const addItemOption = async (newName: string) => {
+    if (!newName) {
+        return;
     }
-    showDropdown.value = false;
+    if (newName && !existingTypes.value.some(item => item.name === newName)) {
+        const newItem = await ItemService.create({ name: newName, description: '' });
+        existingTypes.value.push(newItem);
+        showDropdown.value = false;
+    }
 }
 
 const handleKeydown = (event: KeyboardEvent, name: string) => {
@@ -83,12 +131,12 @@ const handleKeydown = (event: KeyboardEvent, name: string) => {
                 />                           
                 <ul v-if="showDropdown" class="dropdown-list">
                     <li
-                        v-for="item in existingItems"
-                        :key="item"
-                        @click="selectOption(item)"
+                        v-for="item in existingTypes"
+                        :key="item.id"
+                        @click="selectOption(item.name)"
                         class="dropdown-item"
                     >
-                        {{ item }}
+                        {{ item.name }}
                     </li>
                 </ul>
             </div>

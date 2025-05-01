@@ -103,8 +103,17 @@ public class User {
    * @return the ID of the household, or {@code null} if no seller is set.
    */
   @JsonProperty("householdId")
-  public int getHouseholdId() {
+  public Integer getHouseholdId() {
     return household != null ? household.getId() : null;
+  }
+
+  /**
+   * Gets the name of the household.
+   *
+   * @return the name of the household, or {@code null} if no seller is set.
+   */
+  public String getHouseholdName() {
+    return household != null ? household.getName() : null;
   }
 
 }
