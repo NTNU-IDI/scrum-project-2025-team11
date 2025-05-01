@@ -5,13 +5,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter 
+@Getter
 @Setter
 @NoArgsConstructor
-@Schema(description = "Payload for creating or updating an user")
-public class UserRequest {
+@Schema(description = "Data returned for a User")
+public class UserResponseDTO {
 
-    @Schema(description = "Email address of the user.", example ="trump@mail.com")
+    @Schema(description = "Unique identifier for the user.", example = "1")
+    private int id;
+
+    @Schema(description = "Email address of the user.", example = "dontru@gmail.com")
     private String email;
 
     @Schema(description = "Username of the user.", example = "maga123")
@@ -23,7 +26,13 @@ public class UserRequest {
     @Schema(description = "Last name of the user.", example = "Trump")
     private String lastName;
 
+    @Schema(description = "Role of the user.", example = "normal")
+    private String role;
+    
     @Schema(description = "Household ID of the user.", example = "1")
     private int householdId;
+
+    @Schema(description = "Household name of the user.", example = "Household 1")
+    private String householdName;
 
 }
