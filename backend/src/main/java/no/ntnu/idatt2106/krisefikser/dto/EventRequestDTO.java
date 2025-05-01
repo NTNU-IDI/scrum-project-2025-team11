@@ -15,7 +15,7 @@ public class EventRequestDTO {
   
   @Schema(description = "Name of the event.", example = "Jordskjelv i Trondheim")
   @NotBlank(message = "Name is mandatory")
-  @Max(value = 100, message = "Name must be less than 100 characters")
+  @Size(max = 100, message = "Name must be less than 100 characters")
   private String name;
 
   @Schema(description = "Description of the event.", example = "Det har vært et jordskjelv i Trondheim.")
@@ -37,18 +37,27 @@ public class EventRequestDTO {
 
   @Schema(description = "Latitude of the event location.", example = "63.4305")
   @NotNull(message = "Latitude is mandatory")
+  @Digits(integer = 10, fraction = 7, message = "Latitude must be a valid coordinate")
+  @DecimalMin(value = "-90.0", message = "Latitude must be between -90 and 90")
+  @DecimalMax(value = "90.0", message = "Latitude must be between -90 and 90")
   private Double latitude;
 
   @Schema(description = "Longitude of the event location.", example = "10.3951")
   @NotNull(message = "Longitude is mandatory")
+  @Digits(integer = 10, fraction = 7, message = "Longitude must be a valid coordinate")
+  @DecimalMin(value = "-180.0", message = "Longitude must be between -180 and 180")
+  @DecimalMax(value = "180.0", message = "Longitude must be between -180 and 180")
   private Double longitude;
 
-  @Schema(description = "Radius of the event location in meters.", example = "100")
+  @Schema(description = "Radius of the event location in meters.", example = "2500")
   @NotNull(message = "Radius is mandatory")
+  @Digits(integer = 10, fraction = 0, message = "Radius must be a whole number")
+  @Positive(message = "Radius must be positive")
   private int radius;
 
   @Schema(description = "Severity level, from 0 (lowest) to 5 (highest)", example = "3")
   @NotNull(message = "Severity is mandatory")
+  @Digits(integer = 1, fraction = 0, message = "Severity must be a whole number between 0 and 5")
   @Min(0)
   @Max(5)
   private Integer severity;
