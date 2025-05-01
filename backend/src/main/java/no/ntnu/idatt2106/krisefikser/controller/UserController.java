@@ -39,42 +39,6 @@ public class UserController {
 
 
   /**
-   * Saves a new user entity.
-   *
-   * @param user the user entity to be saved
-   * @return {@code ResponseEntity} containing the saved user entity
-   */
-  @Operation(
-    summary     = "Register new user",
-    description = "Creates a new user. Authentication *not* required.")
-  @ApiResponses({
-      @ApiResponse(responseCode = "201", description = "User created",
-          content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = UserResponseDTO.class))),
-      @ApiResponse(responseCode = "409", description = "Email or username already taken"),
-  })
-  @PostMapping
-  public ResponseEntity<UserResponseDTO> register(
-        @Parameter(description = "User registration payload", required = true)
-        @RequestBody UserRequestDTO body) {
-    
-    if (userService.emailExists(body.getEmail())) {
-      return ResponseEntity
-          .status(409) // Conflict
-          .body(null);
-    }
-    if (userService.usernameExists(body.getUsername())) {
-      return ResponseEntity
-          .status(409) // Conflict
-          .body(null);
-    }
-        
-    UserResponseDTO saved = userService.saveUser(body);
-    return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-  }
-
-
-  /**
    * Retrieves a user by their unique identifier.
    *
    * @param id the unique identifier of the user
