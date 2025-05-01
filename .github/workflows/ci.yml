@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Make Maven Wrapper executable
-        run: chmod +x ../mvnw
+        run: chmod +x ./mvnw
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -28,10 +28,10 @@ jobs:
           cache: maven
 
       - name: Clean, Build & test
-        run: ../mvnw clean verify -B
+        run: ./mvnw clean verify -B
 
       - name: Package JAR
-        run: ../mvnw package -DskipTests -B
+        run: ./mvnw package -DskipTests -B
 
       - uses: actions/upload-artifact@v4
         with:
