@@ -1,18 +1,19 @@
-package no.ntnu.idatt2106.krisefikser.service;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+    package no.ntnu.idatt2106.krisefikser.service;
 
-import java.util.List;
-import java.util.Optional;
+    import static org.assertj.core.api.Assertions.*;
+    import static org.mockito.ArgumentMatchers.any;
+    import static org.mockito.Mockito.*;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+    import java.util.List;
+    import java.util.Optional;
+
+    import org.junit.jupiter.api.BeforeEach;
+    import org.junit.jupiter.api.DisplayName;
+    import org.junit.jupiter.api.Test;
+    import org.mockito.InjectMocks;
+    import org.mockito.Mock;
+    import org.mockito.MockitoAnnotations;
 
 import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.UserResponseDTO;
@@ -23,33 +24,35 @@ import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.model.User.Role;
 import no.ntnu.idatt2106.krisefikser.repository.UserRepository;
 
-class UserServiceTest {
+    class UserServiceTest {
 
-    @Mock  private UserRepository   userRepository;
-    @Mock  private HouseholdService householdService;
+        @Mock  private UserRepository   userRepository;
+        @Mock  private HouseholdService householdService;
 
-    @InjectMocks
-    private UserService userService;
+        @InjectMocks
+        private UserService userService;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
-    @Test
-    @DisplayName("saveUser maps DTO → entity, persists and returns response")
-    void testSaveUser() {
-        // Arrange – mock household lookup
-        Household hh = new Household();
-        hh.setId(123);
-        when(householdService.findById(123)).thenReturn(Optional.of(hh));
 
-        //  repo.save should return the same entity with generated id
-        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
-            User u = inv.getArgument(0);
-            u.setId(1);       // mimic DB-generated PK
-            return u;
-        });
+        @BeforeEach
+        void setUp() {
+            MockitoAnnotations.openMocks(this);
+        }
+
+        @Test
+        @DisplayName("saveUser maps DTO → entity, persists and returns response")
+        void testSaveUser() {
+            // Arrange – mock household lookup
+            Household hh = new Household();
+            hh.setId(123);
+            when(householdService.findById(123)).thenReturn(Optional.of(hh));
+
+            //  repo.save should return the same entity with generated id
+            when(userRepository.save(any(User.class))).thenAnswer(inv -> {
+                User u = inv.getArgument(0);
+                u.setId(1);       // mimic DB-generated PK
+                return u;
+            });
 
         UserRequestDTO req = new UserRequestDTO();
         req.setUsername("Jonas");
@@ -88,9 +91,9 @@ class UserServiceTest {
         UserResponseDTO out = UserMapper.toResponseDTO(userService.getUserById(10)
                 .orElseThrow(() -> new RuntimeException("User not found for id: 10")));
 
-        assertThat(out.getUsername()).isEqualTo("alice");
-        assertThat(out.getEmail()).isEqualTo("a@ex.com");
-    }
+            assertThat(out.getUsername()).isEqualTo("alice");
+            assertThat(out.getEmail()).isEqualTo("a@ex.com");
+        }
 
     @Test
     @DisplayName("updateUser updates selected fields and returns DTO")
@@ -117,10 +120,10 @@ class UserServiceTest {
 
         UserResponseDTO updated = userService.updateUser(5, patch);
 
-        assertThat(updated.getUsername()).isEqualTo("newName");
-        assertThat(updated.getEmail()).isEqualTo("new@mail.com");
-        verify(userRepository).save(existing);
-    }
+            assertThat(updated.getUsername()).isEqualTo("newName");
+            assertThat(updated.getEmail()).isEqualTo("new@mail.com");
+            verify(userRepository).save(existing);
+        }
 
     @Test
     @DisplayName("updateUser throws when id not found")
@@ -139,7 +142,7 @@ class UserServiceTest {
         User u1 = new User(); u1.setId(1); u1.setUsername("a"); u1.setEmail("a@b.c"); u1.setRole(Role.normal); u1.setHousehold(new Household());
         User u2 = new User(); u2.setId(2); u2.setUsername("b"); u2.setEmail("b@b.c"); u2.setRole(Role.normal); u2.setHousehold(new Household());
 
-        when(userRepository.findAll()).thenReturn(List.of(u1, u2));
+            when(userRepository.findAll()).thenReturn(List.of(u1, u2));
 
         List<UserResponseDTO> all = userService.findAll();
 
@@ -148,11 +151,12 @@ class UserServiceTest {
                        .containsExactlyInAnyOrder("a", "b");
     }
 
-    @Test
-    @DisplayName("deleteAllUsers delegates to repository")
-    void testDeleteAll() {
-        userService.deleteAllUsers();
-        verify(userRepository, times(1)).deleteAll();
+        @Test
+        @DisplayName("deleteAllUsers delegates to repository")
+        void testDeleteAll() {
+            userService.deleteAllUsers();
+            verify(userRepository, times(1)).deleteAll();
+        }
     }
-}
+
 
