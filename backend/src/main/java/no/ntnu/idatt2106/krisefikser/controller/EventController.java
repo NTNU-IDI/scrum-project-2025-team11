@@ -96,14 +96,14 @@ public class EventController {
   public ResponseEntity<List<EventResponseDTO>> getAllEvents(
     @Parameter (description = "the name of the event to filter by", example = "Jordskjelv i Oslo")
     @RequestParam(required = false) String name,
-    @Parameter (description = "the icon type of the event to filter by", example = "DANGER")
+    @Parameter (description = "the icon type of the event to filter by", example = "danger")
     @RequestParam(required = false) String iconType,
-    @Parameter (description = "the start time of the event to filter by", example = "2023-10-01T12:00:00")
+    @Parameter (description = "the start time of the event to filter by. Events with start time after the given time will be returned", example = "2025-02-19T12:50:00")
     @RequestParam(required = false) String startTime,
-    @Parameter (description = "the end time of the event to filter by", example = "2023-10-01T14:00:00")
+    @Parameter (description = "the end time of the event to filter by. Events with end time before the given time will be returned", example = "2025-10-01T12:00:00")
     @RequestParam(required = false) String endTime,
-    @Parameter (description = "the severity of the event to filter by", example = "HIGH")
-    @RequestParam(required = false) int severity) {
+    @Parameter (description = "the severity of the event to filter by", example = "3")
+    @RequestParam(required = false) Integer severity) {
     List<EventResponseDTO> events = eventService.getFilteredEvents(name, iconType, startTime, endTime, severity);
     if (!events.isEmpty()) {
       return ResponseEntity.ok(events);
@@ -198,7 +198,7 @@ public class EventController {
   })
   @GetMapping("/icon/{iconType}")
   public ResponseEntity<List<EventResponseDTO>> getEventsByIconType(
-    @Parameter (description = "the icon type of the event to filter by", required = true, example = "DANGER")
+    @Parameter (description = "the icon type of the event to filter by", required = true, example = "danger")
     @PathVariable String iconType) {
     List<EventResponseDTO> events = eventService.getEventsByIconType(iconType);
     if (!events.isEmpty()) {
