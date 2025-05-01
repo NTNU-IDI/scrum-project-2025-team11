@@ -38,6 +38,33 @@ export const usePointStore = defineStore("pointStore", () => {
     }
   };
 
+  const createPoint = async (point: PointOfInterest) => {
+    try {
+      const response = await fetch("http://localhost:8080/api/interest", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: point.name,
+          iconType: point.iconType,
+          description: point.description,
+          latitude: point.latitude,
+          longitude: point.longitude,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to create point");
+
+      const newPoint = await response.json();
+      allPoints.value.push(newPoint);
+      return newPoint;
+    } catch (error) {
+      console.error("Error creating point:", error);
+      throw error;
+    }
+  };
+
   const updatePointById = async (point: PointOfInterest) => {
     try {
       const response = await fetch(
@@ -67,6 +94,7 @@ export const usePointStore = defineStore("pointStore", () => {
     shelters,
     fetchAllPoints,
     fetchShelters,
+    createPoint,
     updatePointById,
   };
 });

@@ -22,10 +22,13 @@
         <input v-model="pointData.longitude" placeholder="Lengdegrad" />
       </div>
 
-      <div class="edit-buttons">
-        <!-- Save button for edit, Create button for create -->
-        <button class="button" @click="savePoint">{{ buttonText }}</button>
-        <!-- Delete button for edit -->
+      <!-- Create mode buttons -->
+      <div v-if="!isEdit" class="point buttons create-buttons">
+        <button class="button" @click="createPoint">Lag nytt punkt</button>
+      </div>
+      <!-- Edit modebuttons -->
+      <div v-else class="point-buttons edit-buttons">
+        <button v-if="isEdit" class="button" @click="savePoint">Lagre punkt</button>
         <button v-if="isEdit" class="delete-button" @click="deletePoint">Slett</button>
       </div>
     </div>
@@ -67,7 +70,15 @@ watch(() => props.selectedPoint, (newPoint) => {
 
 const isEdit = computed(() => props.mode === 'edit');
 const formTitle = computed(() => isEdit.value ? 'Endre punkt' : 'Nytt punkt');
-const buttonText = computed(() => isEdit.value ? 'Lagre' : 'Opprett');
+
+const createPoint = async () => {
+  try {
+    await pointStore.createPoint(pointData.value);
+
+  } catch (error) {
+    alert("Kunne ikke lage det nye punktet.");
+  }
+};
 
 const savePoint = async () => {
   try {
@@ -86,7 +97,7 @@ const deletePoint = async () => {
 </script>
 
 <style scoped>
-.edit-buttons {
+.point-buttons {
   display: flex;
   flex-direction: column;
   gap: 5px;
