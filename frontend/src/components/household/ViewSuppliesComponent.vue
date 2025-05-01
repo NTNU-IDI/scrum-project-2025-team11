@@ -59,13 +59,9 @@ const toggleNewItemBox = () => {
                 </div>
             </div>
         </div>
-        <button v-if="isEditMode" class="dark-button" id="add-button" 
-            @click="$emit('show-new-item-box'), toggleNewItemBox"
-            :disabled="isBoxVisible"
-        >+</button>
     </div>
 
-    <button :class="['dark-button', { active: isEditMode }]" @click="toggleEditMode(), $emit('hide-new-item-box')">
+    <button :class="['dark-button', { active: isEditMode }]" @click="() => { toggleEditMode(); $emit('hide-new-item-box'); }">
         {{ isEditMode ? 'Large' : 'Endre lager' }}
     </button>
 </template>
@@ -81,17 +77,6 @@ const toggleNewItemBox = () => {
     }
     .dark-button.active {
         background-color: var(--good-green);
-    }
-
-    #add-button {
-        display: flex;
-        align-items: center; 
-        justify-content: center; 
-        width: 3rem; 
-        height: 3rem; 
-        font-size: var(--font-size-xlarge);
-        margin-left: auto;
-        margin-top: 1rem;
     }
 
     .article-card {

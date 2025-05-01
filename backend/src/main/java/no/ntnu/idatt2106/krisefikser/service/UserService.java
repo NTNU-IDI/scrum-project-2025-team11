@@ -1,0 +1,153 @@
+package no.ntnu.idatt2106.krisefikser.service;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import no.ntnu.idatt2106.krisefikser.dto.PasswordChangeDTO;
+import no.ntnu.idatt2106.krisefikser.dto.UserRequest;
+import no.ntnu.idatt2106.krisefikser.dto.UserResponse;
+import no.ntnu.idatt2106.krisefikser.model.Household;
+import no.ntnu.idatt2106.krisefikser.model.User;
+import no.ntnu.idatt2106.krisefikser.model.User.Role;
+import no.ntnu.idatt2106.krisefikser.repository.UserRepository;
+
+/**
+ * Service class for managing user-related operations.
+ * This class provides methods for creating, updating, deleting, and retrieving users.
+ */
+@Service
+@Transactional
+@RequiredArgsConstructor
+public class UserService {
+    private final UserRepository userRepository;
+    private final HouseholdService householdService;
+
+    /**
+     * Finds a user by their ID.
+     * @param id
+     * @return Optional<User> object containing the user if found, otherwise empty
+     */
+    public UserResponse getUserById(int id) {
+      User user = userRepository.findById(id);
+      return mapToResponse(user);
+    }
+
+    /**
+     * Delete a user by their ID.
+     * @param id
+     */
+    public void deleteById(int id) {
+        userRepository.deleteById(id);
+    }
+
+    /**
+     * Changes the password for a user.
+     * @param id the ID of the user whose password will be changed
+     * @param newPassword the new password (should be hashed before saving)
+     * @return UserResponse object for the updated user
+     */
+    public UserResponse changePassword(int id, PasswordChangeDTO password) {
+      User existing = Optional.ofNullable(userRepository.findById(id))
+        .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+      existing.setPassword(password.getNewPassword()); // Remember to hash the password before saving
+      User saved = userRepository.save(existing);
+      return mapToResponse(saved);
+    }
+
+    /**
+     * Finds a user by their username.
+     * @param username
+     * @return User object if found, otherwise null
+     */
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    /**
+     * Finds a user by their email.
+     * @param email
+     * @return User object if found, otherwise null
+     */
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public List<UserResponse> findAll() {
+      return userRepository.findAll().stream()
+          .map(this::mapToResponse)
+          .toList();
+
+    }
+
+    /**
+     * Saves a user to the database.
+     * @param user
+     * @return User object that was saved
+     */
+    public UserResponse saveUser(UserRequest user) {
+      User newUser = new User();
+      newUser.setEmail(user.getEmail());
+      newUser.setUsername(user.getUsername());
+      newUser.setFirstName(user.getFirstName());
+      newUser.setLastName(user.getLastName());
+      
+      Household household = householdService.findById(user.getHouseholdId()).orElseThrow(() -> new RuntimeException("Household not found"));
+      newUser.setHousehold(household);
+
+      newUser.setRole(Role.normal);
+      User savedUser = userRepository.save(newUser);
+      return mapToResponse(savedUser);
+
+
+    }
+
+    private UserResponse mapToResponse(User user) {
+        UserResponse response = new UserResponse();
+        response.setId(user.getId());
+        response.setEmail(user.getEmail());
+        response.setUsername(user.getUsername());
+        response.setFirstName(user.getFirstName());
+        response.setLastName(user.getLastName());
+        response.setRole(user.getRole().toString());
+        response.setHouseholdId(user.getHousehold().getId());
+        response.setHouseholdName(user.getHousehold().getName());
+        return response;
+    }
+
+    /**
+     * Deletes a user by their ID.
+     * @param id
+     */
+    public void deleteAllUsers() {
+        userRepository.deleteAll();
+    }
+
+    /**
+     * Updates a user by their ID.
+     * @param id
+     * @param updatedUser
+     * @return User object that was updated
+     */
+    public UserResponse updateUser(int id, UserRequest updated) {
+
+      User existing = Optional.ofNullable(userRepository.findById(id))
+          .orElseThrow(() -> new RuntimeException("User not found " + id));
+  
+      if (updated.getUsername() != null)  existing.setUsername(updated.getUsername());
+      if (updated.getEmail()    != null)  existing.setEmail(updated.getEmail());
+      if (updated.getFirstName()!= null)  existing.setFirstName(updated.getFirstName());
+      if (updated.getLastName() != null)  existing.setLastName(updated.getLastName());
+      
+      User saved = userRepository.save(existing);   // lagrer entiteten
+  
+      return mapToResponse(saved);                  // mapper → DTO
+    }
+
+    
+
+    
+}
