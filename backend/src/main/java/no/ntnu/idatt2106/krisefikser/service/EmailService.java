@@ -1,12 +1,16 @@
 package no.ntnu.idatt2106.krisefikser.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.SimpleMailMessage;
-import no.ntnu.idatt2106.krisefikser.model.User;
+import org.springframework.mail.javamail.MimeMessageHelper;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+
+import no.ntnu.idatt2106.krisefikser.dto.EmailRequest;
 
 @Service
 @Profile("dev") // Only active in the "dev" profile
@@ -16,41 +20,40 @@ import no.ntnu.idatt2106.krisefikser.model.User;
  * It is currently only active in the "dev" profile.
  */
 public class EmailService {
+
+    private final JavaMailSender mailSender;
+
     @Autowired
-    private JavaMailSender mailSender;
-
-    @Value("${app.frontend.url}")
-    private String frontendUrl;  // e.g. https://yourapp.com
-
-    public void sendPasswordResetEmail(User user, String token) {
-        String to = user.getEmail();
-        String subject = "Password Reset Request";
-        String resetLink = frontendUrl + "/reset-password?token=" + token;
-
-        // For simple text email:
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(
-            "Hello " + user.getFirstName() + ",\n\n" +
-            "To reset your password, click the link below:\n" +
-            resetLink + "\n\n" +
-            "This link will expire in 24 hours.\n\n" +
-            "If you did not request a password reset, just ignore this email."
-        );
-        mailSender.send(message);
+    public EmailService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
     }
 
     /**
-     * Helper method to send a test email.
+     * Sends an email based on the provided EmailRequest.
+     * Supports both text and HTML emails.
      *
-     * @param to the recipient's email address
+     * @param req the email request details
+     * @throws MessagingException if sending an HTML email fails
      */
-    public void sendTestEmail(String to) {
-        SimpleMailMessage msg = new SimpleMailMessage();
-        msg.setTo(to);
-        msg.setSubject("🎉 Spring Boot Mail Test");
-        msg.setText("Woah, The SMTP setup works!");
-        mailSender.send(msg);
+    public void sendEmail(EmailRequest req) throws MessagingException {
+        if (req.isHtml()) {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            // false = not multipart, UTF-8 encoding
+            MimeMessageHelper helper = new MimeMessageHelper(
+                mimeMessage,
+                false,
+                java.nio.charset.StandardCharsets.UTF_8.name()
+            );
+            helper.setTo(req.getTo());
+            helper.setSubject(req.getSubject());
+            helper.setText(req.getBody(), true);
+            mailSender.send(mimeMessage);
+        } else {
+            SimpleMailMessage msg = new SimpleMailMessage();
+            msg.setTo(req.getTo());
+            msg.setSubject(req.getSubject());
+            msg.setText(req.getBody());
+            mailSender.send(msg);
+        }
     }
 }
