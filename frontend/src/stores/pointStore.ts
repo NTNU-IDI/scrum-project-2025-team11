@@ -89,6 +89,20 @@ export const usePointStore = defineStore("pointStore", () => {
     }
   };
 
+  const deletePointById = async (id: number) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/interest/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) throw new Error("Failed to delete point");
+      allPoints.value = allPoints.value.filter((point) => point.id !== id);
+    } catch (error) {
+      console.error("Error deleting point:", error);
+      throw error;
+    }
+  };
+
   return {
     allPoints,
     shelters,
@@ -96,5 +110,6 @@ export const usePointStore = defineStore("pointStore", () => {
     fetchShelters,
     createPoint,
     updatePointById,
+    deletePointById,
   };
 });

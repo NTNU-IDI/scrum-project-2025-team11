@@ -90,8 +90,15 @@ const savePoint = async () => {
 };
 
 const deletePoint = async () => {
-  // TODO: Confirmation
-  // TODO: Pointstore -> backend
+  const confirmDelete = confirm("Er du sikker på at du vil slette dette punktet?");
+  
+  if (confirmDelete) {
+    try {
+      await pointStore.deletePointById(pointData.value.id);
+    } catch (error) {
+      alert("Kunne ikke slette punktet.");
+    }
+  }
 };
 
 </script>
