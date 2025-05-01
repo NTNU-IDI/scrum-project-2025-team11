@@ -2,6 +2,7 @@
 import {ref, watch, onMounted} from 'vue'
 import axios from 'axios'
 import {useRouter} from "vue-router";
+import {validateFirstName, validateLastName, validateEmail, validateUsername, validateHouseholdName} from "@/utils/validationService.ts";
 
 const router = useRouter()
 
@@ -21,24 +22,71 @@ const householdName = ref('')
 const address = ref('')
 const postalCode = ref('');
 //Checkbox for privacyPolicy
-const privacyPolicyCheck = ref('')
+const privacyPolicyCheck = ref(false)
 //Handles logic related to what inputs are shown in the form
-const householdChoice = ref()
-const hasChosenNewHousehold = ref();
+const householdChoice = ref("new")
+const hasChosenNewHousehold = ref(true);
 //References an error-message-<p>
 const errorMessage = ref('');
 
+function validateFields() {
+  let errorInfo = []
+  errorMessage.value = ""
+  if (!validateFirstName(firstName.value)) {
+    errorInfo.push("hei")
+    errorMessage.value = "Sørg for at fornavn kun består av bokstaver, mellomrom og eller bindestrek."
+    return false
+  }
+  if (!validateLastName(lastName.value)) {
+    errorMessage.value = "Sørg for at etternavn kun består av bokstaver, mellomrom og eller bindestrek."
+    return false
+  }
+  if (!validateEmail(email.value)) {
+    errorMessage.value = "Ugyldig format på email."
+    return false
+  }
+  if (!validateUsername(username.value)) {
+    errorMessage.value = "Sørg for at brukernavn kun består av bokstaver og tall."
+    return false
+  }
+  if (!validatePassword(password.value, repeatedPassword.value)) {
+    errorMessage.value = "Passordene dine er tomme eller ulike."
+    return false
+  }
+  if (householdChoice.value === "new") {
+    if (!validateHouseholdName(householdName.value)) {
+      errorMessage.value = "Sørg for at husholdningsnavn kun består av bokstaver og mellomrom."
+      return false
+    }
+    if (address.value.toString() === "" || postalCode.value === "") {
+      errorMessage.value = "Sørg for at addresseinformasjon og postkode er riktig."
+      return false
+    }
+  }
+  if (householdChoice.value === "existing") {
+    if (householdCode.value.toString() === "") {
+      errorMessage.value = "Sørg for å skrive inn husstandskode."
+      return false
+    }
+  }
+  if (!privacyPolicyCheck.value) {
+    errorMessage.value = "Du må godta personvernerklæringen for å opprette bruker."
+    return false
+  }
+
+  return true
+}
+
 async function attemptRegistration() {
   errorMessage.value = ""
-
-  if (isValidPassword()) {
-    if(hasChosenNewHousehold) {
+  if (validateFields()) {
+    if(householdChoice.value === "new") {
       const location = await getLocationDataFromAdressAndPostalCode(address.value, postalCode.value)
       if (location === undefined) {
         errorMessage.value = "Addresse og/eller postkode er ugyldig. Vennligst forsikre deg om at disse er riktige og prøv igjen."
       } else {
         errorMessage.value = ""
-        registerHouseholdAndCreateUser(location.lat, location.lon, location.address.city)
+        await registerHouseholdAndCreateUser(location.lat, location.lon, location.address.city)
       }
     } else {
       //TODO: Implement how creation of new user joining existing household works when backend is ready
@@ -50,12 +98,11 @@ async function attemptRegistration() {
   }
 }
 
-function isValidPassword() {
-  if (password.value.toString() !== repeatedPassword.value.toString()) {
-    errorMessage.value = "Du har ikke skrevet like passord. Vennligst sjekk disse og prøv igjen."
+function validatePassword(password: string, repeatedPassword: string) {
+  if (password === "" || repeatedPassword === "") {
     return false
   }
-  return true
+  return password === repeatedPassword
 }
 
 async function registerHouseholdAndCreateUser(latitude: number, longitude: number, city: string) {
@@ -91,7 +138,7 @@ async function createNewUser(hhID: number) {
     password: password.value,
     householdId: hhID
   })
-      .then(() => {
+      .then((response) => {
         router.push("/")
       })
       .catch((error) => {
@@ -145,6 +192,8 @@ onMounted(() => {
   handleHouseholdChoice()
 })
 
+defineExpose({validateFields})
+
 </script>
 
 <template>
@@ -152,22 +201,22 @@ onMounted(() => {
     <h1>Registrer bruker</h1>
     <form v-on:submit.prevent>
       <div id="divConstantInputs">
-        <input type="text" placeholder="Fornavn" v-model="firstName" required>
-        <input type="text" placeholder="Etternavn" v-model="lastName" required>
-        <input type="text" placeholder="Brukernavn" v-model="username" required>
-        <input type="email" placeholder="Epost" v-model="email" required>
-        <input type="password" placeholder="Passord" v-model="password" required>
-        <input type="password" placeholder="Gjenta passord" v-model="repeatedPassword" required>
+        <input type="text" placeholder="Fornavn" v-model="firstName" id="iptFirstName"required>
+        <input type="text" placeholder="Etternavn" v-model="lastName" id="iptLastName" required>
+        <input type="text" placeholder="Brukernavn" v-model="username" id="iptUsername" required>
+        <input type="email" placeholder="Epost" v-model="email" id="iptEmail" required>
+        <input type="password" placeholder="Passord" v-model="password" id="iptPassword" required>
+        <input type="password" placeholder="Gjenta passord" v-model="repeatedPassword" id="iptRepeatedPassword" required>
       </div>
       <label><input type="radio" v-model="householdChoice" value="new" @change="handleHouseholdChoice"> Ny husstand</label> <br>
       <div id="divNewHouseholdInfo" v-if="hasChosenNewHousehold">
-        <input type="text" placeholder="Husholdningsnavn, f.eks. 'Familien Madsen'" v-model="householdName" required>
-        <input type="text" placeholder="Adresse" v-model="address" required>
-        <input type="text" placeholder="Postkode" v-model="postalCode" required>
+        <input type="text" placeholder="Husholdningsnavn, f.eks. 'Familien Madsen'" v-model="householdName" id="iptHouseholdName" required>
+        <input type="text" placeholder="Adresse" v-model="address" id="iptAddress" required>
+        <input type="text" placeholder="Postkode" v-model="postalCode" id="iptPostalCode" required>
       </div>
       <label><input type="radio" v-model="householdChoice" value="existing" @change="handleHouseholdChoice"> Eksisterende husstand </label>
-      <input type="text" id="iptHouseholdCode" v-if="!hasChosenNewHousehold" placeholder="Husstandsskode" v-model="householdCode" required><br><br>
-      <label><input type="checkbox" id="cbPrivacyPolicy" v-model="privacyPolicyCheck" required>
+      <input type="text" v-if="!hasChosenNewHousehold" placeholder="Husstandsskode" v-model="householdCode" id="iptHouseholdCode" required><br><br>
+      <label><input type="checkbox" v-model="privacyPolicyCheck" id="cbPrivacyPolicy" required>
         Jeg godtar og har lest <a href="/personvern" id="linkPrivacyPolicy" target="_blank" class="link"> personvernerklæringen</a> </label> <br>
       <button class="good-button" type="submit" @click="attemptRegistration"> Registrer </button>
       <p id="error">{{errorMessage}}</p>
