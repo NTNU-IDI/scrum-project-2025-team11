@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import no.ntnu.idatt2106.krisefikser.dto.EventRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.EventResponseDTO;
+import no.ntnu.idatt2106.krisefikser.model.Enums;
 import no.ntnu.idatt2106.krisefikser.model.Event;
 
 /**
@@ -37,7 +38,7 @@ public class EventMapper {
     Event event = new Event();
     event.setName(dto.getName());
     event.setDescription(dto.getDescription());
-    event.setIconType(Event.IconType.valueOf(dto.getIconType()));
+    event.setIconType(Enums.IconEnum.valueOf(dto.getIconType()));
     event.setStartTime(LocalDateTime.parse(dto.getStartTime(), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")));
     if (dto.getEndTime() != null) {
       event.setEndTime(LocalDateTime.parse(dto.getEndTime(), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")));
