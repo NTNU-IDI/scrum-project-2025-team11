@@ -1,13 +1,12 @@
 package no.ntnu.idatt2106.krisefikser.controller;
 
-import java.net.URI;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,9 +22,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.dto.PasswordChangeDTO;
-import no.ntnu.idatt2106.krisefikser.dto.UserPatchDTO;
-import no.ntnu.idatt2106.krisefikser.dto.UserRequest;
-import no.ntnu.idatt2106.krisefikser.dto.UserResponse;
+import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
+import no.ntnu.idatt2106.krisefikser.dto.UserResponseDTO;
+import no.ntnu.idatt2106.krisefikser.dto.UserUpdateDTO;
+import no.ntnu.idatt2106.krisefikser.mapper.UserMapper;
 import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.service.UserService;
 
@@ -35,24 +35,8 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
 @RequiredArgsConstructor
 @Tag(name = "User", description = "Operations related to user management")
 public class UserController {
-    private final UserService userService;
+  private final UserService userService;
 
-  // /**
-  //  * Retrieves the currently authenticated user.
-  //  *
-  //  * @return {@code ResponseEntity} containing the current user's profile
-  //  *         information
-  //  */
-  //   @Operation(
-  //     summary     = "Get current user",
-  //     description = "Returns the profile of the currently authenticated user.")
-  // @ApiResponse(responseCode = "200", description = "Current user",
-  //     content = @Content(mediaType = "application/json",
-  //               schema = @Schema(implementation = UserResponse.class)))
-  // @GetMapping("/me")
-  // public ResponseEntity<UserResponse> me() {
-  //   return ResponseEntity.ok(userService.getCurrentUser());
-  // }
 
   /**
    * Saves a new user entity.
@@ -63,23 +47,32 @@ public class UserController {
   @Operation(
     summary     = "Register new user",
     description = "Creates a new user. Authentication *not* required.")
-@ApiResponses({
-    @ApiResponse(responseCode = "201", description = "User created",
-        content = @Content(mediaType = "application/json",
-                  schema = @Schema(implementation = UserResponse.class))),
-    @ApiResponse(responseCode = "409", description = "Email or username already taken",
-        content = @Content)
-})
-@PostMapping
-public ResponseEntity<UserResponse> register(
-    @Parameter(description = "User registration payload", required = true)
-    @RequestBody UserRequest body) {
+  @ApiResponses({
+      @ApiResponse(responseCode = "201", description = "User created",
+          content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = UserResponseDTO.class))),
+      @ApiResponse(responseCode = "409", description = "Email or username already taken"),
+  })
+  @PostMapping
+  public ResponseEntity<UserResponseDTO> register(
+        @Parameter(description = "User registration payload", required = true)
+        @RequestBody UserRequestDTO body) {
+    
+    if (userService.emailExists(body.getEmail())) {
+      return ResponseEntity
+          .status(409) // Conflict
+          .body(null);
+    }
+    if (userService.usernameExists(body.getUsername())) {
+      return ResponseEntity
+          .status(409) // Conflict
+          .body(null);
+    }
+        
+    UserResponseDTO saved = userService.saveUser(body);
+    return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+  }
 
-  UserResponse saved = userService.saveUser(body);
-  return ResponseEntity
-          .created(URI.create("/api/users/" + saved.getId()))
-          .body(saved);                       // 201
-}
 
   /**
    * Retrieves a user by their unique identifier.
@@ -94,19 +87,22 @@ public ResponseEntity<UserResponse> register(
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "User found",
           content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = UserResponse.class))),
+                    schema = @Schema(implementation = UserResponseDTO.class))),
       @ApiResponse(responseCode = "404", description = "User not found",
           content = @Content)
   })
   @GetMapping("/{id}")
-  public ResponseEntity<UserResponse> getById(
+  public ResponseEntity<UserResponseDTO> getById(
       @Parameter(description = "Unique user ID", required = true)
       @PathVariable int id) {
+    User user = userService.getUserById(id).orElse(null);
+    if (user == null) {
+      return ResponseEntity.notFound().build();
+    }
 
-    return ResponseEntity.ok(userService.getUserById(id));
+    return ResponseEntity.ok(UserMapper.toResponseDTO(user));
   }
 
-  
 
   /**
    * Endpoint to retrieve all users in the system.
@@ -122,37 +118,16 @@ public ResponseEntity<UserResponse> register(
           content = @Content)
   })
   @GetMapping
-  public ResponseEntity<List<UserResponse>> list() {
-    List<UserResponse> users = userService.findAll();
+  public ResponseEntity<List<UserResponseDTO>> list() {
+    List<UserResponseDTO> users = userService.findAll();
+    if (users == null) {
+      return ResponseEntity.notFound().build();
+    }
     return users.isEmpty()
          ? ResponseEntity.noContent().build()
          : ResponseEntity.ok(users);
   }
 
-  // /**
-  //  * Updates a user by their unique identifier.
-  //  *
-  //  * @param id the unique identifier of the user
-  //  * @param patch the fields to update
-  //  * @return {@code ResponseEntity} containing the updated user if found,
-  //  *         otherwise returns a 404 Not Found response
-  //  */
-  // @Operation(
-  //     summary     = "Update user (partial)",
-  //     description = "Updates non-sensitive profile fields (name, e-mail, household).")
-  // @ApiResponse(responseCode = "200", description = "User updated",
-  //     content = @Content(mediaType = "application/json",
-  //               schema = @Schema(implementation = UserResponse.class)))
-  // @PatchMapping("/{id}")
-  // public ResponseEntity<UserResponse> patch(
-  //     @Parameter(description = "User ID", required = true)
-  //     @PathVariable int id,
-  //     @Parameter(description = "Fields to update") 
-  //     @RequestBody UserPatchDTO patch) {
-
-  //   UserResponse updated = userService.patchUser(id, patch);
-  //   return ResponseEntity.ok(updated);
-  // }
 
   /**
    * Changes the password of a user by their unique identifier.
@@ -175,6 +150,20 @@ public ResponseEntity<UserResponse> register(
       @PathVariable int id,
       @Parameter(description = "Password change payload", required = true)
       @RequestBody PasswordChangeDTO dto) {
+    User user = userService.getUserById(id).orElse(null);
+    if (user == null) {
+      return ResponseEntity.notFound().build();
+    }
+    if (!user.getPassword().equals(dto.getCurrentPassword())) {
+      return ResponseEntity
+          .status(HttpStatus.BAD_REQUEST) // Bad Request
+          .body(null);
+    }
+    if (dto.getNewPassword() == null || dto.getNewPassword().isEmpty()) {
+      return ResponseEntity
+          .status(HttpStatus.BAD_REQUEST) // Bad Request
+          .body(null);
+    }
 
     userService.changePassword(id, dto);
     return ResponseEntity.noContent().build();     // 204
@@ -189,11 +178,21 @@ public ResponseEntity<UserResponse> register(
   @Operation(
       summary     = "Delete user",
       description = "Deletes a user (admin only).")
-  @ApiResponse(responseCode = "204", description = "User deleted")
+  @ApiResponses({
+      @ApiResponse(responseCode = "204", description = "User deleted",
+          content = @Content),
+      @ApiResponse(responseCode = "404", description = "User not found",
+          content = @Content)
+  })
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> delete(
       @Parameter(description = "User ID", required = true)
       @PathVariable int id) {
+    
+    User user = userService.getUserById(id).orElse(null);
+    if (user == null) {
+      return ResponseEntity.notFound().build();
+    }
 
     userService.deleteById(id);
     return ResponseEntity.noContent().build();
@@ -211,15 +210,37 @@ public ResponseEntity<UserResponse> register(
     summary = "Update user",
     description = "Updates an existing user entity in the system."
   )
-  @ApiResponse(responseCode = "200", description = "User updated successfully",
-      content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class)))
+  @ApiResponses({
+      @ApiResponse(responseCode = "404", description = "User not found",
+          content = @Content),
+      @ApiResponse(responseCode = "409", description = "Email or username already taken",
+          content = @Content),
+      @ApiResponse(responseCode = "200", description = "User updated successfully",
+          content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = UserResponseDTO.class)))
+  })
   @PostMapping("/{id}")
-  public ResponseEntity<UserResponse> updateUser(
+  public ResponseEntity<UserResponseDTO> updateUser(
     @Parameter(description = "The unique identifier of the user", required = true)
     @PathVariable int id,
     @Parameter(description = "Updated user object", required = true)
-    @RequestBody UserRequest user) {
-    UserResponse updatedUser = userService.updateUser(id, user);
+    @RequestBody UserUpdateDTO user) {
+    User existingUser = userService.getUserById(id).orElse(null);
+    if (existingUser == null) {
+      return ResponseEntity.notFound().build();
+    }
+    if (userService.emailExists(user.getEmail())) {
+      return ResponseEntity
+          .status(409) // Conflict
+          .body(null);
+    }
+    if (userService.usernameExists(user.getUsername())) {
+      return ResponseEntity
+          .status(409) // Conflict
+          .body(null);
+    }
+
+    UserResponseDTO updatedUser = userService.updateUser(id, user);
     return ResponseEntity.ok(updatedUser);
   }  
 }

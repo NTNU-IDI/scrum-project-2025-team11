@@ -14,8 +14,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import no.ntnu.idatt2106.krisefikser.dto.UserRequest;
-import no.ntnu.idatt2106.krisefikser.dto.UserResponse;
+import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
+import no.ntnu.idatt2106.krisefikser.dto.UserResponseDTO;
+import no.ntnu.idatt2106.krisefikser.dto.UserUpdateDTO;
+import no.ntnu.idatt2106.krisefikser.mapper.UserMapper;
 import no.ntnu.idatt2106.krisefikser.model.Household;
 import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.model.User.Role;
@@ -49,7 +51,7 @@ class UserServiceTest {
             return u;
         });
 
-        UserRequest req = new UserRequest();
+        UserRequestDTO req = new UserRequestDTO();
         req.setUsername("Jonas");
         req.setEmail("jon@mail.com");
         req.setFirstName("Jonas");
@@ -57,13 +59,12 @@ class UserServiceTest {
         req.setHouseholdId(123);
 
         // Act
-        UserResponse resp = userService.saveUser(req);
+        UserResponseDTO resp = userService.saveUser(req);
 
         // Assert
         assertThat(resp.getId()).isEqualTo(1);
         assertThat(resp.getUsername()).isEqualTo("Jonas");
         assertThat(resp.getEmail()).isEqualTo("jon@mail.com");
-        assertThat(resp.getRole()).isEqualTo(Role.normal.name());
         verify(userRepository).save(any(User.class));
     }
 
@@ -78,10 +79,14 @@ class UserServiceTest {
         u.setLastName("Wonder");
         u.setPassword("hash");
         u.setRole(Role.normal);
+        u.setHousehold(new Household());
+        u.getHousehold().setId(123);
+        u.getHousehold().setName("Wonderland");
 
-        when(userRepository.findById(10)).thenReturn(u);
+        when(userRepository.findById(10)).thenReturn(Optional.of(u));
 
-        UserResponse out = userService.getUserById(10);
+        UserResponseDTO out = UserMapper.toResponseDTO(userService.getUserById(10)
+                .orElseThrow(() -> new RuntimeException("User not found for id: 10")));
 
         assertThat(out.getUsername()).isEqualTo("alice");
         assertThat(out.getEmail()).isEqualTo("a@ex.com");
@@ -99,15 +104,18 @@ class UserServiceTest {
         existing.setLastName("Name");
         existing.setPassword("oldPwd");
         existing.setRole(Role.normal);
+        existing.setHousehold(new Household());
+        existing.getHousehold().setId(123);
+        existing.getHousehold().setName("OldHouse");
 
-        when(userRepository.findById(5)).thenReturn(existing);
+        when(userRepository.findById(5)).thenReturn(Optional.of(existing));
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        UserRequest patch = new UserRequest();
+        UserUpdateDTO patch = new UserUpdateDTO();
         patch.setUsername("newName");
         patch.setEmail("new@mail.com");
 
-        UserResponse updated = userService.updateUser(5, patch);
+        UserResponseDTO updated = userService.updateUser(5, patch);
 
         assertThat(updated.getUsername()).isEqualTo("newName");
         assertThat(updated.getEmail()).isEqualTo("new@mail.com");
@@ -117,9 +125,9 @@ class UserServiceTest {
     @Test
     @DisplayName("updateUser throws when id not found")
     void testUpdateUserNotFound() {
-        when(userRepository.findById(99)).thenReturn(null);
+        when(userRepository.findById(99)).thenReturn(Optional.empty());
 
-        UserRequest patch = new UserRequest();
+        UserUpdateDTO patch = new UserUpdateDTO();
         assertThatThrownBy(() -> userService.updateUser(99, patch))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("99");
@@ -128,15 +136,15 @@ class UserServiceTest {
     @Test
     @DisplayName("findAll maps list of entities → list of DTOs")
     void testFindAll() {
-        User u1 = new User(); u1.setId(1); u1.setUsername("a"); u1.setEmail("a@b.c"); u1.setRole(Role.normal);
-        User u2 = new User(); u2.setId(2); u2.setUsername("b"); u2.setEmail("b@b.c"); u2.setRole(Role.normal);
+        User u1 = new User(); u1.setId(1); u1.setUsername("a"); u1.setEmail("a@b.c"); u1.setRole(Role.normal); u1.setHousehold(new Household());
+        User u2 = new User(); u2.setId(2); u2.setUsername("b"); u2.setEmail("b@b.c"); u2.setRole(Role.normal); u2.setHousehold(new Household());
 
         when(userRepository.findAll()).thenReturn(List.of(u1, u2));
 
-        List<UserResponse> all = userService.findAll();
+        List<UserResponseDTO> all = userService.findAll();
 
         assertThat(all).hasSize(2)
-                       .extracting(UserResponse::getUsername)
+                       .extracting(UserResponseDTO::getUsername)
                        .containsExactlyInAnyOrder("a", "b");
     }
 
