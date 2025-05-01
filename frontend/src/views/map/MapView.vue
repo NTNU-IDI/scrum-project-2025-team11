@@ -3,6 +3,7 @@
     <div class="corner-container">
       <IconsOverview />
       <button class="button" @click="findNearestShelter">Finn nærmeste tilfluktsrom</button>
+      <EditPoint v-if="showEditPoint" :selectedPoint="selectedPoint" @close="showEditPoint = false"/>
     </div>
 
     <div id="map" class="map"></div>
@@ -18,10 +19,16 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine';
 import IconsOverview from '../../components/map/IconsOverview.vue';
+import EditPoint from '../../components/map/EditPoint.vue';
 import { onMounted, ref } from 'vue';
+import { usePointStore, type PointOfInterest } from '@/stores/pointStore';
+
+const pointStore = usePointStore(); 
+const showCrisisAlert = ref(false);
+const showEditPoint = ref(false);
+const selectedPoint = ref(<PointOfInterest | null>(null));
 
 let map: L.Map;
-const showCrisisAlert = ref(false);
 
 declare global {
   interface Window {
@@ -31,34 +38,6 @@ declare global {
 window.routingControl = null;
 
 // Test data
-type PointOfInterest = {
-  id: number;
-  name: string;
-  icon_type: string;
-  description: string;
-  latitude: number;
-  longitude: number;
-};
-
-const testPointsOfInterest = [
-  {
-    id: 1,
-    name: 'Tilfluktsrom Sentrum',
-    icon_type: 'star',
-    description: 'Offentlig tilfluktsrom i sentrum.',
-    latitude: 63.432,
-    longitude: 10.393
-  },
-  {
-    id: 2,
-    name: 'Møteplass Elgeseter',
-    icon_type: 'meetup',
-    description: 'Samleplass ved Elgeseter gate.',
-    latitude: 63.434,
-    longitude: 10.399,
-  }
-];
-
 type Event = {
   id: number;
   name: string;
@@ -111,7 +90,7 @@ const testEvents = [
   }
 ];
 
-onMounted(() => {
+onMounted(async () => {
   // Init map
   map = L.map('map', {
     zoomControl: false
@@ -120,39 +99,37 @@ onMounted(() => {
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
   // Add points of interest
+  await pointStore.fetchAllPoints();
   addPointsOfInterest(map);
 
   // Add events
   addEvents(map);
 
-  // Get user location
-  getUserLocation(map);
+  // Get user location and set marker
+  getUserPosition((lat, lon) => {
+  L.marker([lat, lon]).addTo(map).bindPopup("Din posisjon").openPopup();
+    map.setView([lat, lon], 13);
+    checkIfInCrisisArea(lat, lon);
+  });
 });
 
-function getUserLocation(map: L.Map) {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const userLatitude = position.coords.latitude;
-        const userLongitude = position.coords.longitude;
+function getUserPosition(callback: (lat: number, lon: number) => void) {
+  // Return if browser does not support geolocation
+  if (!navigator.geolocation) return;
 
-        // Add marker
-        const userLocationMarker = L.marker([userLatitude, userLongitude])
-          .addTo(map)
-          .bindPopup("<strong>Din posisjon</strong>")
-          .openPopup();
-        map.setView([userLatitude, userLongitude], 13);
+  // Get user position
+  navigator.geolocation.getCurrentPosition(
+    pos => callback(pos.coords.latitude, pos.coords.longitude),
+    err => console.error("Error getting location: ", err)
+  );
+}
 
-        // Check if user is in a crisis area
-        checkIfInCrisisArea(userLatitude, userLongitude);
-      },
-      (error) => {
-        console.error("Error getting location: ", error);
-      }
-    );
-  } else {
-    console.warn("Geolocation is not supported by this browser.");
-  }
+function getEventColor(severity: number) {
+  return severity === 1
+    ? 'var(--light-orange)'
+    : severity === 0
+    ? 'var(--yellow)'
+    : 'var(--bad-red)';
 }
 
 function checkIfInCrisisArea(userLatitude: number, userLongitude: number) {
@@ -169,12 +146,16 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   const R = 6371;
   const dLat = toRadians(lat2 - lat1);
   const dLon = toRadians(lon2 - lon1);
+
+  // Haversine formula
   const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
             Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
             Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+  // Central angle
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  const distance = R * c;
-  return distance * 1000;
+
+  return R * c * 1000;
 }
 
 function toRadians(degrees: number): number {
@@ -182,82 +163,69 @@ function toRadians(degrees: number): number {
 }
 
 function addPointsOfInterest(map: L.Map) {
-  testPointsOfInterest.forEach(point => {
+  pointStore.allPoints.forEach(point => {
     const customIcon = L.divIcon({
-      html: `<div class="map-icon ${point.icon_type}" style="margin: 0;"></div>`,
+      // Set class based on point type
+      html: `<div class="map-icon ${point.iconType}" style="margin: 0;"></div>`,
       className: '',
       iconSize: [20, 20],
       iconAnchor: [10, 10]
     });
 
+    // Add point to map
     L.marker([point.latitude, point.longitude], {
       icon: customIcon
-    }).addTo(map).bindPopup(`<strong>${point.name}</strong><br>${point.description}`);
+    }).addTo(map).bindPopup(`<strong>${point.name}</strong><br>${point.description}`)
+      .on('click', () => {
+        selectedPoint.value = point;   
+        console.log(selectedPoint);
+        showEditPoint.value = true;     
+    });
   });
 }
 
 function addEvents(map: L.Map) {
-  testEvents.forEach(event => {
-    let circleColor = 'var(--bad-red)'; 
-    let fillColor = 'var(--bad-red)';
-
-    if (event.severity === 1) {
-      circleColor = 'var(--light-orange)';
-      fillColor = 'var(--light-orange)';
-    } else if (event.severity === 0) {
-      circleColor = 'var(--yellow)';
-      fillColor = 'var(--yellow)';
-    }
-
-    L.circle([event.latitude, event.longitude], {
-      color: circleColor,
-      fillColor: fillColor,
+  testEvents.forEach(({ latitude, longitude, radius, severity, name, description }) => {
+    const color = getEventColor(severity);
+    L.circle([latitude, longitude], {
+      color,
+      fillColor: color,
       weight: 1,
-      radius: event.radius,
-      fillOpacity: 0.3 
-    }).addTo(map).bindPopup(`<strong>${event.name}</strong><br>${event.description}`);
+      radius,
+      fillOpacity: 0.3
+    }).addTo(map).bindPopup(`<strong>${name}</strong><br>${description}`);
   });
 }
 
 async function findNearestShelter() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition((position) => {
-      const userLatitude = position.coords.latitude;
-      const userLongitude = position.coords.longitude;
+  getUserPosition(async (lat, lon) => {
+    await pointStore.fetchShelters();
+    const shelter = getNearestPoint(lat, lon, pointStore.shelters);
 
-      const nearestShelter = getNearestShelter(userLatitude, userLongitude);
-      
-      if (nearestShelter) {
-        // Remove previous route
-        if (window.routingControl) {
-          map.removeControl(window.routingControl);
-        }
-        // Show route
-        L.Routing.control({
-          waypoints: [
-            L.latLng(userLatitude, userLongitude),
-            L.latLng(nearestShelter.latitude, nearestShelter.longitude)
-          ],
-          routeWhileDragging: false,
-        }).addTo(map);
-      }
-    });
-  }
+    // Return if no shelter was found
+    if (!shelter) return;
+
+    if (window.routingControl) map.removeControl(window.routingControl);
+    window.routingControl = L.Routing.control({
+      waypoints: [L.latLng(lat, lon), L.latLng(shelter.latitude, shelter.longitude)],
+      routeWhileDragging: false,
+    }).addTo(map);
+  });
 }
 
-function getNearestShelter(userLatitude: number, userLongitude: number): PointOfInterest | null {
-  let nearestShelter: PointOfInterest | null = null;
+function getNearestPoint(userLatitude: number, userLongitude: number, points: PointOfInterest[]): PointOfInterest | null {
+  let nearestPoint: PointOfInterest | null = null;
   let minDistance = Infinity;
 
-  testPointsOfInterest.forEach(point => {
+  // Iterate each point and find closest one
+  points.forEach(point => {
     const distance = calculateDistance(userLatitude, userLongitude, point.latitude, point.longitude);
     if (distance < minDistance) {
       minDistance = distance;
-      nearestShelter = point;
+      nearestPoint = point;
     }
   });
-
-  return nearestShelter;
+  return nearestPoint;
 }
 </script>
 
