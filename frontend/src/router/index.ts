@@ -4,6 +4,7 @@ import MapView from "@/views/map/MapView.vue";
 import RegisterView from "@/views/RegisterView.vue";
 import HouseholdView from "@/views/household/HouseholdView.vue";
 import PrivacyPolicyView from "@/views/PrivacyPolicyView.vue";
+import UserHomeView from "@/views/HomeInloggedView.vue";
 import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
 
@@ -37,6 +38,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/personvern',
     name: 'PrivacyPolicy',
     component: PrivacyPolicyView,
+  },
+  {
+    path: "/userhome",
+    name: "UserHomeView",
+    component: UserHomeView,
   },
 ];
 

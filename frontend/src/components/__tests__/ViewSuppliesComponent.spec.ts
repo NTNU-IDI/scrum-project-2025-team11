@@ -1,112 +1,105 @@
-import { mount } from "@vue/test-utils";
+import { mount, flushPromises } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import ViewSuppliesComponent from "@/components/household/ViewSuppliesComponent.vue";
 import { useItemTypeStore } from "@/stores/itemStore";
+import { useHouseholdStore } from "@/stores/householdStore";
+import { useInventoryStore } from "@/stores/inventoryStore";
+import { ItemService } from "@/api/ItemService";
+
+vi.mock("@/api/ItemService", () => ({
+    ItemService: {
+      findById: vi.fn((id: number) => Promise.resolve({ name: `Item ${id}` })),
+    },
+}));
 
 describe("ViewSuppliesComponent", () => {
-  let store: ReturnType<typeof useItemTypeStore>;
+	let itemTypeStore: ReturnType<typeof useItemTypeStore>;
+	let householdStore: ReturnType<typeof useHouseholdStore>;
+	let inventoryStore: ReturnType<typeof useInventoryStore>;
 
-  beforeEach(() => {
-    setActivePinia(createPinia());
-    store = useItemTypeStore();
-  });
+	beforeEach(() => {
+		setActivePinia(createPinia());
+		itemTypeStore = useItemTypeStore();
+		householdStore = useHouseholdStore();
+		inventoryStore = useInventoryStore();
 
-  it("renders component with correct header", () => {
-    const wrapper = mount(ViewSuppliesComponent);
-    expect(wrapper.find("h1").text()).toBe("Beredskapslager");
-  });
+		householdStore.setHousehold(1);
 
-  it("displays all supply items correctly", () => {
-    const wrapper = mount(ViewSuppliesComponent);
-    const itemCards = wrapper.findAll(".item-card");
-    expect(itemCards.length).toBe(7);
-  });
+		inventoryStore.inventory = [
+		{ householdId: 1, itemName: "Vann", itemId: 1, quantity: 10, unit: "liter", acquiredDate: "2024-01-01" },
+		{ householdId: 1, itemName: "Bønner", itemId: 2, quantity: 5, unit: "kg", acquiredDate: "2024-02-01" },
+		];
+	});
 
-  it("show correct quantity and unit for item", () => {
-    const wrapper = mount(ViewSuppliesComponent);
-    const firstItem = wrapper.find(".quantity");
-    expect(firstItem.text()).toContain("10 liter");
-  });
+	it("renders header correctly", async () => {
+		const wrapper = mount(ViewSuppliesComponent);
+		await flushPromises();
+		expect(wrapper.find("h1").text()).toBe("Beredskapslager");
+	});
 
-  it("calls chooseItemType when an item is clicked", async () => {
-    const wrapper = mount(ViewSuppliesComponent);
-    const chooseItemTypeSpy = vi.spyOn(wrapper.vm, "chooseItemType");
-    await wrapper.findAll(".article-card")[0].trigger("click");
-    expect(chooseItemTypeSpy).toHaveBeenCalled();
-    expect(chooseItemTypeSpy).toHaveBeenCalledWith(
-      1,
-      "Vann",
-      expect.arrayContaining([
-        expect.objectContaining({ quantity: 6, unit: "kg" }),
-        expect.objectContaining({ quantity: 1, unit: "kg" }),
-      ])
-    );
-  });
+	it("displays correct number of items", async () => {
+		const wrapper = mount(ViewSuppliesComponent);
+		await flushPromises();
+		const items = wrapper.findAll(".item-card");
+		expect(items.length).toBe(2);
+	});
 
-  it("updates store when chooseItemType is called", async () => {
-    const wrapper = mount(ViewSuppliesComponent);
-    const setItemTypeSpy = vi.spyOn(store, "setItemType");
-    await wrapper.vm.chooseItemType(2, "Hermetiske tomater", [
-      { quantity: 6, unit: "kg", expirationDate: new Date("2026-10-01") },
-    ]);
-    expect(setItemTypeSpy).toHaveBeenCalledWith(
-      2,
-      "Hermetiske tomater",
-      expect.arrayContaining([
-        expect.objectContaining({ quantity: 6, unit: "kg" }),
-      ])
-    );
-    expect(wrapper.vm.selectedTypeId).toBe(2);
-  });
+	it("shows quantity and unit correctly", async () => {
+		const wrapper = mount(ViewSuppliesComponent);
+		await flushPromises();
+		expect(wrapper.find(".quantity").text()).toBe("10 liter");
+	});
 
-  it("toggles edit mode when button is clicked", async () => {
-    const wrapper = mount(ViewSuppliesComponent);
-    const toggleEditModeSpy = vi.spyOn(store, "toggleEditMode");
-    expect(wrapper.vm.isEditMode).toBe(false);
-    expect(wrapper.find(".dark-button").text()).toBe("Endre lager");
-    await wrapper.find(".dark-button").trigger("click");
-    expect(toggleEditModeSpy).toHaveBeenCalled();
-    expect(wrapper.vm.isEditMode).toBe(true);
-    expect(wrapper.find(".dark-button").text()).toBe("Large");
-    expect(wrapper.find(".dark-button").classes()).toContain("active");
-  });
+	it("updates selected item when clicked", async () => {
+		const wrapper = mount(ViewSuppliesComponent);
+		await flushPromises();
+		const card = wrapper.findAll(".article-card")[1];
+		await card.trigger("click");
 
-  it("shows delete buttons in edit mode", async () => {
-    const wrapper = mount(ViewSuppliesComponent);
-    expect(wrapper.findAll(".delete-button").length).toBe(0);
-    await wrapper.find(".dark-button").trigger("click");
-    const deleteButtons = wrapper.findAll(".delete-button");
-    expect(deleteButtons.length).toBe(7);
-    expect(deleteButtons[0].text()).toBe("X");
-  });
+		expect(itemTypeStore.id).toBe(2);
+		expect(itemTypeStore.name).toBe("Item 2");
 
-  it("apply class to selected item", async () => {
-    const wrapper = mount(ViewSuppliesComponent);
-    await wrapper.findAll(".article-card")[1].trigger("click");
-    const activeCards = wrapper.findAll(".article-card.active");
-    expect(activeCards.length).toBe(1);
-    expect(activeCards[0].text()).toContain("Hermetiske tomater");
-  });
+		const activeCards = wrapper.findAll(".article-card.active");
+		expect(activeCards.length).toBe(1);
+		expect(activeCards[0].text()).toContain("Item 2");
+	});
 
-  it("handle empty items array", () => {
-    const wrapper = mount(ViewSuppliesComponent, {
-      global: {
-        mocks: {
-          items: [],
-        },
-      },
-    });
-    expect(wrapper.findAll(".item-card").length).toBe(0);
-  });
+	it("toggles edit mode and button text", async () => {
+		const wrapper = mount(ViewSuppliesComponent);
+		await flushPromises();
 
-  it("update text on button when mode changes", async () => {
-    const wrapper = mount(ViewSuppliesComponent);
-    const button = wrapper.find(".dark-button");
-    expect(button.text()).toBe("Endre lager");
-    await button.trigger("click");
-    expect(button.text()).toBe("Large");
-    await button.trigger("click");
-    expect(button.text()).toBe("Endre lager");
-  });
+		const button = wrapper.find(".dark-button");
+		expect(button.text()).toBe("Endre lager");
+
+		await button.trigger("click");
+		expect(wrapper.vm.isEditMode).toBe(true);
+		expect(button.text()).toBe("Large");
+		expect(button.classes()).toContain("active");
+
+		await button.trigger("click");
+		expect(wrapper.vm.isEditMode).toBe(false);
+		expect(button.text()).toBe("Endre lager");
+	});
+
+	it("shows delete buttons in edit mode", async () => {
+		const wrapper = mount(ViewSuppliesComponent);
+		await flushPromises();
+
+		expect(wrapper.findAll(".delete-button").length).toBe(0);
+
+		await wrapper.find(".dark-button").trigger("click");
+		await flushPromises();
+
+		const deleteButtons = wrapper.findAll(".delete-button");
+		expect(deleteButtons.length).toBe(2);
+		expect(deleteButtons[0].text()).toBe("X");
+	});
+
+	it("handles empty inventory gracefully", async () => {
+		inventoryStore.inventory = [];
+		const wrapper = mount(ViewSuppliesComponent);
+		await flushPromises();
+		expect(wrapper.findAll(".item-card").length).toBe(0);
+	});
 });
