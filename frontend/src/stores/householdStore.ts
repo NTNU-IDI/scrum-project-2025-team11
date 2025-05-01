@@ -39,7 +39,7 @@ export const useHouseholdStore = defineStore('household', {
             this.memberCount = 0;
             this.addressId = '';
         },
-        async addMember(count: number) {
+        async setMemberCount(count: number) {
             this.memberCount = count;
             try {
                 if (this.id === null) {

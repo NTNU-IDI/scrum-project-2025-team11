@@ -31,7 +31,7 @@ const changeMemberCount = async () => {
             console.error('Household ID is not available');
             return;
         }
-        await householdStore.addMember(newMemberCount.value); 
+        await householdStore.setMemberCount(newMemberCount.value); 
     } catch (error) {
         console.error('Failed to update household:', error);
     }
