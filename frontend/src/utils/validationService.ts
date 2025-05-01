@@ -3,8 +3,11 @@ const itemNameRegex = /^[a-zA-Z0-9_ ]+$/;
 const itemQuantityRegex = /^[0-9]+$/;
 const itemUnitRegex = /^[a-zA-Z]+$/;
 const itemExpirationDateRegex = /^\d{4}-\d{2}-\d{2}$/; // YYYY-MM-DD format
-const firstNameRegex = /^[a-zA-Z]+$/;
-const lastNameRegex = /^[a-zA-Z]+$/;
+const firstNameRegex = /^[a-zA-Z\s\-]+$/;
+const lastNameRegex = /^[a-zA-Z\s\-]+$/;
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const usernameRegex = /^[a-zA-Z0-9]+$/;
+const householdNameRegex = /^[a-zA-Z\s\-]+$/;
 
 // Function to validate item name
 export function validateItemName(name: string): boolean {
@@ -45,6 +48,16 @@ export function validateLastName(name: string): boolean {
 // Function to validate email
 export function validateEmail(email: string): boolean {
     if(!email) return false;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
 }
+
+export function validateUsername(username: string): boolean {
+    if(!username) return false
+    return usernameRegex.test(username)
+}
+
+export function validateHouseholdName(householdName: string): boolean {
+    if(!householdName) return false
+    return householdNameRegex.test(householdName)
+}
+
