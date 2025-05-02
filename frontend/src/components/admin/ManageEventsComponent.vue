@@ -3,11 +3,20 @@ import { ref } from 'vue';
 import EditEventComponent from './manage_events/EditEventComponent.vue';
 import ViewEventsComponent from './manage_events/ViewEventsComponent.vue';
 import NewEventComponent from './manage_events/NewEventComponent.vue';
+import { useEventStore } from '@/stores/eventStore';
 
 const showNewEventBox = ref(false);
 const toggleNewEventBox = () => {
     showNewEventBox.value = !showNewEventBox.value;
 }
+
+const showSingleEventBox = ref(false);
+const eventStore = useEventStore();
+const chooseEventId = (eventId: number) => {
+    eventStore.chooseEvent(eventId);
+    eventStore.fetchChosenEvent();
+    showSingleEventBox.value = true;
+};
 </script>
 <template>
 <div class="header-container"> 
@@ -18,8 +27,8 @@ const toggleNewEventBox = () => {
     </div>  
 </div>   
 <div class="page-container">
-    <ViewEventsComponent />
-    <EditEventComponent />
+    <ViewEventsComponent @event-selected="chooseEventId"/>
+    <EditEventComponent v-if="showSingleEventBox" />
     <div v-if="showNewEventBox">
         <NewEventComponent @hide-new-event-box="toggleNewEventBox" />
     </div>
