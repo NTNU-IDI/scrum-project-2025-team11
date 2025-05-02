@@ -207,6 +207,20 @@ select {
   font-size: var(--font-size-small);
 }
 
+.error-message {
+  font-size: var(--font-size-small);
+  color: var(--bad-red);
+}
+
+.button:disabled {
+  background-color: var(--grey);
+  cursor: not-allowed;
+}
+
+.button:disabled:hover {
+  background-color: var(--grey);
+}
+
 @media (max-width: 768px) {
   .title-map {
     font-size: var(--font-size-large);
