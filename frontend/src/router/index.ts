@@ -38,8 +38,8 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresNormalUser: true }
   },
   {
-    path: '/personvern',
-    name: 'PrivacyPolicy',
+    path: "/personvern",
+    name: "PrivacyPolicy",
     component: PrivacyPolicyView,
   },
   {
@@ -48,8 +48,8 @@ const routes: Array<RouteRecordRaw> = [
     component: UserHomeView,
   },
   {
-    path: '/auth',
-    name: 'Auth',
+    path: "/auth",
+    name: "Auth",
     component: AuthView,
   },
   // { //Eksempel - admin-route
