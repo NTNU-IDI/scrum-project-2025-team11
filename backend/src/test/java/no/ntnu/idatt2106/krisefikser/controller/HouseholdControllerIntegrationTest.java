@@ -3,24 +3,28 @@ package no.ntnu.idatt2106.krisefikser.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdRequestDTO;
+import no.ntnu.idatt2106.krisefikser.config.TestSecurityConfig;
 import no.ntnu.idatt2106.krisefikser.model.Household;
 import no.ntnu.idatt2106.krisefikser.repository.HouseholdRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.context.annotation.Import;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@ActiveProfiles("test")
 @SpringBootTest
 @AutoConfigureMockMvc
+@Import(TestSecurityConfig.class)
 class HouseholdControllerIntegrationTest {
 
     @Autowired
@@ -78,6 +82,7 @@ class HouseholdControllerIntegrationTest {
     }
 
     @Test
+    @WithMockUser
     void testUpdateHousehold() throws Exception {
 
         Household initialHousehold = new Household();

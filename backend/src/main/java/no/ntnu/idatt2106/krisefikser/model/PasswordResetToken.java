@@ -17,10 +17,20 @@ import lombok.Setter;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GenerationType;
 
+/**
+ * Entity class representing a password reset token in the database.
+ * This class is used to map the password_reset_tokens table in the database.
+ *
+ * It contains the following fields:
+ * - id: Unique identifier for the token
+ * - token: The actual token string
+ * - expiryDate: The date and time when the token expires
+ * - user: The user associated with this token
+ */
 @Entity
 @Table(name = "password_reset_tokens")
 @Getter @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 public class PasswordResetToken {
