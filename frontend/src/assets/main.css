@@ -63,6 +63,7 @@ h1 {
   font-size: 1.8rem;
   margin-bottom: 1rem;
   color: var(--darkest-blue);
+  text-align: center;
 }
 
 input {
@@ -230,7 +231,7 @@ select {
   background-color: var(--grey);
 }
 
-/* Styling for hjemmesidene! Ikke rør altså!! */
+/* ---Styling for hjemmesidene! Ikke rør altså!!--- */
 .page-wrapper {
   display: flex;
   flex-direction: column;
@@ -358,7 +359,7 @@ select {
   cursor: pointer;
 }
 
-/* Stylingen til headerene, så helst ikke rør denne heller! */
+/* ---Stylingen til headerene, så helst ikke rør denne heller!--- */
 .header {
   background-color: var(--dark-blue);
   color: white;
@@ -401,7 +402,7 @@ select {
   transform: scale(1.1);
 }
 
-/* De andre knappene (altså innlogging og sånn) */
+/* De andre knappene (altså innlogging og sånn i header) */
 .button {
   display: inline-block;
   padding: 15px 25px;
