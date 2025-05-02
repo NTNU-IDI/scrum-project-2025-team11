@@ -6,6 +6,10 @@ import HouseholdView from "@/views/household/HouseholdView.vue";
 import PrivacyPolicyView from "@/views/PrivacyPolicyView.vue";
 import AuthView from "@/views/AuthView.vue";
 import UserHomeView from "@/views/HomeInloggedView.vue";
+import HomeAdminView from "@/views/HomeAdminView.vue";
+import AboutView from "@/views/AboutView.vue";
+
+
 import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
 
@@ -50,6 +54,15 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Auth',
     component: AuthView,
   },
+  {
+    path: '/adminhome',
+    name: 'HomeAdminView',
+    component: HomeAdminView,
+  },
+  { path: '/about',
+    name: 'AboutView',
+    component: AboutView,
+  }
 ];
 
 const router = createRouter({

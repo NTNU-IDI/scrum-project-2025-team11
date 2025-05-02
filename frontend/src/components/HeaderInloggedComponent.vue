@@ -8,27 +8,9 @@
       <div class="header-right">
         <img src="../assets/ikon/house-line-fill.png" alt="Husstand" class="icon" @click="goToHousehold" />
         <img src="../assets/ikon/list-plus-fill.png" alt="Lager" class="icon" @click="goToStorage" />
-        <a href="/" class="button login" @click.prevent="goToLogout">Logg ut</a>
+        <a href="/" class="button logout" @click.prevent="goToLogout">Logg ut</a>
       </div>
     </div>
   </header>
 </template>
-
-
-<script lang="ts" setup>
-import { useRouter } from 'vue-router'
-const router = useRouter()
-const goToHome = () => {
-  router.push('/')
-}
-const goToLogout = () => {
-  router.push('/')
-}
-const goToStorage = () => {
-  router.push('/storage')
-}
-const goToHousehold = () => {
-  router.push('/household')
-}
-</script>
 

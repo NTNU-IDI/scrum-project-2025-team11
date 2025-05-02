@@ -3,14 +3,14 @@
     <div class="footer-content">
       <h1>Andre tjenester</h1>
 
-      <div class="footer-links" data-tooltip="Disse tjenestene er ikke tilgjengelige enda.">
+      <div class="footer-links">
         |
         <a href="/about">Om oss </a> |
         <a href="/privacy">Personvern</a> |
-        <a href="/contact">Kontakt oss</a> |
-        <a href="/userhome">User home (for testing)</a> |
-        <a href="/admin">Admin (for testing)</a>
-        <a href="/auth">Auth (for testing)</a> |
+         <!--<a href="/contact">Kontakt oss</a> |-->
+        <a href="/userhome" >User home (for testing)</a> |
+        <a href="/adminhome">Admin (for testing)</a> |
+        <a href="/auth">Auth (for testing)</a>
         <br />
         <br />
         <br />
@@ -59,16 +59,6 @@
 }
 .footer-links:hover {
   cursor: pointer;
-}
-.footer-links:hover::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  background-color: #ff0000;
-  color: #fff;
-  padding: 5px;
-  border-radius: 4px;
-  font-size: 12px;
-  white-space: nowrap;
 }
 
 .footer-links a {
