@@ -36,8 +36,8 @@ const routes: Array<RouteRecordRaw> = [
     component: HouseholdView,
   },
   {
-    path: '/personvern',
-    name: 'PrivacyPolicy',
+    path: "/personvern",
+    name: "PrivacyPolicy",
     component: PrivacyPolicyView,
   },
   {
@@ -46,8 +46,8 @@ const routes: Array<RouteRecordRaw> = [
     component: UserHomeView,
   },
   {
-    path: '/auth',
-    name: 'Auth',
+    path: "/auth",
+    name: "Auth",
     component: AuthView,
   },
 ];
