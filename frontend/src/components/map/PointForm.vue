@@ -6,7 +6,7 @@
 
       <h1 class="title-map">{{ formTitle }}</h1>
 
-      <input v-model="pointData.name" placeholder="Navn" />
+      <input v-model="pointData.name" type="text" placeholder="Navn" />
 
       <select v-model="pointData.iconType">
         <option disabled value="">Velg type punkt</option>
@@ -18,17 +18,20 @@
       <input v-model="pointData.description" placeholder="Beskrivelse" />
 
       <div class="coordinates-input">
-        <input v-model="pointData.latitude" placeholder="Breddegrad" />
-        <input v-model="pointData.longitude" placeholder="Lengdegrad" />
+        <input v-model="pointData.latitude" type="number" placeholder="Breddegrad" />
+        <input v-model="pointData.longitude" type="number" placeholder="Lengdegrad" />
       </div>
+
+      <p v-if="validationError" class="error-message">{{ validationError }}</p>
+      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
 
       <!-- Create mode buttons -->
       <div v-if="!isEdit" class="point buttons create-buttons">
-        <button class="button" @click="createPoint">Lag nytt punkt</button>
+        <button class="button" @click="createPoint" :disabled="hasValidationError">Lag nytt punkt</button>
       </div>
       <!-- Edit modebuttons -->
       <div v-else class="point-buttons edit-buttons">
-        <button v-if="isEdit" class="button" @click="savePoint">Lagre punkt</button>
+        <button v-if="isEdit" class="button" @click="savePoint" :disabled="hasValidationError">Lagre punkt</button>
         <button v-if="isEdit" class="delete-button" @click="deletePoint">Slett</button>
       </div>
     </div>
@@ -39,6 +42,13 @@
 <script lang="ts" setup>
 import { type PointOfInterest, usePointStore } from '@/stores/pointStore';
 import { computed, defineProps, type PropType, ref, watch } from 'vue';
+import {
+  validatePointName,
+  validatePointDescription,
+  validateIconType,
+  validateLatitude,
+  validateLongitude
+} from '@/utils/validationService';
 
 const pointStore = usePointStore();
 
@@ -70,22 +80,52 @@ watch(() => props.selectedPoint, (newPoint) => {
 
 const isEdit = computed(() => props.mode === 'edit');
 const formTitle = computed(() => isEdit.value ? 'Endre punkt' : 'Nytt punkt');
+const validationError = ref('');
+const errorMessage = ref('');
+
+const hasValidationError = computed(() => {
+  if (!validatePointName(pointData.value.name)) {
+    validationError.value = "Ugyldig navn. Bruk kun bokstaver, tall og noen skilletegn.";
+    return true;
+  }
+  if (!validateIconType(pointData.value.iconType)) {
+    validationError.value = "Velg en gyldig type for punktet.";
+    return true;
+  }
+  if (!validatePointDescription(pointData.value.description)) {
+    validationError.value = "Beskrivelsen må være på minst 5 tegn.";
+    return true;
+  }
+  if (!validateLatitude(pointData.value.latitude)) {
+    validationError.value = "Breddegrad må være et tall mellom -90 og 90.";
+    return true;
+  }
+  if (!validateLongitude(pointData.value.longitude)) {
+    validationError.value = "Lengdegrad må være et tall mellom -180 og 180.";
+    return true;
+  }
+
+  validationError.value = '';
+  return false;
+});
 
 const createPoint = async () => {
+  errorMessage.value = '';
   try {
     await pointStore.createPoint(pointData.value);
 
   } catch (error) {
-    alert("Kunne ikke lage det nye punktet.");
+    errorMessage.value = "Kunne ikke lage det nye punktet.";
   }
 };
 
 const savePoint = async () => {
+  errorMessage.value = '';
   try {
     await pointStore.updatePointById(pointData.value);
 
   } catch (error) {
-    alert("Kunne ikke oppdatere punktet.");
+    errorMessage.value = "Kunne ikke oppdatere punktet.";
   }
 };
 
@@ -96,7 +136,7 @@ const deletePoint = async () => {
     try {
       await pointStore.deletePointById(pointData.value.id);
     } catch (error) {
-      alert("Kunne ikke slette punktet.");
+      errorMessage.value = "Kunne ikke slette punktet.";
     }
   }
 };
@@ -121,6 +161,6 @@ const deletePoint = async () => {
 }
 
 .close-icon:hover {
-  color: var(--bad-red, red);
+  color: var(--bad-red);
 }
 </style>
