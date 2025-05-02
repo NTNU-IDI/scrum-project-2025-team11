@@ -6,7 +6,7 @@
       <div class="footer-links">
         |
         <a href="/about">Om oss </a> |
-        <a href="/privacy">Personvern</a> |
+        <a href="/personvern">Personvern</a> |
          <!--<a href="/contact">Kontakt oss</a> |-->
         <a href="/userhome" >User home (for testing)</a> |
         <a href="/adminhome">Admin (for testing)</a> |
