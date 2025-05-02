@@ -29,8 +29,12 @@ import PointForm from '../../components/map/PointForm.vue';
 import { onMounted, ref } from 'vue';
 import { usePointStore } from '@/stores/pointStore';
 import type { PointOfInterest } from "@/types/PointOfInterest";
-import { calculateDistance, getNearestPoint, getEventColor } from '@/utils/geoService';
+import { calculateDistance, getEventColor } from '@/utils/geoService';
+import {useUserStore} from "@/stores/userStore.ts";
+import {storeToRefs} from "pinia";
 
+const userStore = useUserStore()
+const {role} = storeToRefs(userStore)
 const pointStore = usePointStore(); 
 const showCrisisAlert = ref(false);
 const showPointForm = ref(false);
@@ -46,13 +50,6 @@ const selectedPoint = ref<PointOfInterest>({
 
 let map: L.Map;
 let temporaryMarker: L.Marker | null = null;
-
-const props = defineProps({
-  role: {
-    type: String,
-    required: true
-  }
-});
 
 declare global {
   interface Window {
@@ -137,7 +134,7 @@ onMounted(async () => {
   });
 
   // ADMIN: New point on click
-  if (props.role === 'admin') {
+  if (role.value === 'admin') {
     map.on('click', (e: L.LeafletMouseEvent) => {
     const { lat, lng } = e.latlng;
     removeTempMarker();
@@ -225,7 +222,7 @@ function addPointsOfInterest(map: L.Map) {
         selectedPoint.value = { ...point };
 
         // ADMIN: Edit on icon click
-        if (props.role === 'admin') {
+        if (role.value === 'admin') {
           removeTempMarker();
           formMode.value = 'edit';
           showPointForm.value = true;
