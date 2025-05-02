@@ -1,12 +1,12 @@
 import { mount } from "@vue/test-utils";
-import PointForm from "@/components/map/PointForm.vue";
+import PointView from "@/components/map/PointView.vue";
 import { createPinia, setActivePinia } from "pinia";
 import { describe, beforeEach, it, expect, vi } from "vitest";
 import { usePointStore } from "@/stores/pointStore";
 
 vi.mock("@/stores/pointStore");
 
-describe("PointForm.vue", () => {
+describe("PointView.vue", () => {
   let pointStoreMock: any;
 
   beforeEach(() => {
@@ -29,7 +29,7 @@ describe("PointForm.vue", () => {
   };
 
   it("create mode renders correctly", () => {
-    const wrapper = mount(PointForm, {
+    const wrapper = mount(PointView, {
       props: {
         selectedPoint: testPoint,
         mode: "create",
@@ -41,7 +41,7 @@ describe("PointForm.vue", () => {
   });
 
   it("edit mode renders correctly", () => {
-    const wrapper = mount(PointForm, {
+    const wrapper = mount(PointView, {
       props: {
         selectedPoint: testPoint,
         mode: "edit",
@@ -54,7 +54,7 @@ describe("PointForm.vue", () => {
   });
 
   it("view mode renders correctly (without input fields or edit buttons)", () => {
-    const wrapper = mount(PointForm, {
+    const wrapper = mount(PointView, {
       props: {
         selectedPoint: testPoint,
         mode: "view",
@@ -79,7 +79,7 @@ describe("PointForm.vue", () => {
   });
 
   it('calls createPoint when clicking on "Lag nytt punkt" button', async () => {
-    const wrapper = mount(PointForm, {
+    const wrapper = mount(PointView, {
       props: {
         selectedPoint: testPoint,
         mode: "create",
@@ -91,7 +91,7 @@ describe("PointForm.vue", () => {
   });
 
   it('calls updatePointById when clicking on "Lagre punkt" button', async () => {
-    const wrapper = mount(PointForm, {
+    const wrapper = mount(PointView, {
       props: {
         selectedPoint: testPoint,
         mode: "edit",
@@ -108,7 +108,7 @@ describe("PointForm.vue", () => {
   it('confirms deletion and calls deletePointById when clicking "Slett"', async () => {
     vi.spyOn(window, "confirm").mockReturnValue(true);
 
-    const wrapper = mount(PointForm, {
+    const wrapper = mount(PointView, {
       props: {
         selectedPoint: testPoint,
         mode: "edit",
@@ -125,7 +125,7 @@ describe("PointForm.vue", () => {
   });
 
   it("emits close when clicking on close icon", async () => {
-    const wrapper = mount(PointForm, {
+    const wrapper = mount(PointView, {
       props: {
         selectedPoint: testPoint,
         mode: "edit",
@@ -137,7 +137,7 @@ describe("PointForm.vue", () => {
   });
 
   it("disables create button when validation fails", async () => {
-    const wrapper = mount(PointForm, {
+    const wrapper = mount(PointView, {
       props: {
         selectedPoint: { ...testPoint, name: "" }, // Invalid name
         mode: "create",

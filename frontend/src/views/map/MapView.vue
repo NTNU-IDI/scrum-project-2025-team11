@@ -25,7 +25,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine';
 import IconsOverview from '../../components/map/IconsOverview.vue';
-import PointForm from '../../components/map/PointForm.vue';
+import PointForm from '../../components/map/PointView.vue';
 import { onMounted, ref } from 'vue';
 import { usePointStore } from '@/stores/pointStore';
 import type { PointOfInterest } from "@/types/PointOfInterest";
