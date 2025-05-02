@@ -7,7 +7,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -16,6 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import no.ntnu.idatt2106.krisefikser.config.TestSecurityConfig;
 import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
 import no.ntnu.idatt2106.krisefikser.model.Address;
@@ -27,7 +30,9 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@WebMvcTest(AddressController.class) 
+@Import(TestSecurityConfig.class)
+@WebMvcTest(AddressController.class)
+@AutoConfigureMockMvc
 public class AddressControllerTest {
   @Autowired
   private MockMvc mvc;

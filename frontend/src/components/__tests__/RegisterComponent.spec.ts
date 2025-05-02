@@ -41,18 +41,28 @@ describe('RegisterComponent', () => {
         expect(radioInput.length).toBe(2)
 
         //Test that new household is the one that is rendered
-        expect(wrapper.find("#iptHouseholdCode").exists()).toBeTruthy()
-        expect(wrapper.find("#divPlaceInfo").exists()).toBeFalsy()
+        expect(wrapper.find("#divNewHouseholdInfo").exists()).toBeTruthy()
+        if (wrapper.find("#divNewHouseholdInfo").exists()) {
+            expect(wrapper.find("#divNewHouseholdInfo").findAll("input").length).toBe(3)
+        }
+        expect(wrapper.find("#iptHouseholdCode").exists()).toBeFalsy()
+
 
         //Test that address fields are shown when the second radio is triggered
         radioInput[1].trigger("change")
         await nextTick()
+        expect(wrapper.find("#iptHouseholdCode").exists()).toBeTruthy()
+        expect(wrapper.find("#divPlaceInfo").exists()).toBeFalsy()
 
-        expect(wrapper.find("#iptHouseholdCode").exists()).toBeFalsy()
-        expect(wrapper.find("#divPlaceInfo").exists()).toBeTruthy()
-        if (wrapper.find("#divPlaceInfo").exists()) {
-            expect(wrapper.find("#divPlaceInfo").findAll("input").length).toBe(2)
-        }
+        //Test that privacy policy checkbox exists
+        const cbPrivacyPolicy = wrapper.find("#cbPrivacyPolicy")
+        expect(cbPrivacyPolicy.exists()).toBeTruthy()
+
+        //Test that link to privacy policy exists and links correctly
+        const linkToPrivacyPolicy = wrapper.find("#linkPrivacyPolicy")
+        expect(linkToPrivacyPolicy.exists()).toBeTruthy()
+        expect(linkToPrivacyPolicy.attributes("href")).toBe("/personvern")
+        expect(linkToPrivacyPolicy.attributes("target")).toBe("_blank")
 
         //Test that register-button shows
         const registerButton = wrapper.find("button")
@@ -60,7 +70,7 @@ describe('RegisterComponent', () => {
         expect(registerButton.text()).toBe("Registrer")
 
         //Test that link shows and leads to login
-        const linkToLogin = wrapper.find(".link")
+        const linkToLogin = wrapper.find(".register-login-text").find(".link")
         expect(linkToLogin.exists()).toBeTruthy()
         expect(linkToLogin.attributes("href")).toBe("/login")
         expect(linkToLogin.text()).toBe("Logg inn her")
