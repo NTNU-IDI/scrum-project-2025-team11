@@ -8,6 +8,8 @@ import AuthView from "@/views/AuthView.vue";
 import UserHomeView from "@/views/HomeInloggedView.vue";
 import HomeAdminView from "@/views/HomeAdminView.vue";
 import AboutView from "@/views/AboutView.vue";
+import ForgotPassword from "@/views/ForgotPasswordView.vue";
+import ResetPassword from "@/views/ResetPasswordView.vue";
 
 
 import type { RouteRecordRaw } from "vue-router";
@@ -62,7 +64,17 @@ const routes: Array<RouteRecordRaw> = [
   { path: '/about',
     name: 'AboutView',
     component: AboutView,
-  }
+  },
+  {
+    path: "/forgot",
+    name: "ForgotPassword",
+    component: ForgotPassword,
+  },
+  {
+    path: "/reset",
+    name: "ResetPassword",
+    component: ResetPassword,
+  },
 ];
 
 const router = createRouter({

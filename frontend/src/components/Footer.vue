@@ -11,6 +11,8 @@
         <a href="/userhome" >User home (for testing)</a> |
         <a href="/adminhome">Admin (for testing)</a> |
         <a href="/auth">Auth (for testing)</a>
+        <a href="/forgot">Forgot (for testing)</a>
+        <a href="/reset">Reset (for testing)</a>
         <br />
         <br />
         <br />
