@@ -122,6 +122,7 @@ button:hover {
   text-decoration: none;
 }
 
+
 .article-card {
   display: flex;
   align-items: center;
@@ -213,8 +214,7 @@ select {
   font-size: var(--font-size-small);
 }
 
-/* Hjemmesidene! Ikke rør altså! */
-/* === Hjemmeside layout === */
+/* Styling for hjemmesidene! Ikke rør altså!! */
 .page-wrapper {
   display: flex;
   flex-direction: column;
@@ -250,7 +250,7 @@ select {
   font-weight: 500;
 }
 
-/* Grid med tjenester */
+/* Grid med tjenestebokser */
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -261,7 +261,7 @@ select {
   margin: 20px 100px;
 }
 
-/* Tjenesteboks */
+/* Boks med en tjeneste */
 .box {
   background-color: var(--light-blue);
   border: 2px solid var(--light-blue);
@@ -292,7 +292,7 @@ select {
   cursor: pointer;
 }
 
-/* Utilgjengelig boks */
+/* Boks som ikke skal kunne trykkes på */
 .box.unavailable {
   background-color: var(--lightest-blue);
   border: 2px solid var(--lightest-blue);
@@ -329,7 +329,7 @@ select {
   opacity: 1;
 }
 
-/* Boks for innlogget bruker */
+/* Boks som kun gjelder for innloggede bruker */
 .box.registered {
   background-color: var(--good-green);
   border: 2px solid var(--good-green);
@@ -340,6 +340,89 @@ select {
   color: white;
   transform: scale(1.02);
   cursor: pointer;
+}
+
+/* Stylingen til headerene, så helst ikke rør denne heller! */
+.header {
+  background-color: var(--dark-blue);
+  color: white;
+  padding: 16px;
+}
+
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* For dele opp headeren i venstre og høyre del */
+.header-left,
+.header-right,
+.header-icons,
+.nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+/* Logoene og ikonene */
+.logo {
+  height: 100px;
+  width: auto;
+  cursor: pointer;
+}
+
+.icon {
+  height: 55px;
+  width: 55px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.icon:hover {
+  transform: scale(1.1);
+}
+
+/* De andre knappene (altså innlogging og sånn) */
+.button {
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 18px;
+  border-radius: 4px;
+  border: 2px solid transparent;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  text-decoration: none;
+  font-weight: 500;
+  margin: 10px 10px;
+  background-color: var(--light-blue);
+  color: #ffffff;
+}
+
+.button.login {
+  background-color: var(--bad-red);
+  border-color: var(--bad-red);
+}
+
+.button.login:hover {
+  background-color: #ffffff;
+  color: var(--bad-red);
+  border-color: var(--bad-red);
+}
+
+.button.other {
+  background-color: var(--light-blue);
+  border-color: var(--light-blue);
+  color: #ffffff;
+}
+
+.button.other:hover {
+  background-color: #ffffff;
+  border-color: var(--light-blue);
+  color: var(--darkest-blue);
 }
 
 
