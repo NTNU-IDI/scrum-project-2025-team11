@@ -20,8 +20,6 @@ const toggleNewItemBox = () => {
 const toggleNewMemberBox = () => {
 	isMemberBoxVisible.value = !isMemberBoxVisible.value;
 }
-
-//TODO: se på det med new item card i morra, er gap til høyre
 </script>
 
 <template>
