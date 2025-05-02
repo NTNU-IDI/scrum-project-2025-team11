@@ -1,14 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-
-export interface PointOfInterest {
-  id: number;
-  name: string;
-  iconType: string;
-  description: string;
-  latitude: number;
-  longitude: number;
-}
+import type { PointOfInterest } from "@/types/PointOfInterest";
 
 export const usePointStore = defineStore("pointStore", () => {
   const allPoints = ref<PointOfInterest[]>([]);

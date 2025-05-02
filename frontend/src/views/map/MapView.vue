@@ -8,6 +8,7 @@
         :selectedPoint="selectedPoint" 
         :mode="formMode"
         @close="closePointForm" 
+        @coordinates-updated="updateMarkerPosition"
       />
     </div>
 
@@ -26,7 +27,9 @@ import 'leaflet-routing-machine';
 import IconsOverview from '../../components/map/IconsOverview.vue';
 import PointForm from '../../components/map/PointForm.vue';
 import { onMounted, ref } from 'vue';
-import { usePointStore, type PointOfInterest } from '@/stores/pointStore';
+import { usePointStore } from '@/stores/pointStore';
+import type { PointOfInterest } from "@/types/PointOfInterest";
+import { calculateDistance, getNearestPoint, getEventColor } from '@/utils/geoService';
 
 const pointStore = usePointStore(); 
 const showCrisisAlert = ref(false);
@@ -42,6 +45,7 @@ const selectedPoint = ref<PointOfInterest>({
 });
 
 let map: L.Map;
+let temporaryMarker: L.Marker | null = null;
 
 declare global {
   interface Window {
@@ -50,7 +54,7 @@ declare global {
 }
 window.routingControl = null;
 
-// Test data
+// TODO: Retrieve event data from backend
 type Event = {
   id: number;
   name: string;
@@ -125,26 +129,52 @@ onMounted(async () => {
     checkIfInCrisisArea(lat, lon);
   });
 
+  // Add marker for new point on click
   map.on('click', (e: L.LeafletMouseEvent) => {
   const { lat, lng } = e.latlng;
-
-  // Create a new point structure with coordinates
+  removeTempMarker();
+  createTempMarker(lat, lng);
   selectedPoint.value = {
       id: 0,
       name: '',
       description: '',
-      iconType: 'default',
+      iconType: '',
       latitude: lat,
       longitude: lng
     };
-
     formMode.value = 'create';
     showPointForm.value = true;
   });
 });
 
 function closePointForm() {
+  removeTempMarker();
   showPointForm.value = false;
+}
+
+function removeTempMarker() {
+  if (temporaryMarker) {
+    map.removeLayer(temporaryMarker);
+    temporaryMarker = null;
+  }
+}
+
+function createTempMarker(lat: number, lng: number) {
+  temporaryMarker = L.marker([lat, lng]).addTo(map);
+  if (formMode.value === 'create') {
+    temporaryMarker.bindPopup("Nytt punkt her").openPopup();
+  }
+}
+
+function updateMarkerPosition(coords: { latitude: number, longitude: number }) {
+  // Update marker position
+  removeTempMarker();
+  createTempMarker(coords.latitude, coords.longitude);
+  map.setView([coords.latitude, coords.longitude], map.getZoom());
+  
+  // Update selectedPoint with new coordinates
+  selectedPoint.value.latitude = coords.latitude;
+  selectedPoint.value.longitude = coords.longitude;
 }
 
 function getUserPosition(callback: (lat: number, lon: number) => void) {
@@ -158,14 +188,6 @@ function getUserPosition(callback: (lat: number, lon: number) => void) {
   );
 }
 
-function getEventColor(severity: number) {
-  return severity === 1
-    ? 'var(--light-orange)'
-    : severity === 0
-    ? 'var(--yellow)'
-    : 'var(--bad-red)';
-}
-
 function checkIfInCrisisArea(userLatitude: number, userLongitude: number) {
   testEvents.forEach(event => {
     const distance = calculateDistance(userLatitude, userLongitude, event.latitude, event.longitude);
@@ -174,26 +196,6 @@ function checkIfInCrisisArea(userLatitude: number, userLongitude: number) {
       showCrisisAlert.value = true;
     }
   });
-}
-
-function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371;
-  const dLat = toRadians(lat2 - lat1);
-  const dLon = toRadians(lon2 - lon1);
-
-  // Haversine formula
-  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-
-  // Central angle
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  return R * c * 1000;
-}
-
-function toRadians(degrees: number): number {
-  return degrees * (Math.PI / 180);
 }
 
 function addPointsOfInterest(map: L.Map) {
@@ -211,6 +213,7 @@ function addPointsOfInterest(map: L.Map) {
       icon: customIcon
     }).addTo(map).bindPopup(`<strong>${point.name}</strong><br>${point.description}`)
       .on('click', () => {
+        removeTempMarker();
         selectedPoint.value = { ...point };
         formMode.value = 'edit';
         showPointForm.value = true; 
@@ -245,21 +248,6 @@ async function findNearestShelter() {
       routeWhileDragging: false,
     }).addTo(map);
   });
-}
-
-function getNearestPoint(userLatitude: number, userLongitude: number, points: PointOfInterest[]): PointOfInterest | null {
-  let nearestPoint: PointOfInterest | null = null;
-  let minDistance = Infinity;
-
-  // Iterate each point and find closest one
-  points.forEach(point => {
-    const distance = calculateDistance(userLatitude, userLongitude, point.latitude, point.longitude);
-    if (distance < minDistance) {
-      minDistance = distance;
-      nearestPoint = point;
-    }
-  });
-  return nearestPoint;
 }
 </script>
 
