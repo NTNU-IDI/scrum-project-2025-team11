@@ -18,7 +18,7 @@ describe("IconsOverview", () => {
     expect(listItems.length).toBe(6);
     expect(listItems[0].text()).toContain("Tilfluktsrom");
     expect(listItems[1].text()).toContain("Møteplass");
-    expect(listItems[2].text()).toContain("Medisinks hjelp");
+    expect(listItems[2].text()).toContain("Medisinsk hjelp");
     expect(listItems[3].text()).toContain("Alvorlig kriseberørt område");
     expect(listItems[4].text()).toContain("Moderat kriseberørt område");
     expect(listItems[5].text()).toContain("Lett kriseberørt område");
