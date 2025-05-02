@@ -1,8 +1,6 @@
 import { defineStore } from 'pinia';
-import { InventoryService } from '@/api/InventoryService';
-import type { HouseholdItemResponse, HouseholdItemRequest } from '@/types/Inventory';
-import type { UserResponseDTO } from '@/types/User';
-import { UserService } from '@/api/UserService';
+import type { UserResponseDTO, UserRequestDTO } from '@/types/User';
+import { AdminService } from '@/api/AdminService';
 
 export const useAdminUserStore = defineStore('adminUsers', {
     state: () => ({
@@ -12,7 +10,7 @@ export const useAdminUserStore = defineStore('adminUsers', {
     actions: {
         async fetchUsers() {
             try {
-                const data = await UserService.findAll();
+                const data = await AdminService.findAll();
                 this.adminUsers = data.filter(user => user.role === 'admin');
             } catch (error) {
                 console.error('Error fetching admin users:', error);
@@ -20,12 +18,21 @@ export const useAdminUserStore = defineStore('adminUsers', {
         },
         async deleteUser(userId: number) {
            try {
-                await UserService.deleteUser(userId);
-                this.adminUsers = this.adminUsers.filter(user => user.id !== userId);
+                await AdminService.deleteUser(userId);
+                await this.fetchUsers();
             }
             catch (error) {
            } 
         },
+
+        async createUser(user: Omit<UserRequestDTO, 'id'>) {
+            try {
+                await AdminService.create(user);
+                await this.fetchUsers(); 
+            } catch (error) {
+                console.error('Error adding admin user:', error);
+            }
+        }
     },
     persist: true
 });
