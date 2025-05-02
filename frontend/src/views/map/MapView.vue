@@ -1,22 +1,26 @@
 <template>
-  <div class="map-page">
-    <div class="corner-container">
-      <IconsOverview />
-      <PointForm 
-        v-if="showPointForm" 
-        :selectedPoint="selectedPoint" 
-        :mode="formMode"
-        @close="closePointForm" 
-        @coordinates-updated="updateMarkerPosition"
-        @navigate="handleNavigation"
-      />
-    </div>
+  <div class="layout-map-page">
+    <Header />
+    <div class="map-page">
+      <div class="corner-container">
+        <IconsOverview />
+        <PointForm 
+          v-if="showPointForm" 
+          :selectedPoint="selectedPoint" 
+          :mode="formMode"
+          @close="closePointForm" 
+          @coordinates-updated="updateMarkerPosition"
+          @navigate="handleNavigation"
+        />
+      </div>
 
-    <div id="map" class="map"></div>
+      <div id="map" class="map"></div>
 
-    <div v-if="showCrisisAlert" class="crisis-alert">
-      <p><strong>Viktig melding:</strong> Du er i et kriseområde!</p>
+      <div v-if="showCrisisAlert" class="crisis-alert">
+        <p><strong>Viktig melding:</strong> Du er i et kriseområde!</p>
+      </div>
     </div>
+    <Footer />
   </div>
 </template>
 
@@ -26,6 +30,8 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine';
 import IconsOverview from '../../components/map/IconsOverview.vue';
 import PointForm from '../../components/map/PointView.vue';
+import Header from '@/components/Header.vue';
+import Footer from '@/components/Footer.vue';
 import { onMounted, ref } from 'vue';
 import { usePointStore } from '@/stores/pointStore';
 import type { PointOfInterest } from "@/types/PointOfInterest";
@@ -265,8 +271,8 @@ function handleNavigation(coords: { latitude: number, longitude: number }) {
 <style>
 .corner-container {
   position: absolute;
-  top: 30px;
-  left: 20px;
+  top: 10px;
+  left: 10px;
   z-index: 2;
   display: flex;
   flex-direction: column;
@@ -284,20 +290,28 @@ function handleNavigation(coords: { latitude: number, longitude: number }) {
   background-color: var(--darkest-blue);
 }
 
-.map-page {
+.layout-map-page {
   display: flex;
-  height: 100vh; 
+  flex-direction: column;
+  height: 100vh;
+}
+.map-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
 }
 
 .map {
-  height: 100%;
+  flex: 1;
   width: 100%;
   z-index: 0;
 }
 
 .crisis-alert {
-  position: fixed;
-  bottom: 40px;
+  position: absolute;
+  bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
   background-color: var(--bad-red);
