@@ -7,8 +7,6 @@ import { eventIcons } from '@/utils/icons';
 const eventStore = useEventStore();
 
 // Props
-//const localEvent = ref<{ id: number; name: string; description: string; iconType: string; startDate: string; endDate: string; latitude: number; longitude: number; radius: number; severity: number }>();
-
 const localEvent = ref({
   id: 0,
   name: '',
@@ -21,7 +19,6 @@ const localEvent = ref({
   radius: 0,
   severity: 0,
 });
-
 const isEventDirty = ref(false);
 const selectedIcon = ref('none');
 const icons = eventIcons;
