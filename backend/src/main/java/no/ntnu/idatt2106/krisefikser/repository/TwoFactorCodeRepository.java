@@ -11,7 +11,7 @@ import no.ntnu.idatt2106.krisefikser.model.User;
 @Repository
 public interface TwoFactorCodeRepository extends JpaRepository<TwoFactorCode, Integer> {
 
-    Optional<TwoFactorCode> findByToken(String token);
+    Optional<TwoFactorCode> findByCode(String code);
     void deleteByUser(User user);
 
 }
