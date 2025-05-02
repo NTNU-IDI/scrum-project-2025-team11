@@ -4,7 +4,7 @@
 
     <div class="point-card-content">
 
-      <h1 class="title-map">Endre punkt</h1>
+      <h1 class="title-map">{{ formTitle }}</h1>
 
       <input v-model="pointData.name" placeholder="Navn" />
 
@@ -22,9 +22,14 @@
         <input v-model="pointData.longitude" placeholder="Lengdegrad" />
       </div>
 
-      <div class="edit-buttons">
-        <button class="button" @click="savePoint">Lagre</button>
-        <button class="delete-button" @click="deletePoint">Slett</button>
+      <!-- Create mode buttons -->
+      <div v-if="!isEdit" class="point buttons create-buttons">
+        <button class="button" @click="createPoint">Lag nytt punkt</button>
+      </div>
+      <!-- Edit modebuttons -->
+      <div v-else class="point-buttons edit-buttons">
+        <button v-if="isEdit" class="button" @click="savePoint">Lagre punkt</button>
+        <button v-if="isEdit" class="delete-button" @click="deletePoint">Slett</button>
       </div>
     </div>
   </div>
@@ -32,15 +37,19 @@
 
 
 <script lang="ts" setup>
-import { defineProps, type PropType, ref, watch } from 'vue';
 import { type PointOfInterest, usePointStore } from '@/stores/pointStore';
+import { computed, defineProps, type PropType, ref, watch } from 'vue';
 
 const pointStore = usePointStore();
 
 const props = defineProps({
   selectedPoint: {
-    type: Object as PropType<PointOfInterest | null>,
+    type: Object as PropType<PointOfInterest>,
     required: true,
+  },
+  mode: {
+    type: String as PropType<'edit' | 'create'>,
+    default: 'create'
   }
 });
 
@@ -56,10 +65,20 @@ const pointData = ref<PointOfInterest>({
 
 // Update data whenever prop changes
 watch(() => props.selectedPoint, (newPoint) => {
-  if (newPoint) {
-    pointData.value = { ...newPoint };
-  }
+  pointData.value = { ...newPoint };
 }, { immediate: true });
+
+const isEdit = computed(() => props.mode === 'edit');
+const formTitle = computed(() => isEdit.value ? 'Endre punkt' : 'Nytt punkt');
+
+const createPoint = async () => {
+  try {
+    await pointStore.createPoint(pointData.value);
+
+  } catch (error) {
+    alert("Kunne ikke lage det nye punktet.");
+  }
+};
 
 const savePoint = async () => {
   try {
@@ -71,14 +90,21 @@ const savePoint = async () => {
 };
 
 const deletePoint = async () => {
-  // TODO: Confirmation
-  // TODO: Pointstore -> backend
+  const confirmDelete = confirm("Er du sikker på at du vil slette dette punktet?");
+  
+  if (confirmDelete) {
+    try {
+      await pointStore.deletePointById(pointData.value.id);
+    } catch (error) {
+      alert("Kunne ikke slette punktet.");
+    }
+  }
 };
 
 </script>
 
 <style scoped>
-.edit-buttons {
+.point-buttons {
   display: flex;
   flex-direction: column;
   gap: 5px;
