@@ -42,6 +42,7 @@ const selectedPoint = ref<PointOfInterest>({
 });
 
 let map: L.Map;
+let temporaryMarker: L.Marker | null = null;
 
 declare global {
   interface Window {
@@ -128,6 +129,14 @@ onMounted(async () => {
   map.on('click', (e: L.LeafletMouseEvent) => {
   const { lat, lng } = e.latlng;
 
+  // Remove any existing temporary marker
+  removeTempMarker();
+
+  // Add new marker and store the reference
+  temporaryMarker = L.marker([lat, lng]).addTo(map)
+    .bindPopup("Nytt punkt her")
+    .openPopup();
+
   // Create a new point structure with coordinates
   selectedPoint.value = {
       id: 0,
@@ -145,6 +154,13 @@ onMounted(async () => {
 
 function closePointForm() {
   showPointForm.value = false;
+}
+
+function removeTempMarker() {
+  if (temporaryMarker) {
+    map.removeLayer(temporaryMarker);
+    temporaryMarker = null;
+  }
 }
 
 function getUserPosition(callback: (lat: number, lon: number) => void) {
@@ -211,6 +227,7 @@ function addPointsOfInterest(map: L.Map) {
       icon: customIcon
     }).addTo(map).bindPopup(`<strong>${point.name}</strong><br>${point.description}`)
       .on('click', () => {
+        removeTempMarker();
         selectedPoint.value = { ...point };
         formMode.value = 'edit';
         showPointForm.value = true; 
