@@ -1,5 +1,6 @@
 package no.ntnu.idatt2106.krisefikser.service;
 
+import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -9,22 +10,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import jakarta.mail.MessagingException;
-
 import no.ntnu.idatt2106.krisefikser.dto.EmailRequest;
 import no.ntnu.idatt2106.krisefikser.model.PasswordResetToken;
 import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.repository.PasswordResetTokenRepository;
-import no.ntnu.idatt2106.krisefikser.service.PasswordResetService;
-import no.ntnu.idatt2106.krisefikser.service.UserService;
 
 /**
  * Service class for handling password reset functionality.
  * This class provides methods for initiating and completing password resets.
- * It is only active in the "dev" profile.
  */
-@Service
-@Profile("dev") 
+@Service 
 public class PasswordResetServiceImpl implements PasswordResetService {
 
     private static final Duration EXPIRATION = Duration.ofHours(24);
@@ -51,40 +46,57 @@ public class PasswordResetServiceImpl implements PasswordResetService {
      */
     @Override
     public void initiateReset(String email) {
-        User user = userService.getUserByEmail(email)
-            .orElseThrow(() -> new IllegalArgumentException("No user with email: " + email));
+    User user = userService.getUserByEmail(email)
+        .orElseThrow(() -> new IllegalArgumentException("No user with email: " + email));
 
-        // 1. clean up old tokens
-        tokenRepo.deleteByUser(user);
+    // 1. Remove old tokens
+    tokenRepo.deleteByUser(user);
 
-        // 2. generate new token
-        String token = UUID.randomUUID().toString();
-        PasswordResetToken prt = PasswordResetToken.builder()
-            .user(user)
-            .token(token)
-            .expiryDate(LocalDateTime.now().plus(EXPIRATION))
-            .build();
-        tokenRepo.save(prt);
+    // 2. Generate a short 6-character alphanumeric token
+    String token = generateResetCode(6);
 
-        // 3. build reset link
-        String link = frontendUrl + "/reset-password?token=" + token;
-        String body = "<p>Hello " + user.getFirstName() + ",</p>"
-                    + "<p>Click <a href=\"" + link + "\">here</a> to reset your password.</p>"
-                    + "<p>This link expires in 24 hours.</p>";
+    // 3. Save token with expiration
+    PasswordResetToken prt = PasswordResetToken.builder()
+        .user(user)
+        .token(token)
+        .expiryDate(LocalDateTime.now().plus(EXPIRATION))
+        .build();
+    tokenRepo.save(prt);
 
-        // 4. send the email
-        EmailRequest req = new EmailRequest(
-            user.getEmail(),
-            "Reset your password",
-            body,
-            true
-        );
-        try {
-            emailService.sendEmail(req);
-        } catch (MessagingException ex) {
-            throw new RuntimeException("Unable to send password reset email", ex);
-        }
+    // 4. Send the token via email
+    String body = "<p>Hello <strong>" + user.getFirstName() + "</strong>,</p>"
+                + "<p>Your password reset code is:</p>"
+                + "<h2><strong>" + token + "</strong></h2>"
+                + "<p>This code expires in 24 hours.</p>";
+
+    EmailRequest req = new EmailRequest(
+        user.getEmail(),
+        "Password Reset Code",
+        body,
+        true
+    );
+
+    try {
+        emailService.sendEmail(req);
+    } catch (Exception ex) {
+        throw new RuntimeException("Unable to send password reset code", ex);
     }
+}
+
+    /**
+     * Generates a random alphanumeric code of the specified length.
+     * @param length the length of the code to generate
+     * @return a random alphanumeric code
+     */
+    private String generateResetCode(int length) {
+    String chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no O, 0, I, 1 for clarity
+    SecureRandom rnd = new SecureRandom();
+    StringBuilder sb = new StringBuilder(length);
+    for (int i = 0; i < length; i++) {
+        sb.append(chars.charAt(rnd.nextInt(chars.length())));
+    }
+    return sb.toString();
+}
 
     /**
      * Completes the password reset process by validating the token and updating the user's password.
