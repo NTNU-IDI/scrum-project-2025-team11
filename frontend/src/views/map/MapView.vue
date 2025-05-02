@@ -279,17 +279,6 @@ function handleNavigation(coords: { latitude: number, longitude: number }) {
   gap: 10px;
 }
 
-.button {
-  background-color: var(--dark-blue);
-  color: var(--white);
-  font-size: var(--font-size-small);
-  padding: 13px;
-}
-
-.button:hover {
-  background-color: var(--darkest-blue);
-}
-
 .layout-map-page {
   display: flex;
   flex-direction: column;
