@@ -14,6 +14,7 @@ import ResetPassword from "@/views/ResetPasswordView.vue";
 
 import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
+import {useUserStore} from "@/stores/userStore.ts";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -40,10 +41,11 @@ const routes: Array<RouteRecordRaw> = [
     path: "/household",
     name: "Household",
     component: HouseholdView,
+    meta: { requiresNormalUser: true }
   },
   {
-    path: '/personvern',
-    name: 'PrivacyPolicy',
+    path: "/personvern",
+    name: "PrivacyPolicy",
     component: PrivacyPolicyView,
   },
   {
@@ -52,8 +54,8 @@ const routes: Array<RouteRecordRaw> = [
     component: UserHomeView,
   },
   {
-    path: '/auth',
-    name: 'Auth',
+    path: "/auth",
+    name: "Auth",
     component: AuthView,
   },
   {
@@ -75,11 +77,42 @@ const routes: Array<RouteRecordRaw> = [
     name: "ResetPassword",
     component: ResetPassword,
   },
+
+    // { //Eksempel - admin-route
+  //   path: '/adminrute',
+  //   name: 'AdminEksempelView',
+  //   component: AdminEksempelView,
+  //   meta: {requieresAdmin: true}
+  // },
+  // { //Eksempel - super-admin-route
+  //   path: '/superadminrute',
+  //   name: 'SuperAdminEksempelView',
+  //   component: SuperAdminEksempelView,
+  //   meta: {requieresSuperAdmin: true}
+  // },
+
 ];
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
 });
+
+router.beforeEach((to, from, next) => {
+  const userStore = useUserStore()
+
+  if(to.meta.requiresNormalUser && userStore.role !== 'normal') {
+    alert("Du har ikke adgangsnivå til denne siden.")
+    next("/")
+  } else if (to.meta.requiresAdmin && userStore.role !== 'admin') {
+    alert("Du har ikke adgangsnivå til denne siden.")
+    next("/")
+  } else if (to.meta.requiresSuperAdmin && userStore.role !== 'super_admin') {
+    alert("Du har ikke adgangsnivå til denne siden.")
+    next("/")
+  } else {
+    next()
+  }
+})
 
 export default router;
