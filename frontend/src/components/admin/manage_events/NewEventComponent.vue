@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-
-
+import { eventIcons } from '@/utils/icons';
 
 // Props
 const name = ref('');
@@ -14,15 +13,7 @@ const startDate = ref();
 const endDate = ref();
 const selectedIcon = ref('none');
 const emit = defineEmits(['hide-new-event-box']);
-const icons = [
-    'none', 
-    'point', 
-    'normal',
-    'danger',
-    'assembly_point',
-    'medical',
-    'shelter'
-];
+const icons = eventIcons;
 
 // Add event 
 const addEvent = () => {
@@ -79,7 +70,7 @@ const addEvent = () => {
 </template>
 <style scoped>
 .grey-container {
-   height: 40rem;
+   height: 30rem;
    margin-top: 4.75rem;
 }
 
@@ -110,7 +101,7 @@ const addEvent = () => {
     background-color: white; 
     margin-right: 1rem;
     max-width: 24rem;
-    margin-bottom: 2rem;
+   
 }
 
 textarea {
