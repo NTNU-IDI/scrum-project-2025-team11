@@ -45,11 +45,11 @@ const deleteEvent = async () => {
             
                 <!-- Severity and radius -->
                 <div class="double-label-container">
-                    <label for="security-input">Krisenivå</label>
+                    <label for="severity-input">Krisenivå</label>
                     <label for="radius-input">Radius</label>
                 </div>
                 <div class="double-input-container">                   
-                    <input type="text" class="edit-input" id="security-input" @input="isEventDirty = true" v-model="localEvent.severity" />                    
+                    <input type="text" class="edit-input" id="severity-input" @input="isEventDirty = true" v-model="localEvent.severity" />                    
                     <input type="text" class="edit-input" id="radius-input" @input="isEventDirty = true" v-model="localEvent.radius" />
                 </div>
 
@@ -65,7 +65,7 @@ const deleteEvent = async () => {
                 <textarea class="edit-input" id="description-input" @input="isEventDirty = true" v-model="localEvent.description"></textarea>
                 <label for="start-input">Startdato</label>
                 <input type="date" class="edit-input" id="start-input" @input="isEventDirty = true" v-model="localEvent.startDate" />
-                <label for="end-input">Sluttdato</label>
+                <label for="end-input">Eventuell sluttdato</label>
                 <input type="date" class="edit-input" id="end-input" @input="isEventDirty = true" v-model="localEvent.endDate" />
                 
                 <!-- Icon type -->
@@ -87,6 +87,7 @@ const deleteEvent = async () => {
 <style scoped>
     .grey-container {
         background-color: var(--light-blue);
+        height: 40rem;
     }
 
     .page-container {
@@ -117,6 +118,9 @@ const deleteEvent = async () => {
         gap: 1rem;
     }
 
+    select {
+        font-size: var(--font-size-medium);
+    }
     .button-container {
         display: flex;
         justify-content: space-between;
