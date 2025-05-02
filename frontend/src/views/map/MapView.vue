@@ -8,6 +8,7 @@
         :selectedPoint="selectedPoint" 
         :mode="formMode"
         @close="closePointForm" 
+        @coordinates-updated="updateMarkerPosition"
       />
     </div>
 
@@ -27,7 +28,6 @@ import IconsOverview from '../../components/map/IconsOverview.vue';
 import PointForm from '../../components/map/PointForm.vue';
 import { onMounted, ref } from 'vue';
 import { usePointStore, type PointOfInterest } from '@/stores/pointStore';
-import { popup } from 'leaflet';
 
 const pointStore = usePointStore(); 
 const showCrisisAlert = ref(false);
@@ -52,7 +52,7 @@ declare global {
 }
 window.routingControl = null;
 
-// Test data
+// TODO: Retrieve event data from backend
 type Event = {
   id: number;
   name: string;
@@ -127,18 +127,11 @@ onMounted(async () => {
     checkIfInCrisisArea(lat, lon);
   });
 
+  // Add marker for new point on click
   map.on('click', (e: L.LeafletMouseEvent) => {
   const { lat, lng } = e.latlng;
-
-  // Remove any existing temporary marker
   removeTempMarker();
-
-  // Add new marker and store the reference
-  temporaryMarker = L.marker([lat, lng]).addTo(map)
-    .bindPopup("Nytt punkt her")
-    .openPopup();
-
-  // Create a new point structure with coordinates
+  createTempMarker(lat, lng);
   selectedPoint.value = {
       id: 0,
       name: '',
@@ -147,7 +140,6 @@ onMounted(async () => {
       latitude: lat,
       longitude: lng
     };
-
     formMode.value = 'create';
     showPointForm.value = true;
   });
@@ -163,6 +155,23 @@ function removeTempMarker() {
     map.removeLayer(temporaryMarker);
     temporaryMarker = null;
   }
+}
+
+function createTempMarker(lat: number, lng: number) {
+  temporaryMarker = L.marker([lat, lng]).addTo(map)
+    .bindPopup("Nytt punkt her")
+    .openPopup();
+}
+
+function updateMarkerPosition(coords: { latitude: number, longitude: number }) {
+  // Update marker position
+  removeTempMarker();
+  createTempMarker(coords.latitude, coords.longitude);
+  map.setView([coords.latitude, coords.longitude], map.getZoom());
+  
+  // Update selectedPoint with new coordinates
+  selectedPoint.value.latitude = coords.latitude;
+  selectedPoint.value.longitude = coords.longitude;
 }
 
 function getUserPosition(callback: (lat: number, lon: number) => void) {
