@@ -6,7 +6,7 @@ const itemExpirationDateRegex = /^\d{4}-\d{2}-\d{2}$/; // YYYY-MM-DD format
 const firstNameRegex = /^[a-zA-Z]+$/;
 const lastNameRegex = /^[a-zA-Z]+$/;
 const usernameRegex = /^[a-zA-Z0-9_]+$/;
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+const passwordRegex =/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&()_+\-={}:;"'|<>,.?]).{10,}$/;
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Function to validate item name
