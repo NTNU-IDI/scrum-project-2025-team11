@@ -15,7 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 import java.net.URI;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -88,7 +88,7 @@ public class InventoryController {
      *
      * @param hhId the ID of the household
      * @param itemId the ID of the item to update
-     * @param acquiredDate the date when the item was acquired
+     * @param acquiredDate the date and time when the item was acquired
      * @param req the request body containing updated item details
      * @return a {@link HouseholdItemResponse} object representing the updated item
      */
@@ -102,7 +102,7 @@ public class InventoryController {
     public HouseholdItemResponse update(
         @PathVariable Integer hhId,
         @PathVariable Integer itemId,
-        @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate acquiredDate,
+        @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime acquiredDate,
         @Valid @RequestBody HouseholdItemRequest req
     ) {
         // ignore any key fields in JSON, use path variables
@@ -149,7 +149,7 @@ public class InventoryController {
     public ResponseEntity<Void> removeOne(
         @PathVariable Integer hhId,
         @PathVariable Integer itemId,
-        @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate acquiredDate
+        @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime acquiredDate
     ) {
         service.remove(hhId, itemId, acquiredDate);
         return ResponseEntity.noContent().build();
