@@ -10,6 +10,7 @@
         <a href="/contact">Kontakt oss</a> |
         <a href="/userhome">User home (for testing)</a> |
         <a href="/admin">Admin (for testing)</a>
+        <a href="/auth">Auth (for testing)</a> |
         <br />
         <br />
         <br />
@@ -95,6 +96,5 @@
 .link-button:hover {
   color: #d1d5db;
 }
-
 
 </style>
