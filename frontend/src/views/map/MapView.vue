@@ -133,7 +133,7 @@ onMounted(async () => {
       id: 0,
       name: '',
       description: '',
-      iconType: 'default',
+      iconType: '',
       latitude: lat,
       longitude: lng
     };
