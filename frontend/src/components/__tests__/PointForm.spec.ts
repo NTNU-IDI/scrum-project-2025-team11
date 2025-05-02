@@ -53,7 +53,32 @@ describe("PointForm.vue", () => {
     expect(wrapper.text()).toContain("Slett");
   });
 
-  it('call createPoint when clicking on "Lag nytt punkt" button', async () => {
+  it("view mode renders correctly (without input fields or edit buttons)", () => {
+    const wrapper = mount(PointForm, {
+      props: {
+        selectedPoint: testPoint,
+        mode: "view",
+      },
+    });
+
+    // Title = Points name
+    expect(wrapper.find("h1").text()).toBe(testPoint.name);
+
+    // Contain fields for reading
+    expect(wrapper.text()).toContain("Type punkt:");
+    expect(wrapper.text()).toContain("Beskrivelse:");
+    expect(wrapper.text()).toContain("Koordinater:");
+    expect(wrapper.text()).toContain("Naviger til dette punktet");
+
+    // Not contain input fields or edit/create/delete buttons
+    expect(wrapper.find("input").exists()).toBe(false);
+    expect(wrapper.find("select").exists()).toBe(false);
+    expect(wrapper.text()).not.toContain("Lag nytt punkt");
+    expect(wrapper.text()).not.toContain("Lagre punkt");
+    expect(wrapper.text()).not.toContain("Slett");
+  });
+
+  it('calls createPoint when clicking on "Lag nytt punkt" button', async () => {
     const wrapper = mount(PointForm, {
       props: {
         selectedPoint: testPoint,
@@ -65,7 +90,7 @@ describe("PointForm.vue", () => {
     expect(pointStoreMock.createPoint).toHaveBeenCalled();
   });
 
-  it('call updatePointById when clicking on "Lagre punkt" button', async () => {
+  it('calls updatePointById when clicking on "Lagre punkt" button', async () => {
     const wrapper = mount(PointForm, {
       props: {
         selectedPoint: testPoint,
@@ -80,7 +105,7 @@ describe("PointForm.vue", () => {
     expect(pointStoreMock.updatePointById).toHaveBeenCalled();
   });
 
-  it('confirms deletion and call deletePointById clciking on "Slett"" button', async () => {
+  it('confirms deletion and calls deletePointById when clicking "Slett"', async () => {
     vi.spyOn(window, "confirm").mockReturnValue(true);
 
     const wrapper = mount(PointForm, {
@@ -99,7 +124,7 @@ describe("PointForm.vue", () => {
     expect(pointStoreMock.deletePointById).toHaveBeenCalledWith(testPoint.id);
   });
 
-  it("emit close when clicking on close icon", async () => {
+  it("emits close when clicking on close icon", async () => {
     const wrapper = mount(PointForm, {
       props: {
         selectedPoint: testPoint,
@@ -109,5 +134,17 @@ describe("PointForm.vue", () => {
 
     await wrapper.find(".close-icon").trigger("click");
     expect(wrapper.emitted()).toHaveProperty("close");
+  });
+
+  it("disables create button when validation fails", async () => {
+    const wrapper = mount(PointForm, {
+      props: {
+        selectedPoint: { ...testPoint, name: "" }, // Invalid name
+        mode: "create",
+      },
+    });
+
+    const createButton = wrapper.find("button.button");
+    expect(createButton.attributes("disabled")).toBeDefined();
   });
 });
