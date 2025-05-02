@@ -3,6 +3,7 @@ package no.ntnu.idatt2106.krisefikser.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
@@ -27,6 +28,7 @@ import no.ntnu.idatt2106.krisefikser.repository.UserRepository;
 public class UserService {
     private final UserRepository userRepository;
     private final HouseholdService householdService;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * Finds a user by their ID.
@@ -43,23 +45,6 @@ public class UserService {
      */
     public void deleteById(int id) {
         userRepository.deleteById(id);
-    }
-
-    /**
-     * Changes the password for a user.
-     * @param id the ID of the user whose password will be changed
-     * @param newPassword the new password (should be hashed before saving)
-     * @return UserResponse object for the updated user
-     */
-    public UserResponseDTO changePassword(int id, PasswordChangeDTO password) {
-      User existing = userRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-      if (!existing.getPassword().equals(password.getCurrentPassword())) {
-        throw new RuntimeException("Old password is incorrect");
-      }
-      existing.setPassword(password.getNewPassword()); // Remember to hash the password before saving
-      User saved = userRepository.save(existing);
-      return UserMapper.toResponseDTO(saved);
     }
 
     /**
@@ -98,16 +83,13 @@ public class UserService {
       newUser.setUsername(user.getUsername());
       newUser.setFirstName(user.getFirstName());
       newUser.setLastName(user.getLastName());
+      newUser.setHousehold(householdService.findById(user.getHouseholdId())
+            .orElseThrow(() -> new RuntimeException("Household not found")));
       
-      Household household = householdService.findById(user.getHouseholdId()).orElseThrow(() -> new RuntimeException("Household not found"));
-      newUser.setHousehold(household);
-
-      newUser.setPassword(user.getPassword()); // Remember to hash the password before saving
+      newUser.setPassword(passwordEncoder.encode(user.getPassword())); // Hash the password before saving
 
       newUser.setRole(Role.normal);
-      User savedUser = userRepository.save(newUser);
-      return UserMapper.toResponseDTO(savedUser);
-
+      return UserMapper.toResponseDTO(userRepository.save(newUser)); // mapper → DTO
 
     }
 
@@ -138,6 +120,26 @@ public class UserService {
       User saved = userRepository.save(existing);   // lagrer entiteten
   
       return UserMapper.toResponseDTO(saved); // mapper → DTO
+    }
+
+    public UserResponseDTO changePassword(int id, PasswordChangeDTO dto) {
+      User u = userRepository.findById(id)
+          .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+
+      // ✅ verify old password matches hashed password
+      if (!passwordEncoder.matches(dto.getCurrentPassword(), u.getPassword())) {  // ③
+          throw new RuntimeException("Old password is incorrect");
+      }
+
+      // 🔐 update via helper
+      updatePassword(u, dto.getNewPassword());  // ④
+
+      return UserMapper.toResponseDTO(u);
+    }
+
+    public void updatePassword(User user, String rawPassword) {
+      user.setPassword(passwordEncoder.encode(rawPassword));
+      userRepository.save(user);
     }
 
     /**

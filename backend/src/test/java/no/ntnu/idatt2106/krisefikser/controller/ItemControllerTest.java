@@ -1,6 +1,8 @@
 package no.ntnu.idatt2106.krisefikser.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import no.ntnu.idatt2106.krisefikser.config.TestSecurityConfig;
 import no.ntnu.idatt2106.krisefikser.dto.ItemRequest;
 import no.ntnu.idatt2106.krisefikser.dto.ItemResponse;
 import no.ntnu.idatt2106.krisefikser.mapper.ItemMapper;
@@ -9,9 +11,12 @@ import no.ntnu.idatt2106.krisefikser.service.ItemService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -61,6 +66,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * - {@link ItemMapper}: Mocked mapper for converting between entities and DTOs.
  */
 @WebMvcTest(controllers = ItemController.class)
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
+@Import(TestSecurityConfig.class)
 class ItemControllerTest {
 
     @Autowired private MockMvc mvc;
