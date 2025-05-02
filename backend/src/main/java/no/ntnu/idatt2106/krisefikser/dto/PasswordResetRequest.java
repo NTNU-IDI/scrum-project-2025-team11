@@ -5,6 +5,10 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+
+/**
+ * DTO for requesting a password reset.
+ */
 @Getter
 @Setter
 public class PasswordResetRequest {

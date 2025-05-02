@@ -29,17 +29,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
+            .csrf(csrf -> csrf
+            .ignoringRequestMatchers("/h2-console/**") // allow POSTs to H2 console
+            .disable()
+            )
+            .headers(headers -> headers
+            .frameOptions(frame -> frame.sameOrigin()) // allow H2 Console in frames
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/auth/login",
                     "/auth/refresh",
-                    "/swagger-ui/",
-                    "/v3/api-docs/"
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
+                    "/h2-console/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
-            .httpBasic(Customizer.withDefaults()); // optional depending on your needs
+            .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }
