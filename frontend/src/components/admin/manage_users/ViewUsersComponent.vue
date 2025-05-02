@@ -1,6 +1,9 @@
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
+import { UserService } from '@/api/UserService';
+import { onMounted, ref, watch } from 'vue';
+import { useAdminUserStore } from '@/stores/adminUserStore';
 
+/*
 const adminbrukere = ref([
     {id: 1, username: 'Garv', email: 'garv@admin.com'},
     {id: 2, username: 'An', email: 'an@admin.com'},
@@ -11,15 +14,30 @@ const adminbrukere = ref([
     {id: 7, username: 'Gabriel', email: 'gabriel@admin.com'},
     {id: 8, username: 'Madde', email: 'madde@Admin.com'},
 ]);
+*/
 
-onMounted(() => {
-    loadUsers();
+// Store imports
+const adminUserStore = useAdminUserStore();
+
+// Props
+const adminbrukere = ref<{ id: number; username: string; email: string }[]>([]);
+
+const loadUsers = async () => {
+    await adminUserStore.fetchUsers();
+};
+
+onMounted( async () => {
+    await loadUsers();
 });
 
-const loadUsers = () => {
-    // TODO
-    // adminbrukere.value = ???
-};
+watch(() => adminUserStore.adminUsers, async (newUsers) => {
+    adminbrukere.value = newUsers.filter(user => user.role === 'admin').map(user => ({
+        id: user.id,
+        username: user.username,
+        email: user.email
+    }));
+});
+
 const deleteUser = (id: number) => {
    // TODO
 };
