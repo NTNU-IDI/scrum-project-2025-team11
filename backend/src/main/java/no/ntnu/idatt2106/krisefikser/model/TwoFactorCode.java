@@ -20,7 +20,7 @@ import jakarta.persistence.GenerationType;
 @Entity
 @Table(name = "two_factor_codes")
 @Getter @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 public class TwoFactorCode {
