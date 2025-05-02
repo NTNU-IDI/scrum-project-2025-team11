@@ -100,7 +100,7 @@ import java.util.Map;
       refreshCookie.setMaxAge((int) jwtUtil.getRefreshExpiration() / 1000);
       response.addCookie(refreshCookie);
 
-      return ResponseEntity.ok().body(Map.of("User role: ", jwtUtil.extractRole(newAccessToken)));
+      return ResponseEntity.ok().body(Map.of("role ", jwtUtil.extractRole(newAccessToken)));
     }
 
     @Operation(
@@ -141,7 +141,7 @@ import java.util.Map;
       response.addCookie(jwtCookie);
 
       //return ResponseEntity.ok(Map.of("token", token));
-      return ResponseEntity.ok().body(Map.of("User role",user.getRole()));
+      return ResponseEntity.ok().body(Map.of("role",user.getRole()));
     }
 
     /**
@@ -206,7 +206,7 @@ import java.util.Map;
       // Return both the saved user and access token
       return ResponseEntity
           .status(HttpStatus.CREATED)
-          .body(Map.of("User role: ", user.getRole()));
+          .body(Map.of("role", user.getRole()));
     }
   }
 
