@@ -43,6 +43,10 @@ const chooseEvent = (eventId: any) => {
         flex-direction: column;
     }
 
+    .grey-container {
+        height: auto;
+    }
+
     .article-card {
         cursor: pointer;
     }
