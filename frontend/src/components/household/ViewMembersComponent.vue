@@ -84,6 +84,20 @@ const changeMemberCount = async () => {
         padding: 1rem;
     }
 
+    @media(max-width: 600px) {
+      .page-container {
+        padding: 0px;
+      }
+      .members-container {
+        flex-direction: column !important;
+        padding: 0px !important;
+        gap: 1rem !important;
+      }
+      .button-container {
+        margin: 0px !important;
+      }
+    }
+
     .members-container {
         display: flex;
         flex-direction: row;

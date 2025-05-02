@@ -14,6 +14,7 @@
     import org.mockito.InjectMocks;
     import org.mockito.Mock;
     import org.mockito.MockitoAnnotations;
+    import org.springframework.security.crypto.password.PasswordEncoder;
 
 import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.UserResponseDTO;
@@ -28,6 +29,7 @@ import no.ntnu.idatt2106.krisefikser.repository.UserRepository;
 
         @Mock  private UserRepository   userRepository;
         @Mock  private HouseholdService householdService;
+        @Mock  private PasswordEncoder  passwordEncoder;
 
         @InjectMocks
         private UserService userService;
@@ -46,6 +48,7 @@ import no.ntnu.idatt2106.krisefikser.repository.UserRepository;
             Household hh = new Household();
             hh.setId(123);
             when(householdService.findById(123)).thenReturn(Optional.of(hh));
+            when(passwordEncoder.encode(any())).thenReturn("mocked-hash");
 
             //  repo.save should return the same entity with generated id
             when(userRepository.save(any(User.class))).thenAnswer(inv -> {
