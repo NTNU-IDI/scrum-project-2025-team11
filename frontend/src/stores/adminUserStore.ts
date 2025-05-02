@@ -13,13 +13,18 @@ export const useAdminUserStore = defineStore('adminUsers', {
         async fetchUsers() {
             try {
                 const data = await UserService.findAll();
-                this.adminUsers = data;
+                this.adminUsers = data.filter(user => user.role === 'admin');
             } catch (error) {
                 console.error('Error fetching admin users:', error);
             }
         },
-        async deleteUser() {
-            
+        async deleteUser(userId: number) {
+           try {
+                await UserService.deleteUser(userId);
+                this.adminUsers = this.adminUsers.filter(user => user.id !== userId);
+            }
+            catch (error) {
+           } 
         },
     },
     persist: true
