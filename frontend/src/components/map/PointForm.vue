@@ -17,11 +17,26 @@
 
       <input v-model="pointData.description" placeholder="Beskrivelse" />
 
-      <div class="coordinates-input">
+      <!-- Choose coordinates or address -->
+      <select v-model="inputMethod">
+        <option disabled value="">Velg inndata for lokasjon</option>
+        <option value="coordinates">Koordinater</option>
+        <option value="address">Adresse</option>
+      </select>
+
+      <!-- Coordinates -->
+      <div v-if="inputMethod === 'coordinates'" class="coordinates-input">
         <input v-model="pointData.latitude" type="number" placeholder="Breddegrad" />
         <input v-model="pointData.longitude" type="number" placeholder="Lengdegrad" />
       </div>
 
+      <!-- Address -->
+      <div v-if="inputMethod === 'address'">
+        <input v-model="address" type="text" placeholder="Adresse" @blur="resolveAddress" />
+        <p v-if="addressError" class="error-message">{{ addressError }}</p>
+      </div>
+
+      <!-- Error messages -->
       <p v-if="validationError" class="error-message">{{ validationError }}</p>
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
 
@@ -40,8 +55,9 @@
 
 
 <script lang="ts" setup>
-import { type PointOfInterest, usePointStore } from '@/stores/pointStore';
-import { computed, defineProps, type PropType, ref, watch } from 'vue';
+import type { PointOfInterest } from "@/types/PointOfInterest";
+import { usePointStore } from '@/stores/pointStore';
+import { computed, defineProps, type PropType, ref, watch, defineEmits } from 'vue';
 import {
   validatePointName,
   validatePointDescription,
@@ -51,6 +67,14 @@ import {
 } from '@/utils/validationService';
 
 const pointStore = usePointStore();
+const isEdit = computed(() => props.mode === 'edit');
+const formTitle = computed(() => isEdit.value ? 'Endre punkt' : 'Nytt punkt');
+const validationError = ref('');
+const errorMessage = ref('');
+const inputMethod = ref('coordinates');
+const address = ref('');
+const addressError = ref('');
+const emit = defineEmits(['close', 'coordinates-updated']);
 
 const props = defineProps({
   selectedPoint: {
@@ -74,14 +98,21 @@ const pointData = ref<PointOfInterest>({
 });
 
 // Update data whenever prop changes
-watch(() => props.selectedPoint, (newPoint) => {
+watch(() => props.selectedPoint, async (newPoint) => {
   pointData.value = { ...newPoint };
+
+  // Regenerate adress from coordinates
+  if (newPoint.latitude && newPoint.longitude) {
+    await resolveCoords(newPoint.latitude, newPoint.longitude);
+  }
 }, { immediate: true });
 
-const isEdit = computed(() => props.mode === 'edit');
-const formTitle = computed(() => isEdit.value ? 'Endre punkt' : 'Nytt punkt');
-const validationError = ref('');
-const errorMessage = ref('');
+// Watch for coordinate changes and emit event
+watch(() => [pointData.value.latitude, pointData.value.longitude], ([newLat, newLon]) => {
+  if (newLat && newLon && !isNaN(newLat) && !isNaN(newLon)) {
+    emit('coordinates-updated', { latitude: newLat, longitude: newLon });
+  }
+}, { deep: true });
 
 const hasValidationError = computed(() => {
   if (!validatePointName(pointData.value.name)) {
@@ -108,6 +139,49 @@ const hasValidationError = computed(() => {
   validationError.value = '';
   return false;
 });
+
+async function resolveAddress() {
+  if (!address.value.trim()) return;
+
+  try {
+    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address.value)}`);
+    const data = await response.json();
+
+    if (data.length > 0) {
+      const newLat = parseFloat(data[0].lat);
+      const newLon = parseFloat(data[0].lon);
+
+      pointData.value.latitude = newLat;
+      pointData.value.longitude = newLon;
+      addressError.value = '';
+      
+      // Emit event with new coordinates
+      emit('coordinates-updated', { 
+        latitude: newLat,
+        longitude: newLon
+      });
+    } else {
+      addressError.value = 'Fant ingen koordinater for adressen.';
+    }
+  } catch (err) {
+    addressError.value = 'En feil skjedde ved oppslag av adresse.';
+  }
+}
+
+async function resolveCoords(lat: number, lon: number) {
+  try {
+    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+    const data = await response.json();
+    if (data?.display_name) {
+      address.value = data.display_name;
+    } else {
+      address.value = '';
+      addressError.value = 'Fant ikke adresse for koordinatene.';
+    }
+  } catch (err) {
+    addressError.value = 'Feil ved oppslag av adresse.';
+  }
+}
 
 const createPoint = async () => {
   errorMessage.value = '';
