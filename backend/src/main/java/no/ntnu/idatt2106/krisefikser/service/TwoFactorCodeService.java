@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import no.ntnu.idatt2106.krisefikser.dto.EmailRequest;
 import no.ntnu.idatt2106.krisefikser.model.TwoFactorCode;
@@ -14,6 +15,7 @@ import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.repository.TwoFactorCodeRepository;
 
 @Service
+@Transactional
 public class TwoFactorCodeService {
     private static final Duration EXPIRATION = Duration.ofHours(1);
 
@@ -81,7 +83,7 @@ public class TwoFactorCodeService {
      * @return a random alphanumeric code
      */
     private String generateTwoFactorCode(int length) {
-    String chars = "123456789"; 
+    String chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no O, 0, I, 1 for clarity
     SecureRandom rnd = new SecureRandom();
     StringBuilder sb = new StringBuilder(length);
     for (int i = 0; i < length; i++) {
@@ -95,7 +97,7 @@ public class TwoFactorCodeService {
      * @param token the two factor code to validate
      */
     public void completeAuthentication(String token) {
-        TwoFactorCode prt = twoFactorRepo.findByToken(token)
+        TwoFactorCode prt = twoFactorRepo.findByCode(token)
             .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
 
         if (prt.isExpired()) {
