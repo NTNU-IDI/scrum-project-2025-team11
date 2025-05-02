@@ -27,6 +27,7 @@ import IconsOverview from '../../components/map/IconsOverview.vue';
 import PointForm from '../../components/map/PointForm.vue';
 import { onMounted, ref } from 'vue';
 import { usePointStore, type PointOfInterest } from '@/stores/pointStore';
+import { popup } from 'leaflet';
 
 const pointStore = usePointStore(); 
 const showCrisisAlert = ref(false);
@@ -153,6 +154,7 @@ onMounted(async () => {
 });
 
 function closePointForm() {
+  removeTempMarker();
   showPointForm.value = false;
 }
 
