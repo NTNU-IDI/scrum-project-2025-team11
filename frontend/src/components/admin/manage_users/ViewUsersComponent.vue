@@ -3,24 +3,11 @@ import { UserService } from '@/api/UserService';
 import { onMounted, ref, watch } from 'vue';
 import { useAdminUserStore } from '@/stores/adminUserStore';
 
-/*
-const adminbrukere = ref([
-    {id: 1, username: 'Garv', email: 'garv@admin.com'},
-    {id: 2, username: 'An', email: 'an@admin.com'},
-    {id: 3, username: 'Therese', email: 'therese@admin.com'},
-    {id: 4, username: 'Jonas', email: 'jonas@admin.com'},
-    {id: 5, username: 'Matteus', email: 'matteus@admin.com'},
-    {id: 6, username: 'August', email: 'august@admin.com'},
-    {id: 7, username: 'Gabriel', email: 'gabriel@admin.com'},
-    {id: 8, username: 'Madde', email: 'madde@Admin.com'},
-]);
-*/
-
 // Store imports
 const adminUserStore = useAdminUserStore();
 
 // Props
-const adminbrukere = ref<{ id: number; username: string; email: string }[]>([]);
+const adminUsers = ref<{ id: number; username: string; email: string }[]>([]);
 
 const loadUsers = async () => {
     await adminUserStore.fetchUsers();
@@ -31,7 +18,7 @@ onMounted( async () => {
 });
 
 watch(() => adminUserStore.adminUsers, async (newUsers) => {
-    adminbrukere.value = newUsers.filter(user => user.role === 'admin').map(user => ({
+    adminUsers.value = newUsers.map(user => ({
         id: user.id,
         username: user.username,
         email: user.email
@@ -39,7 +26,7 @@ watch(() => adminUserStore.adminUsers, async (newUsers) => {
 });
 
 const deleteUser = (id: number) => {
-   // TODO
+   adminUserStore.deleteUser(id);
 };
 </script>
 <template>
@@ -53,11 +40,11 @@ const deleteUser = (id: number) => {
                 <div class="article-card" id="email-header">Epost</div>
                 <div class="article-card" id="delete-header">Slett</div>
             </div>
-            <div v-for="(bruker, index) in adminbrukere" :key="index" class="user-card">
-                <p class="article-card" id="id">{{ bruker.id }}</p>
-                <h2 class="article-card" id="username">{{ bruker.username }}</h2>
-                <p class="article-card" id="email">{{ bruker.email }}</p>
-                <button class="delete-button">X</button>
+            <div v-for="(user, index) in adminUsers" :key="index" class="user-card">
+                <p class="article-card" id="id">{{ user.id }}</p>
+                <h2 class="article-card" id="username">{{ user.username }}</h2>
+                <p class="article-card" id="email">{{ user.email }}</p>
+                <button class="delete-button" @click="deleteUser(user.id)">X</button>
             </div>
         </div>
     </div>
