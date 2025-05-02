@@ -31,9 +31,6 @@ import java.util.Map;
   import no.ntnu.idatt2106.krisefikser.service.UserService;
 
   @RestController
-  @CrossOrigin(
-    origins = "http://localhost:5173",
-    allowCredentials = "true")
   @RequestMapping("/auth")
   public class AuthController {
 
@@ -70,9 +67,14 @@ import java.util.Map;
       if (refreshToken == null || !jwtUtil.validateToken(refreshToken)) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
       }
-
       String username = jwtUtil.extractUsername(refreshToken);
-      String role = jwtUtil.extractRole(refreshToken);
+      User user = userService.getUserByUsername(username).orElse(null);
+      
+      if (user == null) {
+          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+      }
+
+      String role = user.getRole().toString(); 
 
       String newAccessToken = jwtUtil.generateToken(username, role);
       Cookie cookie = new Cookie("jwtToken", newAccessToken);
@@ -86,11 +88,7 @@ import java.util.Map;
       refreshTokenService.revokeToken(refreshToken);
 
       String newRefreshToken = jwtUtil.generateRefreshToken(username);
-      User user = userService.getUserByUsername(username).orElse(null);
 
-      if (user == null) {
-        return ResponseEntity.status(500).body("Failed to retrieve user");
-      }
       refreshTokenService.createRefreshToken(user, newRefreshToken, jwtUtil.getRefreshExpiration());
 
       Cookie refreshCookie = new Cookie("refreshToken", newRefreshToken);

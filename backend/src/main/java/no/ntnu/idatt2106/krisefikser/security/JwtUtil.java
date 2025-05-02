@@ -1,6 +1,7 @@
 package no.ntnu.idatt2106.krisefikser.security;
 
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -69,10 +70,14 @@ public class JwtUtil {
   
   public boolean validateToken(String token) {
     try {
-      jwtParser.parseSignedClaims(token);
-      return true;
-    } catch (Exception e) {
-      return false;
+        jwtParser.parseSignedClaims(token);
+        return true;
+    } catch (ExpiredJwtException ex) {
+        System.err.println("Token expired: " + ex.getMessage());
+    } catch (Exception ex) {
+        System.err.println("Token validation failed: " + ex.getMessage());
+        ex.printStackTrace();
     }
-  }
+    return false;
+}
 }

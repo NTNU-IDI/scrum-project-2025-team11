@@ -49,7 +49,7 @@ protected void doFilterInternal(
     }
 
     // CSRF protection for state-changing requests (POST, PUT, DELETE, etc.)
-    if (!request.getMethod().equalsIgnoreCase("GET")) {
+    /* if (!request.getMethod().equalsIgnoreCase("GET")) {
         String csrfToken = request.getHeader("X-XSRF-TOKEN");
         String csrfCookie = Arrays.stream(request.getCookies())
             .filter(cookie -> "XSRF-TOKEN".equals(cookie.getName()))
@@ -61,7 +61,7 @@ protected void doFilterInternal(
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid CSRF token");
             return;
         }
-    }
+    } */
 
     try {
         // Validate JWT token
