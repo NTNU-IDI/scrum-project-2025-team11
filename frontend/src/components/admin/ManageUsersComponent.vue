@@ -7,7 +7,7 @@ import ViewUsersComponent from './manage_users/ViewUsersComponent.vue';
 <template>
 <div class="header-container"> 
     <h1>Administrere adminbrukere</h1>
-    <p>Dette er siden for administrering av adminbrukere. Husk at du igjennom dette grensesnittet har tilgang til krtiske opplysninger -  vennligst ta ansvaret som følger med det.</p>
+    <p>Her kan du administrere adminbrukere. Husk at du igjennom dette grensesnittet har tilgang til krtiske opplysninger -  vennligst ta ansvaret som følger med det.</p>
 </div>   
 <div class="page-container">
     <ViewUsersComponent />
