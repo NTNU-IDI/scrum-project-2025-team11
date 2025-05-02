@@ -27,7 +27,9 @@ import 'leaflet-routing-machine';
 import IconsOverview from '../../components/map/IconsOverview.vue';
 import PointForm from '../../components/map/PointForm.vue';
 import { onMounted, ref } from 'vue';
-import { usePointStore, type PointOfInterest } from '@/stores/pointStore';
+import { usePointStore } from '@/stores/pointStore';
+import type { PointOfInterest } from "@/types/PointOfInterest";
+import { calculateDistance, getNearestPoint, getEventColor } from '@/utils/geoService';
 
 const pointStore = usePointStore(); 
 const showCrisisAlert = ref(false);
@@ -186,14 +188,6 @@ function getUserPosition(callback: (lat: number, lon: number) => void) {
   );
 }
 
-function getEventColor(severity: number) {
-  return severity === 1
-    ? 'var(--light-orange)'
-    : severity === 0
-    ? 'var(--yellow)'
-    : 'var(--bad-red)';
-}
-
 function checkIfInCrisisArea(userLatitude: number, userLongitude: number) {
   testEvents.forEach(event => {
     const distance = calculateDistance(userLatitude, userLongitude, event.latitude, event.longitude);
@@ -202,26 +196,6 @@ function checkIfInCrisisArea(userLatitude: number, userLongitude: number) {
       showCrisisAlert.value = true;
     }
   });
-}
-
-function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371;
-  const dLat = toRadians(lat2 - lat1);
-  const dLon = toRadians(lon2 - lon1);
-
-  // Haversine formula
-  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-
-  // Central angle
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  return R * c * 1000;
-}
-
-function toRadians(degrees: number): number {
-  return degrees * (Math.PI / 180);
 }
 
 function addPointsOfInterest(map: L.Map) {
@@ -274,21 +248,6 @@ async function findNearestShelter() {
       routeWhileDragging: false,
     }).addTo(map);
   });
-}
-
-function getNearestPoint(userLatitude: number, userLongitude: number, points: PointOfInterest[]): PointOfInterest | null {
-  let nearestPoint: PointOfInterest | null = null;
-  let minDistance = Infinity;
-
-  // Iterate each point and find closest one
-  points.forEach(point => {
-    const distance = calculateDistance(userLatitude, userLongitude, point.latitude, point.longitude);
-    if (distance < minDistance) {
-      minDistance = distance;
-      nearestPoint = point;
-    }
-  });
-  return nearestPoint;
 }
 </script>
 

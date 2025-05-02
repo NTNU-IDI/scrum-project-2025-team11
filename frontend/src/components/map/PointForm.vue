@@ -55,7 +55,8 @@
 
 
 <script lang="ts" setup>
-import { type PointOfInterest, usePointStore } from '@/stores/pointStore';
+import type { PointOfInterest } from "@/types/PointOfInterest";
+import { usePointStore } from '@/stores/pointStore';
 import { computed, defineProps, type PropType, ref, watch, defineEmits } from 'vue';
 import {
   validatePointName,
@@ -149,7 +150,7 @@ async function resolveAddress() {
     if (data.length > 0) {
       const newLat = parseFloat(data[0].lat);
       const newLon = parseFloat(data[0].lon);
-      
+
       pointData.value.latitude = newLat;
       pointData.value.longitude = newLon;
       addressError.value = '';
