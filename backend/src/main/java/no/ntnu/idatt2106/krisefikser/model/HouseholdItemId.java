@@ -6,7 +6,7 @@ import java.io.Serializable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 /**
@@ -21,11 +21,11 @@ import java.time.LocalDate;
 public class HouseholdItemId implements Serializable {
     private Integer householdId;
     private Integer itemId;
-    private LocalDate acquiredDate;
+    private LocalDateTime acquiredDate;
 
     public HouseholdItemId(Integer householdId,
                            Integer itemId,
-                           LocalDate acquiredDate) {
+                           LocalDateTime acquiredDate) {
         this.householdId  = householdId;
         this.itemId       = itemId;
         this.acquiredDate = acquiredDate;

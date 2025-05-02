@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.LocalDate;
 
 /**
@@ -49,7 +50,7 @@ public class HouseholdItem {
    * This field is part of the composite key and is not directly modifiable.
    */
   @Column(nullable = false, insertable = false, updatable = false)
-  public LocalDate getAcquiredDate() {
+  public LocalDateTime getAcquiredDate() {
     return id.getAcquiredDate();
   }
 
