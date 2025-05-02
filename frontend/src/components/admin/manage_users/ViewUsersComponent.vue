@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { UserService } from '@/api/UserService';
 import { onMounted, ref, watch } from 'vue';
 import { useAdminUserStore } from '@/stores/adminUserStore';
 
@@ -57,6 +56,7 @@ const deleteUser = (id: number) => {
 
 .grey-container {
     width: 45rem;
+    height: auto;
 }
 
 .user-card, .header-cards {
