@@ -20,7 +20,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  width: 400px;
+  width: 350px;
   height: 100%;
   font-weight: normal;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
@@ -154,6 +154,12 @@ button:hover {
   display: flex;
   align-items: center;
   border-radius: 0.5rem;
+}
+
+@media(max-width: 480px) {
+  .grey-container {
+    width: 300px !important;
+  }
 }
 
 .delete-button {
