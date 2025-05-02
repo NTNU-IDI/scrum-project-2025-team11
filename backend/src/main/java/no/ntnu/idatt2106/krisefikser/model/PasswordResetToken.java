@@ -30,7 +30,7 @@ import jakarta.persistence.GenerationType;
 @Entity
 @Table(name = "password_reset_tokens")
 @Getter @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 public class PasswordResetToken {

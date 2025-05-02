@@ -9,11 +9,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 
 
@@ -25,21 +25,35 @@ class PasswordResetServiceTest {
     @Mock private EmailService emailService;
 
     @InjectMocks
-    private PasswordResetServiceImpl resetService;
+    private PasswordResetServiceImpl service;
 
     @Test
-    void initiateReset_shouldGenerateAndSendToken() {
-        String email = "user@example.com";
-        User mockUser = new User();
-        mockUser.setEmail(email);
-        mockUser.setFirstName("Jon");
+    void initiateReset_generatesTokenAndSendsEmail() {
+        User user = new User();
+        user.setEmail("user@example.com");
+        user.setFirstName("Alice");
 
-        when(userService.getUserByEmail(email)).thenReturn(Optional.of(mockUser));
+        when(userService.getUserByEmail("user@example.com")).thenReturn(Optional.of(user));
 
-        assertDoesNotThrow(() -> resetService.initiateReset(email));
+        service.initiateReset("user@example.com");
 
-        verify(tokenRepo).deleteByUser(mockUser);
+        verify(tokenRepo).deleteByUser(user);
         verify(tokenRepo).save(any(PasswordResetToken.class));
         verify(emailService).sendEmail(any(EmailRequest.class));
+    }
+
+    @Test
+    void completeReset_validToken_updatesPassword() {
+        User user = new User();
+        PasswordResetToken token = new PasswordResetToken();
+        token.setUser(user);
+        token.setExpiryDate(LocalDateTime.now().plusHours(1));
+
+        when(tokenRepo.findByToken("abc123")).thenReturn(Optional.of(token));
+
+        service.completeReset("abc123", "newPassword");
+
+        verify(userService).updatePassword(user, "newPassword");
+        verify(tokenRepo).delete(token);
     }
 }
