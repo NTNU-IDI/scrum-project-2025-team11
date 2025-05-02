@@ -158,9 +158,10 @@ function removeTempMarker() {
 }
 
 function createTempMarker(lat: number, lng: number) {
-  temporaryMarker = L.marker([lat, lng]).addTo(map)
-    .bindPopup("Nytt punkt her")
-    .openPopup();
+  temporaryMarker = L.marker([lat, lng]).addTo(map);
+  if (formMode.value === 'create') {
+    temporaryMarker.bindPopup("Nytt punkt her").openPopup();
+  }
 }
 
 function updateMarkerPosition(coords: { latitude: number, longitude: number }) {
