@@ -1,28 +1,42 @@
 <script lang="ts" setup>
-import { useEventStore, type CrisisEvent } from '@/stores/eventStore';
-import { storeToRefs } from 'pinia';
-import { computed, onMounted, ref } from 'vue';
+import { useEventStore } from '@/stores/eventStore';
+import { onMounted, ref, watch } from 'vue';
+import { eventIcons } from '@/utils/icons';
 
 // Store imports
 const eventStore = useEventStore();
 
 // Props
-const localEvent = ref({ ...eventStore.event } as CrisisEvent);
+//const localEvent = ref<{ id: number; name: string; description: string; iconType: string; startDate: string; endDate: string; latitude: number; longitude: number; radius: number; severity: number }>();
+
+const localEvent = ref({
+  id: 0,
+  name: '',
+  description: '',
+  iconType: '',
+  startDate: '',
+  endDate: '',
+  latitude: 0,
+  longitude: 0,
+  radius: 0,
+  severity: 0,
+});
+
 const isEventDirty = ref(false);
 const selectedIcon = ref('none');
-const icons = [
-    'none', 
-    'point', 
-    'normal',
-    'danger',
-    'assembly_point',
-    'medical',
-    'shelter'
-];
+const icons = eventIcons;
 
-onMounted(() => {
-    if (eventStore.event) {
-        localEvent.value = { ...eventStore.event };
+const loadChosenEvent = async () => {
+    await eventStore.fetchChosenEvent();
+}
+
+onMounted( async () => {
+    await loadChosenEvent();
+});
+
+watch(() => eventStore.chosenEvent, async (newEvent) => {
+    if(newEvent) {
+        localEvent.value = newEvent;
     }
 });
 
@@ -87,7 +101,7 @@ const deleteEvent = async () => {
 <style scoped>
     .grey-container {
         background-color: var(--light-blue);
-        height: 40rem;
+        min-height: 42rem;
     }
 
     .page-container {
@@ -121,6 +135,7 @@ const deleteEvent = async () => {
     select {
         font-size: var(--font-size-medium);
     }
+
     .button-container {
         display: flex;
         justify-content: space-between;

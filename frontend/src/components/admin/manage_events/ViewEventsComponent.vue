@@ -1,23 +1,43 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useEventStore } from '@/stores/eventStore';
-
-const events = ref([
-    {id: 1, name: 'Event 1', description: 'Mega bombe', iconType: 'danger', startTime: new Date('2023-10-01'), latitude: 60.39299, longitude: 5.32415, radius: 1000, severity: 3},
-    {id: 2, name: 'Event 2', description: 'Mindre bombe', iconType: 'danger', startTime: new Date('2024-10-01'), latitude: 60.39299, longitude: 5.32415, radius: 500, severity: 1},
-    {id: 3, name: 'Event 3', description: 'Røde kors', iconType: 'medical', startTime: new Date('2025-05-01'), latitude: 60.39299, longitude: 5.32415, radius: 10, severity: 1},
-])
+import { EventService } from '@/api/EventService';
 
 // Store imports
 const eventStore = useEventStore();
 
 // Props
-const selectedEventId = ref<number | null>(null)
+const events = ref<{ id: number; name: string; description: string; iconType: string; startDate: string; endDate: string; latitude: number; longitude: number; radius: number; severity: number }[]>([]);
+const selectedEventId = ref<number>(0);
+const emit = defineEmits(['event-selected']);
+
+const loadEvents = async () => {
+    await eventStore.fetchEvents();
+};
+
+onMounted(async () => {
+    await loadEvents();
+});
+
+watch(() => eventStore.events, async (newEvents) => {
+    events.value = newEvents.map(event => ({
+        id: event.id,
+        name: event.name,
+        description: event.description,
+        iconType: event.iconType,
+        startDate: event.startDate,
+        endDate: event.endDate,
+        latitude: event.latitude,
+        longitude: event.longitude,
+        radius: event.radius,
+        severity: event.severity
+    }));
+});
 
 // Choose an item in the supply
 const chooseEvent = (eventId: any) => {
     selectedEventId.value = eventId;
-    eventStore.setEvent(eventId);
+    emit('event-selected', eventId);
 }
 </script>
 <template>
