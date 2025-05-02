@@ -12,14 +12,22 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Tag(name = "Two-Factor Authentication", description = "Operations related to two-factor authentication")
 public class TwoFactorController {
 
     private final TwoFactorCodeService twoFactorCodeService;
 
+    /**
+     * Initiates the two-factor authentication process by sending a code to the user's email.
+     *
+     * @param request the two-factor authentication request containing the user's email
+     * @return a response entity indicating the result of the operation
+     */
     @Operation(
             summary = "Request a two-factor authentication code",
             description = "Initiate the two-factor authentication process by sending a code to the user's email."
@@ -35,6 +43,12 @@ public class TwoFactorController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Completes the two-factor authentication process by validating the provided code.
+     *
+     * @param request the two-factor authentication confirmation containing the code
+     * @return a response entity indicating the result of the operation
+     */
     @Operation(
             summary = "Confirm two-factor authentication",
             description = "Confirm the two-factor authentication process using the provided code."
