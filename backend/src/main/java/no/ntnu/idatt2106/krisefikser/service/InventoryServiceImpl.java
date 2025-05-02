@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -104,7 +104,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public void remove(Integer householdId, Integer itemId, LocalDate acquiredDate) {
+    public void remove(Integer householdId, Integer itemId, LocalDateTime acquiredDate) {
         // Fully qualify the composite key, including the purchase date
         var id = new HouseholdItemId(householdId, itemId, acquiredDate);
         if (!hiRepo.existsById(id)) {
