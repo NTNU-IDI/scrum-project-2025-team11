@@ -5,9 +5,14 @@ import java.util.List;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,6 +28,7 @@ import no.ntnu.idatt2106.krisefikser.security.JwtAuthFilter;
 
 @Profile("!test")
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
@@ -53,6 +59,17 @@ public class SecurityConfig {
                     .authenticationEntryPoint((request, response, authException) -> {
                         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
                     })
+                    .accessDeniedHandler((request, response, accessDeniedException) -> {
+                        // Check if the user is authenticated
+                        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+                            // Not authenticated → Send 401
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                        } else {
+                            // Authenticated but lacks permissions → Send 403
+                            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
+                        }
+                    })
             )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
@@ -61,7 +78,7 @@ public class SecurityConfig {
                     "/swagger-ui.html",
                     "/v3/api-docs/**"
                 ).permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
             //.httpBasic(Customizer.withDefaults()); // optional depending on your needs

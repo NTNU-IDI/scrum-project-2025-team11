@@ -95,7 +95,7 @@ public class UserService {
 
     /**
      * Deletes a user by their ID.
-     * @param id
+     *
      */
     public void deleteAllUsers() {
         userRepository.deleteAll();
@@ -104,7 +104,7 @@ public class UserService {
     /**
      * Updates a user by their ID.
      * @param id
-     * @param updatedUser
+     * @param updated
      * @return User object that was updated
      */
     public UserResponseDTO updateUser(int id, UserUpdateDTO updated) {

@@ -3,16 +3,13 @@ package no.ntnu.idatt2106.krisefikser.controller;
 import java.util.List;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import no.ntnu.idatt2106.krisefikser.security.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,9 +32,11 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
 @CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "jwtCookieAuth")
+@PreAuthorize("isAuthenticated()")
 @Tag(name = "User", description = "Operations related to user management")
 public class UserController {
   private final UserService userService;
+  private final JwtUtil jwtUtil;
 
 
   /**
@@ -83,6 +82,7 @@ public class UserController {
       @ApiResponse(responseCode = "204", description = "No users found",
           content = @Content)
   })
+  @PreAuthorize("hasRole('admin')")
   @GetMapping
   public ResponseEntity<List<UserResponseDTO>> list() {
     List<UserResponseDTO> users = userService.findAll();
@@ -167,8 +167,7 @@ public class UserController {
 
   /**
    * Updates an existing user entity.
-   * 
-   * @param id the unique identifier of the user to be updated
+   *
    * @param user the updated user entity
    * @return {@code ResponseEntity} containing the updated user entity
    */
@@ -185,13 +184,15 @@ public class UserController {
           content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = UserResponseDTO.class)))
   })
-  @PostMapping("/{id}")
+  @PutMapping
   public ResponseEntity<UserResponseDTO> updateUser(
-    @Parameter(description = "The unique identifier of the user", required = true)
-    @PathVariable int id,
     @Parameter(description = "Updated user object", required = true)
     @RequestBody UserUpdateDTO user) {
-    User existingUser = userService.getUserById(id).orElse(null);
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String username = authentication.getName();
+
+    User existingUser = userService.getUserByUsername(username).orElse(null);
     if (existingUser == null) {
       return ResponseEntity.notFound().build();
     }
@@ -206,7 +207,7 @@ public class UserController {
           .body(null);
     }
 
-    UserResponseDTO updatedUser = userService.updateUser(id, user);
+    UserResponseDTO updatedUser = userService.updateUser(existingUser.getId(), user);
     return ResponseEntity.ok(updatedUser);
   }  
 }

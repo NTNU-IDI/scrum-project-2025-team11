@@ -32,23 +32,6 @@ protected void doFilterInternal(
     FilterChain chain
 ) throws ServletException, IOException {
 
-    // Extract JWT token from "accessToken" cookie
-    Cookie[] cookies = request.getCookies();
-    String token = null;
-    if (cookies != null) {
-        token = Arrays.stream(cookies)
-            .filter(cookie -> "jwtToken".equals(cookie.getName()))
-            .map(Cookie::getValue)
-            .findFirst()
-            .orElse(null);
-    }
-
-    // If no token found, proceed without authentication
-    if (token == null) {
-        chain.doFilter(request, response);
-        return;
-    }
-
     // CSRF protection for state-changing requests (POST, PUT, DELETE, etc.)
     /* if (!request.getMethod().equalsIgnoreCase("GET")) {
         String csrfToken = request.getHeader("X-XSRF-TOKEN");
@@ -65,26 +48,37 @@ protected void doFilterInternal(
     } */
 
     try {
-        jwtUtil.getJwtParser().parseSignedClaims(token);
+        // Extract JWT token from "accessToken" cookie
+        Cookie[] cookies = request.getCookies();
+        String token = null;
+        if (cookies != null) {
+            token = Arrays.stream(cookies)
+                    .filter(cookie -> "jwtToken".equals(cookie.getName()))
+                    .map(Cookie::getValue)
+                    .findFirst()
+                    .orElse(null);
+        }
 
-        // Extract username and role from token
-        String username = jwtUtil.extractUsername(token);
-        String role = jwtUtil.extractRole(token);
+        // If no token found, proceed without authentication
+        if (token != null) {
+            jwtUtil.getJwtParser().parseSignedClaims(token);
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            // Create authorities (prefix roles with "ROLE_" for Spring Security)
+            // Extract username and role from token
+            String username = jwtUtil.extractUsername(token);
+            String role = jwtUtil.extractRole(token);
+
             List<SimpleGrantedAuthority> authorities = Collections.singletonList(
-                new SimpleGrantedAuthority("ROLE_" + role)
+                    new SimpleGrantedAuthority("ROLE_" + role)
             );
 
             // Create authentication token
-            UsernamePasswordAuthenticationToken authentication = 
-                new UsernamePasswordAuthenticationToken(username, null, authorities);
-            
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(username, null, authorities);
             // Set authentication in security context
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-
+        // Proceed with the filter chain
+        chain.doFilter(request, response);
     } catch (ExpiredJwtException ex) {
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token expired"); // Specific error
         return;
@@ -92,9 +86,6 @@ protected void doFilterInternal(
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
         return;
     }
-
-    // Proceed with the filter chain
-    chain.doFilter(request, response);
 }
 
 }

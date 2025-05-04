@@ -116,7 +116,7 @@
       Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
       refreshCookie.setHttpOnly(true);
       refreshCookie.setSecure(true); // important in production
-      refreshCookie.setPath("/");
+      refreshCookie.setPath("/auth/refresh");
       refreshCookie.setMaxAge((int) jwtUtil.getRefreshExpiration() / 1000);
 
       return refreshCookie;
