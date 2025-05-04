@@ -1,5 +1,6 @@
 package no.ntnu.idatt2106.krisefikser.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdItemRequest;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdItemResponse;
 import no.ntnu.idatt2106.krisefikser.dto.UpsertInventoryRequest;
@@ -27,6 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/households/{hhId}/items")
 @CrossOrigin(origins = "*")
+@SecurityRequirement(name = "jwtCookieAuth")
 @Tag(name = "Inventory API", description = "Operations for managing household inventory items")
 public class InventoryController {
     private final InventoryService service;

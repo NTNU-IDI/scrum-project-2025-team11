@@ -2,6 +2,7 @@ package no.ntnu.idatt2106.krisefikser.config;
 
 import java.util.List;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -48,6 +49,11 @@ public class SecurityConfig {
                 config.setAllowCredentials(true);
                 return config;
             }))
+            .exceptionHandling(exceptions -> exceptions
+                    .authenticationEntryPoint((request, response, authException) -> {
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                    })
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/auth/**",

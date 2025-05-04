@@ -2,6 +2,7 @@ package no.ntnu.idatt2106.krisefikser.controller;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -33,6 +34,7 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
 @RequestMapping("/api/users")
 @CrossOrigin(origins = "*")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "jwtCookieAuth")
 @Tag(name = "User", description = "Operations related to user management")
 public class UserController {
   private final UserService userService;

@@ -32,7 +32,6 @@ public class PointOfInterestController {
             @ApiResponse(responseCode = "201", description = "Points fetched"),
             @ApiResponse(responseCode = "400", description = "Points could not be found")
     })
-    @SecurityRequirement(name = "jwtCookieAuth")
     @GetMapping
     public ResponseEntity<List<PointOfInterestResponseDTO>> getPointsOfInterest() {
         List<PointOfInterestResponseDTO> pointOfInterestList = pointOfInterestService.findAll();

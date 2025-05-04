@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import no.ntnu.idatt2106.krisefikser.mapper.HouseholdMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ import no.ntnu.idatt2106.krisefikser.service.HouseholdService;
 @RestController
 @RequestMapping("/api/household")
 @CrossOrigin(origins = "*")
+@SecurityRequirement(name = "jwtCookieAuth")
 @RequiredArgsConstructor
 @Tag(name = "Household", description = "Operations related to household management")
 public class HouseholdController {

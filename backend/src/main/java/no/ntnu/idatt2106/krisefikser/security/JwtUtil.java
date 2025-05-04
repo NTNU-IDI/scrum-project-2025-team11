@@ -67,7 +67,11 @@ public class JwtUtil {
   public long getExpiration() {
     return expiration;
   }
-  
+
+  public JwtParser getJwtParser() {
+    return this.jwtParser;
+  }
+
   public boolean validateToken(String token) {
     try {
         jwtParser.parseSignedClaims(token);

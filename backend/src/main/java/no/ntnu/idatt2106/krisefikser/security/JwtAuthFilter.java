@@ -1,5 +1,6 @@
 package no.ntnu.idatt2106.krisefikser.security;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -64,11 +65,7 @@ protected void doFilterInternal(
     } */
 
     try {
-        // Validate JWT token
-        if (!jwtUtil.validateToken(token)) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid/expired token");
-            return;
-        }
+        jwtUtil.getJwtParser().parseSignedClaims(token);
 
         // Extract username and role from token
         String username = jwtUtil.extractUsername(token);
@@ -88,9 +85,11 @@ protected void doFilterInternal(
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
-    } catch (Exception e) {
-        // Handle token validation errors (e.g., tampered token)
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token validation failed: " + e.getMessage());
+    } catch (ExpiredJwtException ex) {
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token expired"); // Specific error
+        return;
+    } catch (Exception ex) {
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
         return;
     }
 
