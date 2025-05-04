@@ -1,13 +1,12 @@
   package no.ntnu.idatt2106.krisefikser.controller;
 
   import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+  import java.util.Map;
 
-  import org.springframework.boot.autoconfigure.data.redis.RedisProperties.Lettuce.Cluster.Refresh;
+  import lombok.RequiredArgsConstructor;
   import org.springframework.http.HttpStatus;
   import org.springframework.http.ResponseEntity;
-  import org.springframework.web.bind.annotation.CrossOrigin;
+  import org.springframework.security.crypto.password.PasswordEncoder;
   import org.springframework.web.bind.annotation.PostMapping;
   import org.springframework.web.bind.annotation.RequestBody;
   import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,18 +30,14 @@ import java.util.Map;
   import no.ntnu.idatt2106.krisefikser.service.UserService;
 
   @RestController
+  @RequiredArgsConstructor
   @RequestMapping("/auth")
   public class AuthController {
 
     private final JwtUtil jwtUtil;
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
-
-    public AuthController(JwtUtil jwtUtil, UserService userService, RefreshTokenService refreshTokenService) {
-      this.jwtUtil = jwtUtil;
-      this.userService = userService;
-      this.refreshTokenService = refreshTokenService;
-    }
+    private final PasswordEncoder passwordEncoder;
 
     @Operation(
       summary = "Refresh JWT token",
@@ -74,31 +69,16 @@ import java.util.Map;
           return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
       }
 
-      String role = user.getRole().toString(); 
+      Cookie jwtCookie = generateJwtToken(username, user);
 
-      String newAccessToken = jwtUtil.generateToken(username, role);
-      Cookie cookie = new Cookie("jwtToken", newAccessToken);
-      cookie.setHttpOnly(true);
-      cookie.setSecure(true);
-      cookie.setPath("/");
-      cookie.setMaxAge((int) jwtUtil.getExpiration() / 1000);
-
-      response.addCookie(cookie);
+      response.addCookie(jwtCookie);
 
       refreshTokenService.revokeToken(refreshToken);
 
-      String newRefreshToken = jwtUtil.generateRefreshToken(username);
-
-      refreshTokenService.createRefreshToken(user, newRefreshToken, jwtUtil.getRefreshExpiration());
-
-      Cookie refreshCookie = new Cookie("refreshToken", newRefreshToken);
-      refreshCookie.setHttpOnly(true);
-      refreshCookie.setSecure(true);
-      refreshCookie.setPath("/");
-      refreshCookie.setMaxAge((int) jwtUtil.getRefreshExpiration() / 1000);
+      Cookie refreshCookie = generateRefreshToken(username, user);
       response.addCookie(refreshCookie);
 
-      return ResponseEntity.ok().body(Map.of("role ", jwtUtil.extractRole(newAccessToken)));
+      return ResponseEntity.ok().body(Map.of("role ", user.getRole()));
     }
 
     @Operation(
@@ -114,11 +94,21 @@ import java.util.Map;
       String password = loginRequest.getPassword();
 
       User user = userService.getUserByUsername(username).orElse(null);
-      if (user == null || !password.equals(user.getPassword())) {
+      if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
         return ResponseEntity.status(401).body("Invalid credentials");
       }
 
-      String token = jwtUtil.generateToken(username, user.getRole().toString());
+      Cookie jwtCookie = generateJwtToken(username, user);
+      Cookie refreshCookie = generateRefreshToken(username, user);
+
+      response.addCookie(refreshCookie);
+      response.addCookie(jwtCookie);
+
+      //return ResponseEntity.ok(Map.of("token", token));
+      return ResponseEntity.ok().body(Map.of("role",user.getRole()));
+    }
+
+    private Cookie generateRefreshToken(String username, User user) {
       String refreshToken = jwtUtil.generateRefreshToken(username);
 
       refreshTokenService.createRefreshToken(user, refreshToken, jwtUtil.getRefreshExpiration());
@@ -129,23 +119,22 @@ import java.util.Map;
       refreshCookie.setPath("/");
       refreshCookie.setMaxAge((int) jwtUtil.getRefreshExpiration() / 1000);
 
+      return refreshCookie;
+    }
+
+    private Cookie generateJwtToken(String username, User user) {
+      String token = jwtUtil.generateToken(username, user.getRole().toString());
       Cookie jwtCookie = new Cookie("jwtToken", token);
       jwtCookie.setHttpOnly(true);
       jwtCookie.setSecure(true);
       jwtCookie.setPath("/");
       jwtCookie.setMaxAge((int) jwtUtil.getExpiration() / 1000);
-
-      response.addCookie(refreshCookie);
-      response.addCookie(jwtCookie);
-
-      //return ResponseEntity.ok(Map.of("token", token));
-      return ResponseEntity.ok().body(Map.of("role",user.getRole()));
+      return jwtCookie;
     }
-
     /**
      * Saves a new user entity.
      *
-     * @param user the user entity to be saved
+     * @param body the user entity to be saved
      * @return {@code ResponseEntity} containing the saved user entity
      */
     @Operation(
@@ -173,7 +162,7 @@ import java.util.Map;
             .status(409) // Conflict
             .body(null);
       }
-          
+
       UserResponseDTO saved = userService.saveUser(body);
       User user = userService.getUserByUsername(saved.getUsername()).orElse(null);
 
@@ -182,24 +171,10 @@ import java.util.Map;
       }
 
       // Generate tokens
-      String token = jwtUtil.generateToken(user.getUsername(), user.getRole().toString());
-      String refreshToken = jwtUtil.generateRefreshToken(user.getUsername());
-
-      refreshTokenService.createRefreshToken(user, refreshToken, jwtUtil.getRefreshExpiration());
-
-      Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
-      refreshCookie.setHttpOnly(true);
-      refreshCookie.setSecure(true);
-      refreshCookie.setPath("/");
-      refreshCookie.setMaxAge((int) jwtUtil.getRefreshExpiration() / 1000);
-      response.addCookie(refreshCookie);
-
-      Cookie jwtCookie = new Cookie("jwtToken", token);
-      jwtCookie.setHttpOnly(true);
-      jwtCookie.setSecure(true);
-      jwtCookie.setPath("/");
-      jwtCookie.setMaxAge((int) jwtUtil.getExpiration() / 1000);
+      Cookie jwtCookie = generateJwtToken(body.getUsername(), user);
+      Cookie refreshCookie = generateRefreshToken(user.getUsername(), user);
       response.addCookie(jwtCookie);
+      response.addCookie(refreshCookie);
 
       // Return both the saved user and access token
       return ResponseEntity

@@ -39,7 +39,7 @@ public class SwaggerConfig {
         .components(components)
         .info(info)
         .addServersItem(server)
-        .addSecurityItem(new SecurityRequirement().addList("jwtCookieAuth"))
+        //.addSecurityItem(new SecurityRequirement().addList("jwtCookieAuth"))
         .tags(List.of(
             new Tag().name("Address").description("Endpoints for address management"),
             new Tag().name("User").description("Endpoints for user management"),
