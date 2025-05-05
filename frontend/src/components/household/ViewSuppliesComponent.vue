@@ -19,7 +19,7 @@ const list = ref<{ id: number; name: string; quantity: number; unit: string; acq
 // Fetch inventory items
 const loadInventory = async () => {
     // TODO: Get actual household id from the store
-    await householdStore.setHousehold(1); 
+    await householdStore.fetchHousehold();
 
     if(!householdStore.id) {
         console.error('Household ID is not available');
@@ -83,7 +83,9 @@ const deleteItem =  (itemId: number) => {
             return;
         }
         if (item.id === itemId) {
-            await inventoryStore.deleteItem(householdStore.id, itemId, item.acquiredDate);
+            if(confirm(`Er du sikker på at du vil slette ${item.name} fra lageret?`)) {
+                await inventoryStore.deleteItem(householdStore.id, itemId, item.acquiredDate);
+            }
         }
     });
 }

@@ -6,12 +6,13 @@
       <div class="footer-links">
         |
         <a href="/about">Om oss </a> |
-        <a href="/personvern">Personvern</a> |
-         <!--<a href="/contact">Kontakt oss</a> |-->
-        <a href="/userhome" >User home (for testing)</a> |
-        <a href="/adminhome">Admin (for testing)</a> |
-        <a href="/auth">Auth (for testing)</a>
-        <a href="/forgot">Forgot (for testing)</a>
+        <a href="/privacy">Personvern</a> |
+        <a href="/contact">Kontakt oss</a> |
+        <a href="/userhome">User home (for testing)</a> |
+        <a href="/admin">Admin (for testing)</a> |
+        <a href="/auth">Auth (for testing)</a> |
+        <a href="/superadmin">Admin (for testing)</a> |
+        <a href="/forgot">Forgot (for testing)</a> |
         <a href="/reset">Reset (for testing)</a>
         <br />
         <br />

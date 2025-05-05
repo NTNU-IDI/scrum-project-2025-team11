@@ -69,7 +69,7 @@ const addItem = async () => {
         description: '',
         quantity: parseInt(newQuantity.value),
         unit: newUnit.value,
-        acquiredDate: new Date().toISOString().split('T')[0],
+        acquiredDate: new Date().toISOString().slice(0, 19),
         expirationDate: newExpirationDate.value
     };
     if(!householdStore.id) {

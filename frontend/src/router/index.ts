@@ -7,6 +7,7 @@ import PrivacyPolicyView from "@/views/PrivacyPolicyView.vue";
 import AuthView from "@/views/AuthView.vue";
 import UserHomeView from "@/views/HomeInloggedView.vue";
 import AdminView from "@/views/admin/AdminView.vue";
+import SuperAdminView from "@/views/admin/SuperAdminView.vue";
 import HomeAdminView from "@/views/HomeAdminView.vue";
 import AboutView from "@/views/AboutView.vue";
 import ForgotPassword from "@/views/ForgotPasswordView.vue";
@@ -15,6 +16,7 @@ import ResetPassword from "@/views/ResetPasswordView.vue";
 import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
 import {useUserStore} from "@/stores/userStore.ts";
+
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -54,9 +56,16 @@ const routes: Array<RouteRecordRaw> = [
     component: UserHomeView,
   },
   {
+    path: "/superadmin",
+    name: "SuperAdminView",
+    component: SuperAdminView,
+    meta: { requiresSuperAdmin: true }
+  },
+  {
     path: "/admin",
     name: "AdminView",
     component: AdminView,
+    meta: { requiresAdmin: true }
   },
   {
     path: "/auth",
@@ -82,20 +91,6 @@ const routes: Array<RouteRecordRaw> = [
     name: "ResetPassword",
     component: ResetPassword,
   },
-
-    // { //Eksempel - admin-route
-  //   path: '/adminrute',
-  //   name: 'AdminEksempelView',
-  //   component: AdminEksempelView,
-  //   meta: {requieresAdmin: true}
-  // },
-  // { //Eksempel - super-admin-route
-  //   path: '/superadminrute',
-  //   name: 'SuperAdminEksempelView',
-  //   component: SuperAdminEksempelView,
-  //   meta: {requieresSuperAdmin: true}
-  // },
-
 ];
 
 const router = createRouter({

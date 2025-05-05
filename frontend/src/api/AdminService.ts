@@ -5,7 +5,7 @@ const ITEM_API_URL = 'http://localhost:8080/api/users';
 
 export class AdminService {
     static async findAll(): Promise<UserResponseDTO[]> {
-        const response = await axios.get<UserResponseDTO[]>(ITEM_API_URL);
+        const response = await axios.get<UserResponseDTO[]>(`${ITEM_API_URL}/all`);
         return response.data;
     }
 
