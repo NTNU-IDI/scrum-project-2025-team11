@@ -9,8 +9,10 @@ import no.ntnu.idatt2106.krisefikser.model.PointOfInterest;
 import no.ntnu.idatt2106.krisefikser.repository.PointOfInterestRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -138,5 +140,25 @@ public class PointOfInterestService {
      */
     public void deleteById(int id) {
         pointOfInterestRepository.deleteById(id);
+    }
+
+
+    /**
+     * Find the three closest shelters to a given point
+     * @param latitude The latitude of the point
+     * @param longitude The longitude of the point
+     * @return A list of the three closest shelters
+     */
+    public List<PointOfInterestResponseDTO> findThreeClosestShelters(double latitude, double longitude) {
+        List<PointOfInterest> allPoints = pointOfInterestRepository.findByIconType(Enums.IconEnum.shelter);
+        List<PointOfInterest> closestShelters = allPoints.stream()
+            .sorted(Comparator.comparingDouble(
+                shelter -> Math.pow(shelter.getLatitude() - latitude, 2) + Math.pow(shelter.getLongitude() - longitude, 2)))
+            .limit(3)
+            .collect(Collectors.toList());
+
+        return closestShelters.stream()
+            .map(PointOfInterestMapper::toResponseDTO)
+            .toList();
     }
 }
