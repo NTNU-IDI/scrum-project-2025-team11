@@ -11,6 +11,8 @@ import no.ntnu.idatt2106.krisefikser.mapper.HouseholdMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,7 +21,9 @@ import no.ntnu.idatt2106.krisefikser.dto.HouseholdRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdResponseDTO;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdUpdateDTO;
 import no.ntnu.idatt2106.krisefikser.model.Household;
+import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.service.HouseholdService;
+import no.ntnu.idatt2106.krisefikser.service.UserService;
 
 
 @RestController
@@ -35,6 +39,7 @@ public class HouseholdController {
      * Service for handling household-related business logic.
      */
     private final HouseholdService householdService;
+    private final UserService userService;
 
     /**
      * Updates an existing household with new data.
@@ -45,15 +50,19 @@ public class HouseholdController {
      *         or a 404 Not Found response if the household with the given ID does not exist.
      */
     @Operation(
-            summary = "Update household information based on ID",
-            description = "Updates already existing household by finding the given ID"
+            summary = "Update household information based on logged in users information",
+            description = "Updates already existing household by using the cookie sent"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Household information updated successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid ID, ID does not exist")
+            @ApiResponse(responseCode = "400", description = "User could not be found")
     })
-    @PutMapping("/{id}")
-    public ResponseEntity<HouseholdResponseDTO> updateHousehold(@PathVariable int id, @RequestBody HouseholdUpdateDTO household) {
+    @PutMapping("/update")
+    public ResponseEntity<HouseholdResponseDTO> updateHousehold(@RequestBody HouseholdUpdateDTO household) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username).orElse(null);
+        int id = user.getId();
         if (!householdService.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
@@ -80,14 +89,18 @@ public class HouseholdController {
 
     @Operation(
             summary = "Get household information",
-            description = "Receive household information based on the given id"
+            description = "Receive household information based on the logged in user"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Household information fetched"),
             @ApiResponse(responseCode = "400", description = "Household could not be found, make sure that the id is correct")
     })
-    @GetMapping("/{id}")
-    public ResponseEntity<HouseholdResponseDTO> getHousehold(@PathVariable int id) {
+    @GetMapping("/me")
+    public ResponseEntity<HouseholdResponseDTO> getHousehold() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username).orElse(null);
+        int id = user.getId();
         Household household = householdService.findById(id).orElse(null);
         if (household == null) {
             return ResponseEntity.notFound().build();
@@ -122,7 +135,7 @@ public class HouseholdController {
             @ApiResponse(responseCode = "201", description = "Households fetched"),
             @ApiResponse(responseCode = "400", description = "Households could not be found")
     })
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<HouseholdResponseDTO>> getAllHouseholds() {
         List<HouseholdResponseDTO> householdList = householdService.findAll();
         if (householdList.isEmpty()) {
