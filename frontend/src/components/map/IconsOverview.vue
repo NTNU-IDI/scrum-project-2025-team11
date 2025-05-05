@@ -30,7 +30,7 @@
 import { ref, watch } from 'vue';
 import { usePointStore } from '@/stores/pointStore';
 
-const isCollapsed = ref(false);
+const isCollapsed = ref(true);
 const selectedIcons = ref<string[]>([])
 
 const pointStore = usePointStore()
