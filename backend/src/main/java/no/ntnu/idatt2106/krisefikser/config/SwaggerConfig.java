@@ -26,24 +26,20 @@ public class SwaggerConfig {
         .title("Krisefikser Application API")
         .description("API documentation for endpoints for Krisefikser system");
 
-    // Define the security scheme for a JWT Bearer token
-    final String securitySchemeName = "BearerAuth";
-    Components components = new Components();
-    components.addSecuritySchemes(securitySchemeName, new SecurityScheme()
-        .type(SecurityScheme.Type.HTTP)
-        .scheme("bearer")
-        .bearerFormat("JWT")
-        .description("Enter your valid token in the text input below.\n\nExample: \" eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\""));
-
-    // Apply the defined security scheme globally
-    SecurityRequirement securityRequirement = new SecurityRequirement();
-    securityRequirement.addList(securitySchemeName);
+    // Define security scheme for JWT cookies
+        Components components = new Components()
+            .addSecuritySchemes("jwtCookieAuth", new SecurityScheme()
+                .type(SecurityScheme.Type.APIKEY)
+                .in(SecurityScheme.In.COOKIE)
+                .name("jwtToken") // Name of your JWT cookie
+                .description("JWT token in cookie")
+            );
 
     return new OpenAPI()
         .components(components)
-        .addSecurityItem(securityRequirement)
         .info(info)
         .addServersItem(server)
+        //.addSecurityItem(new SecurityRequirement().addList("jwtCookieAuth"))
         .tags(List.of(
             new Tag().name("Address").description("Endpoints for address management"),
             new Tag().name("User").description("Endpoints for user management"),
