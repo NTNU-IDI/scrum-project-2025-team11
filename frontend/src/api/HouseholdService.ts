@@ -17,6 +17,11 @@ export class HouseholdService {
         const response = await axios.get<HouseholdResponseDTO>(`${HOUSEHOLS_API_URL}/${id}`);
         return response.data;
     }
+
+    static async getHouseholdInformation(): Promise<HouseholdResponseDTO> {
+        const response = await axios.get<HouseholdResponseDTO>(`${HOUSEHOLS_API_URL}/me`);
+        return response.data;
+    }
     
     static async create(data: HouseholdRequestDTO): Promise<HouseholdResponseDTO> {
         const response = await axios.post<HouseholdResponseDTO>(HOUSEHOLS_API_URL, data);
