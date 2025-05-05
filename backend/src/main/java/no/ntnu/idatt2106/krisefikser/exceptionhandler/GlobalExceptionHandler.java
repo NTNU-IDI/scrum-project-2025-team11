@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
   basePackages = "no.ntnu.idatt2106.krisefikser"
 )
 public class GlobalExceptionHandler {
+
+
   @ExceptionHandler(MethodArgumentNotValidException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ErrorResponse handleValidation(MethodArgumentNotValidException ex) {
@@ -55,7 +59,13 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public ErrorResponse handleAll(Exception ex) {
+  public ErrorResponse handleAll(Exception ex) throws Exception {
+    // check if the exception is security-related
+    if (ex instanceof AuthenticationException || ex instanceof AccessDeniedException) {
+      // Let Spring Security handle these exceptions
+      throw ex; // Re-throw to bypass the 500 mapping
+    }
+
     // you might want to log ex here
     return new ErrorResponse(
       HttpStatus.INTERNAL_SERVER_ERROR.value(),
