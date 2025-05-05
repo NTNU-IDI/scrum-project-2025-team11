@@ -1,6 +1,8 @@
 package no.ntnu.idatt2106.krisefikser.model;
 
 import java.time.LocalDateTime;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -27,12 +29,15 @@ public class TwoFactorCode {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Unique identifier for the two-factor code.")
     private int id;
 
     @Column(nullable = false, unique = true)
+    @Schema(description = "The actual two-factor code.", example = "123456")
     private String code;
 
     @Column(name = "expiry_date", nullable = false)
+    @Schema(description = "The date and time when the two-factor code expires.", example = "2023-10-01T12:00:00")
     private LocalDateTime expiryDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
