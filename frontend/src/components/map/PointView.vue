@@ -38,7 +38,10 @@
           <p v-if="addressError" class="error-message">{{ addressError }}</p>
 
           <!-- Navigation button -->
-          <button class="button" @click="navigateToPoint">Naviger til dette punktet</button>
+           <div class="point-buttons">
+            <button class="good-button small-button" @click="navigateToPoint">Naviger til dette punktet</button>
+            <button class="dark-button small-button" @click="nextShelter">Neste tilfluktsrom</button>
+           </div>
         </div>
       </div>
 
@@ -237,6 +240,10 @@ function navigateToPoint() {
   });
 }
 
+function nextShelter() {
+  // TODO: Navigate to next shelter point
+}
+
 const createPoint = async () => {
   errorMessage.value = '';
   try {
@@ -298,6 +305,10 @@ const deletePoint = async () => {
 
 .point-detail {
   margin-bottom: 10px;
+  font-size: var(--font-size-small);
+}
+
+.small-button {
   font-size: var(--font-size-small);
 }
 
