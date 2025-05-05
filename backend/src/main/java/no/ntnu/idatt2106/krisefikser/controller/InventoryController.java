@@ -7,6 +7,7 @@ import no.ntnu.idatt2106.krisefikser.dto.UpsertInventoryRequest;
 import no.ntnu.idatt2106.krisefikser.service.InventoryService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,6 +30,7 @@ import java.util.List;
 @RequestMapping("/api/households/{hhId}/items")
 @CrossOrigin(origins = "*")
 @SecurityRequirement(name = "jwtCookieAuth")
+@PreAuthorize("isAuthenticated()")
 @Tag(name = "Inventory API", description = "Operations for managing household inventory items")
 public class InventoryController {
     private final InventoryService service;

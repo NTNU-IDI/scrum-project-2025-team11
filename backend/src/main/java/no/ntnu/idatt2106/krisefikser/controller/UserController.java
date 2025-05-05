@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,7 +37,7 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
 @Tag(name = "User", description = "Operations related to user management")
 public class UserController {
   private final UserService userService;
-  private final JwtUtil jwtUtil;
+  private final PasswordEncoder passwordEncoder;
 
 
   /**
@@ -47,8 +48,8 @@ public class UserController {
    *         returns a 404 Not Found response
    */
   @Operation(
-      summary     = "Get user by ID",
-      description = "Retrieves the user details for the specified ID.")
+      summary     = "Get logged in user",
+      description = "Retrieves the user details by login")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "User found",
           content = @Content(mediaType = "application/json",
@@ -56,11 +57,11 @@ public class UserController {
       @ApiResponse(responseCode = "404", description = "User not found",
           content = @Content)
   })
-  @GetMapping("/{id}")
-  public ResponseEntity<UserResponseDTO> getById(
-      @Parameter(description = "Unique user ID", required = true)
-      @PathVariable int id) {
-    User user = userService.getUserById(id).orElse(null);
+  @GetMapping("/me")
+  public ResponseEntity<UserResponseDTO> getUserInfo() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String username = authentication.getName();
+    User user = userService.getUserByUsername(username).orElse(null);
     if (user == null) {
       return ResponseEntity.notFound().build();
     }
@@ -82,8 +83,7 @@ public class UserController {
       @ApiResponse(responseCode = "204", description = "No users found",
           content = @Content)
   })
-  @PreAuthorize("hasRole('admin')")
-  @GetMapping
+  @GetMapping("/all")
   public ResponseEntity<List<UserResponseDTO>> list() {
     List<UserResponseDTO> users = userService.findAll();
     if (users == null) {
@@ -96,7 +96,7 @@ public class UserController {
 
 
   /**
-   * Changes the password of a user by their unique identifier.
+   * Changes the password of a logged in user.
    *
    * @param id the unique identifier of the user
    * @param dto the password change request
@@ -110,17 +110,18 @@ public class UserController {
       @ApiResponse(responseCode = "400", description = "Current password wrong",
           content = @Content)
   })
-  @PostMapping("/{id}/password")
+  @PostMapping("/password")
   public ResponseEntity<Void> changePassword(
-      @Parameter(description = "User ID", required = true)
-      @PathVariable int id,
       @Parameter(description = "Password change payload", required = true)
       @RequestBody PasswordChangeDTO dto) {
-    User user = userService.getUserById(id).orElse(null);
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String username = authentication.getName();
+    User user = userService.getUserByUsername(username).orElse(null);
     if (user == null) {
       return ResponseEntity.notFound().build();
     }
-    if (!user.getPassword().equals(dto.getCurrentPassword())) {
+    if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
       return ResponseEntity
           .status(HttpStatus.BAD_REQUEST) // Bad Request
           .body(null);
@@ -131,6 +132,7 @@ public class UserController {
           .body(null);
     }
 
+    int id = user.getId();
     userService.changePassword(id, dto);
     return ResponseEntity.noContent().build();     // 204
   }
