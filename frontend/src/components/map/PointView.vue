@@ -4,40 +4,42 @@
 
       <!-- View mode (for registered and non-registered users) -->
       <div v-if="isViewMode" class="point-card-content">
-          <h1 class="title-map">{{ pointData.name }}</h1>
+        <h1 class="title-map">{{ pointData.name }}</h1>
 
-        <div class="point-detail">
-          <strong>Type punkt:</strong>
-          <div>
-            {{
-              pointData.iconType === 'shelter'
-                ? 'Tilfluktsrom'
-                : pointData.iconType === 'assembly_point'
-                ? 'Møteplass'
-                : 'Medisinsk hjelp'
-            }}
+        <div class="point-detail-container">
+          <div class="point-detail">
+            <strong>Type punkt:</strong>
+            <div>
+              {{
+                pointData.iconType === 'shelter'
+                  ? 'Tilfluktsrom'
+                  : pointData.iconType === 'assembly_point'
+                  ? 'Møteplass'
+                  : 'Medisinsk hjelp'
+              }}
+            </div>
           </div>
+
+          <div class="point-detail">
+            <strong>Beskrivelse:</strong>
+            <div>{{ pointData.description }}</div>
+          </div>
+
+          <div class="point-detail">
+            <strong>Koordinater:</strong>
+            <div>{{ pointData.latitude }}, {{ pointData.longitude }}</div>
+          </div>
+
+          <div class="point-detail" v-if="address && !addressError">
+            <strong>Adresse:</strong>
+            <div>{{ address }}</div>
+          </div>
+
+          <p v-if="addressError" class="error-message">{{ addressError }}</p>
+
+          <!-- Navigation button -->
+          <button class="button" @click="navigateToPoint">Naviger til dette punktet</button>
         </div>
-
-        <div class="point-detail">
-          <strong>Beskrivelse:</strong>
-          <div>{{ pointData.description }}</div>
-        </div>
-
-        <div class="point-detail">
-          <strong>Koordinater:</strong>
-          <div>{{ pointData.latitude }}, {{ pointData.longitude }}</div>
-        </div>
-
-        <div class="point-detail" v-if="address && !addressError">
-          <strong>Adresse:</strong>
-          <div>{{ address }}</div>
-        </div>
-
-        <p v-if="addressError" class="error-message">{{ addressError }}</p>
-
-        <!-- Navigation button -->
-        <button class="button" @click="navigateToPoint">Naviger til dette punktet</button>
       </div>
 
 
@@ -45,54 +47,55 @@
       <div v-else class="point-card-content">
         <h1 class="title-map">{{ formTitle }}</h1>
 
-        <!-- Name -->
-        <input v-model="pointData.name" type="text" placeholder="Navn" />
+        <div class="point-detail-container">
+          <!-- Name -->
+          <input v-model="pointData.name" type="text" placeholder="Navn" />
 
-        <!-- Icon type -->
-        <select v-model="pointData.iconType">
-          <option disabled value="">Velg type punkt</option>
-          <option value="shelter">Tilfluktsrom</option>
-          <option value="assembly_point">Møteplass</option>
-          <option value="medical">Medisinsk hjelp</option>
-        </select>
+          <!-- Icon type -->
+          <select v-model="pointData.iconType">
+            <option disabled value="">Velg type punkt</option>
+            <option value="shelter">Tilfluktsrom</option>
+            <option value="assembly_point">Møteplass</option>
+            <option value="medical">Medisinsk hjelp</option>
+          </select>
 
-        <!-- Description -->
-        <input v-model="pointData.description" placeholder="Beskrivelse" />
+          <!-- Description -->
+          <input v-model="pointData.description" placeholder="Beskrivelse" />
 
-        <!-- Choose coordinates or address -->
-        <select v-model="inputMethod">
-          <option disabled value="">Velg inndata for lokasjon</option>
-          <option value="coordinates">Koordinater</option>
-          <option value="address">Adresse</option>
-        </select>
+          <!-- Choose coordinates or address -->
+          <select v-model="inputMethod">
+            <option disabled value="">Velg inndata for lokasjon</option>
+            <option value="coordinates">Koordinater</option>
+            <option value="address">Adresse</option>
+          </select>
 
-        <!-- Coordinates -->
-        <div v-if="inputMethod === 'coordinates'" class="coordinates-input">
-          <input v-model="pointData.latitude" type="number" placeholder="Breddegrad" />
-          <input v-model="pointData.longitude" type="number" placeholder="Lengdegrad" />
-        </div>
+          <!-- Coordinates -->
+          <div v-if="inputMethod === 'coordinates'" class="coordinates-input">
+            <input v-model="pointData.latitude" type="number" placeholder="Breddegrad" />
+            <input v-model="pointData.longitude" type="number" placeholder="Lengdegrad" />
+          </div>
 
-        <!-- Address -->
-        <div v-if="inputMethod === 'address'">
-          <input v-model="address" type="text" placeholder="Adresse" @blur="resolveAddress" />
-          <p v-if="addressError" class="error-message">{{ addressError }}</p>
-        </div>
+          <!-- Address -->
+          <div v-if="inputMethod === 'address'">
+            <input v-model="address" type="text" placeholder="Adresse" @blur="resolveAddress" />
+            <p v-if="addressError" class="error-message">{{ addressError }}</p>
+          </div>
 
-        <!-- Error messages -->
-        <p v-if="validationError" class="error-message">{{ validationError }}</p>
-        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+          <!-- Error messages -->
+          <p v-if="validationError" class="error-message">{{ validationError }}</p>
+          <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
 
-        <!-- Create mode buttons -->
-        <div v-if="!isEdit" class="point buttons create-buttons">
-          <button class="button" @click="createPoint" :disabled="hasValidationError">Lag nytt punkt</button>
-        </div>
-        <!-- Edit modebuttons -->
-        <div v-else class="point-buttons edit-buttons">
-          <button v-if="isEdit" class="button" @click="savePoint" :disabled="hasValidationError">Lagre punkt</button>
-          <button v-if="isEdit" class="delete-button" @click="deletePoint">Slett</button>
+          <!-- Create mode buttons -->
+          <div v-if="!isEdit" class="point buttons create-buttons">
+            <button class="button" @click="createPoint" :disabled="hasValidationError">Lag nytt punkt</button>
+          </div>
+          <!-- Edit modebuttons -->
+          <div v-else class="point-buttons edit-buttons">
+            <button v-if="isEdit" class="button" @click="savePoint" :disabled="hasValidationError">Lagre punkt</button>
+            <button v-if="isEdit" class="delete-button" @click="deletePoint">Slett</button>
+          </div>
         </div>
       </div>
-
   </div>
 </template>
 
@@ -287,6 +290,10 @@ const deletePoint = async () => {
 
 .close-icon:hover {
   color: var(--bad-red);
+}
+
+.point-detail-container {
+  padding-top: 7px;
 }
 
 .point-detail {
