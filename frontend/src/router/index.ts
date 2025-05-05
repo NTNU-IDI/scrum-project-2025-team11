@@ -10,6 +10,7 @@ import SuperAdminView from "@/views/admin/SuperAdminView.vue";
 import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
 import {useUserStore} from "@/stores/userStore.ts";
+import AdminView from "@/views/admin/AdminView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -36,7 +37,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/household",
     name: "Household",
     component: HouseholdView,
-    meta: { requiresNormalUser: true }
+    //meta: { requiresNormalUser: true }
   },
   {
     path: "/personvern",
@@ -53,6 +54,12 @@ const routes: Array<RouteRecordRaw> = [
     name: "SuperAdminView",
     component: SuperAdminView,
     //meta: {requieresSuperAdmin: true}
+  },
+  {
+    path: "/admin",
+    name: "AdminView",
+    component: AdminView,
+    //meta: {requieresAdmin: true}
   },
   {
     path: "/auth",
