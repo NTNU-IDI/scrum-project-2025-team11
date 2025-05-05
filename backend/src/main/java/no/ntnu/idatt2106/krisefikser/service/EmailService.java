@@ -6,10 +6,13 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
+
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.springframework.beans.factory.annotation.Value;
 
 import no.ntnu.idatt2106.krisefikser.dto.EmailRequest;
+
 
 @Service
 /**
@@ -21,9 +24,13 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
+    private final String from;
+
     @Autowired
-    public EmailService(JavaMailSender mailSender) {
+    public EmailService(JavaMailSender mailSender,
+                        @Value("${spring.mail.from}") String from) {
         this.mailSender = mailSender;
+        this.from = from;
     }
 
     /**
@@ -42,12 +49,14 @@ public class EmailService {
                     false,
                     java.nio.charset.StandardCharsets.UTF_8.name()
                 );
+                helper.setFrom(from);
                 helper.setTo(req.getTo());
                 helper.setSubject(req.getSubject());
                 helper.setText(req.getBody(), true);
                 mailSender.send(mimeMessage);
             } else {
                 SimpleMailMessage msg = new SimpleMailMessage();
+                msg.setFrom(from);      
                 msg.setTo(req.getTo());
                 msg.setSubject(req.getSubject());
                 msg.setText(req.getBody());
