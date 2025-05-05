@@ -5,14 +5,19 @@
       <div class="corner-container">
         <IconsOverview />
         <EventsOverview />
-        <PointForm 
+        <button class="dark-button small-button" @click="findNearestShelter">
+          Finn 3 nærmeste tilflukstrom
+        </button>        
+        <PointView 
           v-if="showPointForm" 
           :selectedPoint="selectedPoint" 
           :mode="formMode"
           @close="closePointForm" 
           @coordinates-updated="updateMarkerPosition"
           @navigate="handleNavigation"
-        />
+          @next-shelter="handleNextShelter"
+          :show-next-button="viewingNearest && nearestShelters.length > 1"        
+          />
       </div>
 
       <div id="map" class="map"></div>
@@ -31,7 +36,7 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine';
 import IconsOverview from '../../components/map/IconsOverview.vue';
 import EventsOverview from '../../components/map/EventsOverview.vue';
-import PointForm from '../../components/map/PointView.vue';
+import PointView from '../../components/map/PointView.vue';
 import Header from '@/components/Header.vue';
 import Footer from '@/components/Footer.vue';
 import { onMounted, ref } from 'vue';
@@ -49,6 +54,9 @@ const pointStore = usePointStore();
 const showCrisisAlert = ref(false);
 const showPointForm = ref(false);
 const formMode = ref<'edit' | 'create' | 'view'>('create');
+const currentShelterIndex = ref(0);
+const nearestShelters = ref<PointOfInterest[]>([]);
+const viewingNearest = ref(false);
 const selectedPoint = ref<PointOfInterest>({
   id: 0,
   name: '',
@@ -67,6 +75,34 @@ declare global {
   }
 }
 window.routingControl = null;
+
+// TODO: Delete mock data
+const mockShelters: PointOfInterest[] = [
+  {
+    id: 1,
+    name: "Tilfluktsrom 1 - Sentralt",
+    description: "Hovedtilfluktsrom med plass til 200 personer",
+    iconType: "shelter",
+    latitude: 63.4305,
+    longitude: 10.3951,
+  },
+  {
+    id: 2,
+    name: "Tilfluktsrom 2 - Øst",
+    description: "Mindre tilfluktsrom nær Østbyen",
+    iconType: "shelter",
+    latitude: 63.4350,
+    longitude: 10.4100,
+  },
+  {
+    id: 3,
+    name: "Tilfluktsrom 3 - Vest",
+    description: "Nylig oppgradert tilfluktsrom",
+    iconType: "shelter",
+    latitude: 63.4250,
+    longitude: 10.3800,
+  }
+];
 
 onMounted(async () => {
   // Init map
@@ -177,11 +213,12 @@ function addPointsOfInterest(map: L.Map) {
       icon: customIcon
     }).addTo(map)
       .on('click', () => {
+        removeTempMarker();
         selectedPoint.value = { ...point };
+        viewingNearest.value = false;
 
         // ADMIN: Edit on icon click
         if (role.value === 'admin') {
-          removeTempMarker();
           formMode.value = 'edit';
           showPointForm.value = true;
 
@@ -219,6 +256,40 @@ function handleNavigation(coords: { latitude: number, longitude: number }) {
       routeWhileDragging: false,
     }).addTo(map);
   });
+}
+
+async function findNearestShelter() {
+  getUserPosition(async (userLat, userLon) => {
+    // TODO: Remove mock data
+    nearestShelters.value = mockShelters;
+    // nearestShelters.value = await pointStore.fetchNearestShelters(userLat, userLon);
+    
+    if (nearestShelters.value.length === 0) {
+      alert('Ingen tilfluktsrom funnet');
+      return;
+    }
+
+    currentShelterIndex.value = 0;
+    viewingNearest.value = true;
+    showShelter(currentShelterIndex.value);
+  });
+}
+
+function showShelter(index: number) {
+  selectedPoint.value = nearestShelters.value[index];
+  formMode.value = 'view';
+  showPointForm.value = true;
+  
+  // Center map on shelter showing
+  map.setView([selectedPoint.value.latitude, selectedPoint.value.longitude], 15);
+}
+
+function handleNextShelter() {
+  if (nearestShelters.value.length <= 1) return;
+  
+  currentShelterIndex.value = 
+    (currentShelterIndex.value + 1) % nearestShelters.value.length;
+  showShelter(currentShelterIndex.value);
 }
 
 </script>

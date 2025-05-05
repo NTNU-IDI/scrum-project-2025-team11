@@ -17,16 +17,14 @@ export const usePointStore = defineStore("pointStore", () => {
     }
   };
 
-  const fetchShelters = async () => {
+  const fetchNearestShelters = async (lat: number, lon: number) => {
     try {
-      const response = await fetch(
-        "http://localhost:8080/api/interest/iconType?iconType=shelter"
-      );
-      if (!response.ok) throw new Error("Failed fetching shelters");
-      shelters.value = await response.json();
+      // TODO: Call backend
+      // if (!response.ok) throw new Error("Failed fetching all points");
+      // allPoints.value = await response.json();
     } catch (error) {
-      console.error("Error fetching shelters:", error);
-      shelters.value = [];
+      console.error("Error fetching nearest shelters:", error);
+      allPoints.value = [];
     }
   };
 
@@ -99,7 +97,7 @@ export const usePointStore = defineStore("pointStore", () => {
     allPoints,
     shelters,
     fetchAllPoints,
-    fetchShelters,
+    fetchNearestShelters,
     createPoint,
     updatePointById,
     deletePointById,

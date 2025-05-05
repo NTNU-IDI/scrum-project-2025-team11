@@ -102,6 +102,10 @@ button:hover {
   transform: scale(1.03);
 }
 
+.small-button {
+  font-size: var(--font-size-small);
+}
+
 .good-button {
   background-color: var(--good-green);
 }
