@@ -2,7 +2,7 @@
 import {ref, watch, onMounted} from 'vue'
 import axios from 'axios'
 import {useRouter} from "vue-router";
-import {validateFirstName, validateLastName, validateEmail, validateUsername, validateHouseholdName} from "@/utils/validationService.ts";
+import {validateFirstName, validateLastName, validateEmail, validateUsername, validateHouseholdName, validatePassword} from "@/utils/validationService.ts";
 
 const router = useRouter()
 
@@ -49,8 +49,16 @@ function validateFields() {
     errorMessage.value = "Sørg for at brukernavn kun består av bokstaver og tall."
     return false
   }
-  if (!validatePassword(password.value, repeatedPassword.value)) {
+  //Password validation should be improved.
+  //Validates that passwords are not empty and that they match
+  if (!validateBothPasswords(password.value, repeatedPassword.value)) {
     errorMessage.value = "Passordene dine er tomme eller ulike."
+    return false
+  }
+  //Validates that the password matches the regex.
+  if(!validatePassword(password.value) || !validatePassword(repeatedPassword.value)) {
+    errorMessage.value = "Passordet ditt oppfyller ikke kravene om 8 tegn, med minst én stor bokstav, én liten bokstav," +
+        " ett tall og ett spesialtegn."
     return false
   }
   if (householdChoice.value === "new") {
@@ -98,7 +106,7 @@ async function attemptRegistration() {
   }
 }
 
-function validatePassword(password: string, repeatedPassword: string) {
+function validateBothPasswords(password: string, repeatedPassword: string) {
   if (password === "" || repeatedPassword === "") {
     return false
   }

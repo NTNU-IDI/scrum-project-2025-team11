@@ -213,6 +213,11 @@ select {
   font-size: var(--font-size-small);
 }
 
+.header-box-container {
+  display: flex;
+  flex-direction: column;
+}
+
 .error-message {
   font-size: var(--font-size-small);
   color: var(--bad-red);

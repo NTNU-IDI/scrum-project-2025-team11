@@ -5,6 +5,10 @@ const itemUnitRegex = /^[a-zA-Z]+$/;
 const itemExpirationDateRegex = /^\d{4}-\d{2}-\d{2}$/; // YYYY-MM-DD format
 const firstNameRegex = /^[a-zA-Z\s\-]+$/;
 const lastNameRegex = /^[a-zA-Z\s\-]+$/;
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+//Passwordregex ensures at least 8 characters, one uppercase letter, one lowercase letter, one number and one
+//special character. Gotten from: https://stackoverflow.com/questions/19605150/regex-for-password-must-contain-at-least-eight-characters-at-least-one-number-a
+
 
 // Regexes for user
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -94,4 +98,9 @@ export function validateLatitude(lat: number): boolean {
 // Function to validate longitude
 export function validateLongitude(lon: number): boolean {
   return coordinateRegex.test(lon.toString()) && lon >= -180 && lon <= 180;
+}
+
+export function validatePassword(password: string): boolean {
+  if (!password) return false
+  return passwordRegex.test(password)
 }

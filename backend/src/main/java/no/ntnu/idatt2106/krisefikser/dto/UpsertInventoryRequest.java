@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,7 +32,7 @@ public class UpsertInventoryRequest {
     private String unit;
 
     @NotNull
-    private LocalDate acquiredDate;
+    private LocalDateTime acquiredDate;
 
     private LocalDate expirationDate;
 }
