@@ -2,11 +2,11 @@ import { defineStore } from "pinia";
 
 export const useUserStore = defineStore("user", {
   state: () => ({
-    role: "admin",
+    role: "",
   }),
 
   persist: {
-    storage: sessionStorage,
+    storage: localStorage,
   },
 
   actions: {
