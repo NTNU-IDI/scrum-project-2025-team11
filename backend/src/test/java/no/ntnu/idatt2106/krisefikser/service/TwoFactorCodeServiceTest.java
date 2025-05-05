@@ -1,10 +1,8 @@
 package no.ntnu.idatt2106.krisefikser.service;
 
 import no.ntnu.idatt2106.krisefikser.dto.EmailRequest;
-import no.ntnu.idatt2106.krisefikser.model.PasswordResetToken;
 import no.ntnu.idatt2106.krisefikser.model.TwoFactorCode;
 import no.ntnu.idatt2106.krisefikser.model.User;
-import no.ntnu.idatt2106.krisefikser.repository.PasswordResetTokenRepository;
 import no.ntnu.idatt2106.krisefikser.repository.TwoFactorCodeRepository;
 
 import org.junit.jupiter.api.Test;
