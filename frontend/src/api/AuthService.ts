@@ -10,6 +10,8 @@ export async function login(username: string, password: string) {
     await axios.post("http://localhost:8080/auth/login", {
         username: username,
         password: password
+    }, {
+        withCredentials: true
     })
         .then((response) => {
             userStore.setRole(response.data.role)
@@ -39,6 +41,8 @@ export async function registerNormalUser(firstName: string, lastName: string, us
         email: email,
         password: password,
         householdId: householdId
+    }, {
+        withCredentials: true
     })
         .then((response) => {
             userStore.setRole(response.data.role)
