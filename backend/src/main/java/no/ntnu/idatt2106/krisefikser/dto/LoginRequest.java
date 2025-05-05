@@ -5,8 +5,8 @@ import lombok.Data;
 
 @Data
 public class LoginRequest {
-    @Schema(description = "Username given by the user", example = "thelegend27")
+    @Schema(description = "Username given by the user", example = "SolbakkenJon")
     private String username;
-    @Schema(description = "Password entered by the user", example = "passordhash1")
+    @Schema(description = "Password entered by the user", example = "passordhash3")
     private String password;
 }
