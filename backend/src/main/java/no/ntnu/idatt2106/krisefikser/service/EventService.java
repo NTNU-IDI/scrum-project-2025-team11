@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.dto.EventRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.EventResponseDTO;
+import no.ntnu.idatt2106.krisefikser.exceptionhandler.ResourceNotFoundException;
 import no.ntnu.idatt2106.krisefikser.mapper.EventMapper;
+import no.ntnu.idatt2106.krisefikser.model.Enums;
 import no.ntnu.idatt2106.krisefikser.model.Event;
 import no.ntnu.idatt2106.krisefikser.repository.EventRepository;
 
@@ -166,8 +168,22 @@ public class EventService {
    * @return the updated Event as a response DTO {@link EventResponseDTO}
    */
   public EventResponseDTO updateEvent(int id, EventRequestDTO event) {
-    Event entity = mapper.toEntity(event);
-    Event updatedEvent = eventRepository.save(entity);
+    Event existingEvent = eventRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Event", "id", id));
+
+    existingEvent.setName(event.getName());
+    existingEvent.setDescription(event.getDescription());
+    existingEvent.setIconType(Enums.IconEnum.valueOf(event.getIconType()));
+    existingEvent.setStartTime(LocalDateTime.parse(event.getStartTime()));
+    if (event.getEndTime() != null) {
+      existingEvent.setEndTime(LocalDateTime.parse(event.getEndTime()));
+    }
+    existingEvent.setLatitude(event.getLatitude());
+    existingEvent.setLongitude(event.getLongitude());
+    existingEvent.setRadius(event.getRadius());
+    existingEvent.setSeverity(event.getSeverity());
+
+    Event updatedEvent = eventRepository.save(existingEvent);
     return mapper.toResponseDTO(updatedEvent);
   }
 
