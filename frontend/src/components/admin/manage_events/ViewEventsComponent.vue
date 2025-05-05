@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue';
 import { useEventStore } from '@/stores/eventStore';
-import { EventService } from '@/api/EventService';
 
 // Store imports
 const eventStore = useEventStore();
@@ -32,6 +31,12 @@ watch(() => eventStore.events, async (newEvents) => {
         radius: event.radius,
         severity: event.severity
     }));
+});
+
+watch(() => eventStore.chosenEvent, async (newEvent) => {
+    if (newEvent) {
+        selectedEventId.value = newEvent.id;
+    }
 });
 
 // Choose an item in the supply
