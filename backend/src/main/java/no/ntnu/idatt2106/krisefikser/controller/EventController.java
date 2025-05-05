@@ -1,7 +1,6 @@
 package no.ntnu.idatt2106.krisefikser.controller;
 
 import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.dto.EventRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.EventResponseDTO;
 import no.ntnu.idatt2106.krisefikser.exceptionhandler.ResourceNotFoundException;
+import no.ntnu.idatt2106.krisefikser.repository.EventRepository;
 import no.ntnu.idatt2106.krisefikser.service.EventService;
 
 @RestController
@@ -26,6 +26,7 @@ import no.ntnu.idatt2106.krisefikser.service.EventService;
 @Tag(name = "Event", description = "Operations related to events")
 public class EventController {
   private final EventService eventService;
+  private final EventRepository eventRepository;
 
   /**
    * Retrieves an event by its ID.
@@ -306,7 +307,11 @@ public class EventController {
   public ResponseEntity<Void> deleteEvent(
     @Parameter (description = "the ID of the event to delete", required = true, example = "1")
     @PathVariable int id) {
-    eventService.deleteEvent(id);
-    return ResponseEntity.noContent().build();
+      if (eventRepository.existsById(id)) {
+        eventService.deleteEvent(id);
+        return ResponseEntity.noContent().build();
+    } else {
+        throw new ResourceNotFoundException("Event", "id", id);
+    }
   }
 }
