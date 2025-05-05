@@ -9,7 +9,7 @@ export const usePointStore = defineStore("pointStore", () => {
   const fetchAllPoints = async () => {
     try {
       const response = await fetch("http://localhost:8080/api/interest");
-      if (!response.ok) throw new Error("Failed fetching al points");
+      if (!response.ok) throw new Error("Failed fetching all points");
       allPoints.value = await response.json();
     } catch (error) {
       console.error("Error fetching all points:", error);
