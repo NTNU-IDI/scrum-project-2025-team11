@@ -13,7 +13,6 @@ import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.UserResponseDTO;
 import no.ntnu.idatt2106.krisefikser.dto.UserUpdateDTO;
 import no.ntnu.idatt2106.krisefikser.mapper.UserMapper;
-import no.ntnu.idatt2106.krisefikser.model.Household;
 import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.model.User.Role;
 import no.ntnu.idatt2106.krisefikser.repository.UserRepository;
