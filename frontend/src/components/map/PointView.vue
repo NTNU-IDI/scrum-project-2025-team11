@@ -39,8 +39,9 @@
 
           <!-- Navigation button -->
            <div class="point-buttons">
-            <button class="good-button small-button" @click="navigateToPoint">Naviger til dette punktet</button>
-            <button v-if="showNextButton" class="dark-button small-button" @click="nextShelter">Neste tilfluktsrom</button>
+            <button v-if="!props.isNavigating"class="good-button small-button" @click="navigateToPoint">Naviger til dette punktet</button>
+            <button v-if="props.isNavigating" class="delete-button small-button" @click="stopNavigation">Stopp navigasjon</button>
+            <button v-if="showNextButton && !props.isNavigating" class="dark-button small-button" @click="nextShelter">Neste tilfluktsrom</button>
            </div>
         </div>
       </div>
@@ -124,7 +125,7 @@ const errorMessage = ref('');
 const inputMethod = ref('coordinates');
 const address = ref('');
 const addressError = ref('');
-const emit = defineEmits(['close', 'coordinates-updated', 'navigate', 'next-shelter']);
+const emit = defineEmits(['close', 'coordinates-updated', 'navigate', 'next-shelter', 'stop-navigation']);
 
 const props = defineProps({
   selectedPoint: {
@@ -136,6 +137,10 @@ const props = defineProps({
     default: 'create'
   },
   showNextButton: {
+    type: Boolean,
+    default: false
+  },
+  isNavigating: { 
     type: Boolean,
     default: false
   }
@@ -246,6 +251,10 @@ function navigateToPoint() {
 
 function nextShelter() {
   emit('next-shelter');
+}
+
+function stopNavigation() {
+  emit('stop-navigation');
 }
 
 const createPoint = async () => {

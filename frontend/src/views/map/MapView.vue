@@ -12,12 +12,14 @@
           v-if="showPointForm" 
           :selectedPoint="selectedPoint" 
           :mode="formMode"
+          :isNavigating="isNavigating"
           @close="closePointForm" 
           @coordinates-updated="updateMarkerPosition"
           @navigate="handleNavigation"
           @next-shelter="handleNextShelter"
+          @stop-navigation="clearRouting" 
           :show-next-button="viewingNearest && nearestShelters.length > 1"        
-          />
+        />
       </div>
 
       <div id="map" class="map"></div>
@@ -57,6 +59,7 @@ const formMode = ref<'edit' | 'create' | 'view'>('create');
 const currentShelterIndex = ref(0);
 const nearestShelters = ref<PointOfInterest[]>([]);
 const viewingNearest = ref(false);
+const isNavigating = ref(false); 
 const selectedPoint = ref<PointOfInterest>({
   id: 0,
   name: '',
@@ -213,6 +216,7 @@ function addPointsOfInterest(map: L.Map) {
       icon: customIcon
     }).addTo(map)
       .on('click', () => {
+        clearRouting();
         removeTempMarker();
         selectedPoint.value = { ...point };
         viewingNearest.value = false;
@@ -249,13 +253,23 @@ function addEvents(map: L.Map) {
 
 function handleNavigation(coords: { latitude: number, longitude: number }) {
   getUserPosition((userLat, userLon) => {
-    if (window.routingControl) map.removeControl(window.routingControl);
+    clearRouting();
 
     window.routingControl = L.Routing.control({
       waypoints: [L.latLng(userLat, userLon), L.latLng(coords.latitude, coords.longitude)],
       routeWhileDragging: false,
     }).addTo(map);
+
+    isNavigating.value = true;
   });
+}
+
+function clearRouting() {
+  if (window.routingControl) {
+    map.removeControl(window.routingControl);
+    window.routingControl = null;
+  }
+  isNavigating.value = false;
 }
 
 async function findNearestShelter() {
