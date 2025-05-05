@@ -30,7 +30,7 @@ const loadItems = async () => {
         console.error('Household ID is not available');
         return;
     }
-    await inventoryStore.fetchInventory(householdStore.id);
+    await inventoryStore.fetchInventory();
 }
 
 onMounted( async () => {
@@ -98,7 +98,7 @@ const deleteItem = async (item: EditableItem) => {
         return;
     }
     if(confirm('Er du sikker på at du vil slette denne artikkelen?')) {
-        await inventoryStore.deleteItem(householdStore.id, itemTypeId.value, item.acquiredDate)
+        await inventoryStore.deleteItem(itemTypeId.value, item.acquiredDate)
         .then(() => {
             items.value = items.value.filter(item => item.itemId !== itemTypeId.value);
         })

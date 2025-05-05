@@ -25,7 +25,7 @@ const loadInventory = async () => {
         console.error('Household ID is not available');
         return [];
     }
-    await inventoryStore.fetchInventory(householdStore.id);
+    await inventoryStore.fetchInventory();
 }
 
 // Fetch inventory items when the component is mounted
@@ -84,7 +84,7 @@ const deleteItem =  (itemId: number) => {
         }
         if (item.id === itemId) {
             if(confirm(`Er du sikker på at du vil slette ${item.name} fra lageret?`)) {
-                await inventoryStore.deleteItem(householdStore.id, itemId, item.acquiredDate);
+                await inventoryStore.deleteItem(itemId, item.acquiredDate);
             }
         }
     });
