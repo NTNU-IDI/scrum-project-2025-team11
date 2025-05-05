@@ -37,7 +37,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/household",
     name: "Household",
     component: HouseholdView,
-    //meta: { requiresNormalUser: true }
+    meta: { requiresNormalUser: true }
   },
   {
     path: "/personvern",
@@ -53,32 +53,19 @@ const routes: Array<RouteRecordRaw> = [
     path: "/superadmin",
     name: "SuperAdminView",
     component: SuperAdminView,
-    //meta: {requieresSuperAdmin: true}
+    meta: { requiresSuperAdmin: true }
   },
   {
     path: "/admin",
     name: "AdminView",
     component: AdminView,
-    //meta: {requieresAdmin: true}
+    meta: { requiresAdmin: true }
   },
   {
     path: "/auth",
     name: "Auth",
     component: AuthView,
   },
-  // { //Eksempel - admin-route
-  //   path: '/adminrute',
-  //   name: 'AdminEksempelView',
-  //   component: AdminEksempelView,
-  //   meta: {requieresAdmin: true}
-  // },
-  // { //Eksempel - super-admin-route
-  //   path: '/superadminrute',
-  //   name: 'SuperAdminEksempelView',
-  //   component: SuperAdminEksempelView,
-  //   meta: {requieresSuperAdmin: true}
-  // },
-
 ];
 
 const router = createRouter({
