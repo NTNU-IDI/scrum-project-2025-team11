@@ -40,7 +40,9 @@ import type { PointOfInterest } from "@/types/PointOfInterest";
 import { calculateDistance, getEventColor } from '@/utils/geoService';
 import {useUserStore} from "@/stores/userStore.ts";
 import {storeToRefs} from "pinia";
+import { useEventStore } from '@/stores/eventStore'; 
 
+const eventStore = useEventStore(); 
 const userStore = useUserStore()
 const {role} = storeToRefs(userStore)
 const pointStore = usePointStore(); 
@@ -66,59 +68,6 @@ declare global {
 }
 window.routingControl = null;
 
-// TODO: Retrieve event data from backend
-type Event = {
-  id: number;
-  name: string;
-  description: string;
-  icon_type: string;
-  time_start: Date;
-  time_end: Date;
-  latitude: number;
-  longitude: number;
-  radius: number;
-  severity: number;
-};
-
-const testEvents = [
-  {
-    id: 1,
-    name: 'Kriseområde Ila',
-    description: 'Område berørt av hendelse.',
-    icon_type: 'danger',
-    time_start: new Date('2025-04-25'),
-    time_end: new Date('2025-04-26'),
-    latitude: 63.42,
-    longitude: 10.38,
-    radius: 1000,
-    severity: 2 
-  },
-  {
-    id: 2,
-    name: 'Kriseområde Moholt',
-    description: 'Område med moderate hendelser.',
-    icon_type: 'danger',
-    time_start: new Date('2025-04-26'),
-    time_end: new Date('2025-04-27'),
-    latitude: 63.43,
-    longitude: 10.39,
-    radius: 1500,
-    severity: 1 
-  },
-  {
-    id: 3,
-    name: 'Kriseområde Tiller',
-    description: 'Liten hendelse uten alvorlige konsekvenser.',
-    icon_type: 'danger',
-    time_start: new Date('2025-04-26'),
-    time_end: new Date('2025-04-27'),
-    latitude: 63.42,
-    longitude: 10.42,
-    radius: 800,
-    severity: 0 
-  }
-];
-
 onMounted(async () => {
   // Init map
   map = L.map('map', {
@@ -132,6 +81,7 @@ onMounted(async () => {
   addPointsOfInterest(map);
 
   // Add events
+  await eventStore.fetchActiveEvents(); 
   addEvents(map);
 
   // Get user location and set marker
@@ -203,7 +153,7 @@ function getUserPosition(callback: (lat: number, lon: number) => void) {
 }
 
 function checkIfInCrisisArea(userLatitude: number, userLongitude: number) {
-  testEvents.forEach(event => {
+  eventStore.events.forEach(event => {
     const distance = calculateDistance(userLatitude, userLongitude, event.latitude, event.longitude);
     
     if (distance <= event.radius) {
@@ -245,13 +195,16 @@ function addPointsOfInterest(map: L.Map) {
 }
 
 function addEvents(map: L.Map) {
-  testEvents.forEach(({ latitude, longitude, radius, severity, name, description }) => {
-    const color = getEventColor(severity);
-    L.circle([latitude, longitude], {
+  if (eventStore.activeEvents.length === 0) {
+    return;
+  }
+  eventStore.activeEvents.forEach(event => {
+    const color = getEventColor(event.severity);
+    L.circle([event.latitude, event.longitude], {
       color,
       fillColor: color,
       weight: 1,
-      radius,
+      radius: event.radius,
       fillOpacity: 0.3
     }).addTo(map);
   });
