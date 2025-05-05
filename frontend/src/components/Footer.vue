@@ -9,7 +9,7 @@
         <a href="/privacy">Personvern</a> |
         <a href="/contact">Kontakt oss</a> |
         <a href="/userhome">User home (for testing)</a> |
-        <a href="/admin">Admin (for testing)</a>
+        <a href="/superadmin">Admin (for testing)</a>
         <a href="/auth">Auth (for testing)</a> |
         <br />
         <br />
