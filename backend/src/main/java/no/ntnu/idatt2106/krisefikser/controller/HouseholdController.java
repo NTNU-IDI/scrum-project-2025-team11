@@ -29,8 +29,6 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
 @RestController
 @RequestMapping("/api/household")
 @CrossOrigin(origins = "*")
-@SecurityRequirement(name = "jwtCookieAuth")
-@PreAuthorize("isAuthenticated()")
 @RequiredArgsConstructor
 @Tag(name = "Household", description = "Operations related to household management")
 public class HouseholdController {
@@ -57,6 +55,8 @@ public class HouseholdController {
             @ApiResponse(responseCode = "201", description = "Household information updated successfully"),
             @ApiResponse(responseCode = "400", description = "User could not be found")
     })
+    @SecurityRequirement(name = "jwtCookieAuth")
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/update")
     public ResponseEntity<HouseholdResponseDTO> updateHousehold(@RequestBody HouseholdUpdateDTO household) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -95,6 +95,8 @@ public class HouseholdController {
             @ApiResponse(responseCode = "201", description = "Household information fetched"),
             @ApiResponse(responseCode = "400", description = "Household could not be found, make sure that the id is correct")
     })
+    @SecurityRequirement(name = "jwtCookieAuth")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/me")
     public ResponseEntity<HouseholdResponseDTO> getHousehold() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -135,6 +137,8 @@ public class HouseholdController {
             @ApiResponse(responseCode = "201", description = "Households fetched"),
             @ApiResponse(responseCode = "400", description = "Households could not be found")
     })
+    @SecurityRequirement(name = "jwtCookieAuth")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/all")
     public ResponseEntity<List<HouseholdResponseDTO>> getAllHouseholds() {
         List<HouseholdResponseDTO> householdList = householdService.findAll();
