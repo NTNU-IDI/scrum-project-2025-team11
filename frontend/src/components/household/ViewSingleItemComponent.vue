@@ -97,13 +97,15 @@ const deleteItem = async (item: EditableItem) => {
         console.error('Item type ID is not available');
         return;
     }
-    await inventoryStore.deleteItem(householdStore.id, itemTypeId.value, item.acquiredDate)
+    if(confirm('Er du sikker på at du vil slette denne artikkelen?')) {
+        await inventoryStore.deleteItem(householdStore.id, itemTypeId.value, item.acquiredDate)
         .then(() => {
             items.value = items.value.filter(item => item.itemId !== itemTypeId.value);
         })
         .catch(error => {
             console.error('Error deleting item:', error);
         });
+    }
 }
 
 </script>
