@@ -1,5 +1,5 @@
 export function formatDate(date: Date): string {
-    return date.toISOString().split('T')[0];
+    return date.toISOString().slice(0, 19);
 }
 
 export function formatDateToList(date: Date): [String, String, String] {
