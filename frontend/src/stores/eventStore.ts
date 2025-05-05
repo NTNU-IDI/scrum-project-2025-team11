@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { EventResponseDTO } from "@/types/Event";
+import type { EventRequestDTO, EventResponseDTO } from "@/types/Event";
 import { EventService } from "@/api/EventService";
 
 export const useEventStore = defineStore('events', {
@@ -37,6 +37,25 @@ export const useEventStore = defineStore('events', {
                 }
             } catch (error) {
                 console.error('Error choosing event:', error);
+            }
+        },
+        async update(id: number, event: EventRequestDTO){
+            try {
+                await EventService.update(id, event).then((data) => {
+                    this.chosenEvent = data;
+                    this.fetchEvents();
+                });
+            } catch (error) {
+                console.error('Error updating event:', error);
+            }
+        },
+        async delete(id: number) {
+            try {
+                await EventService.delete(id).then(() => {
+                    this.fetchEvents();
+                });
+            } catch (error) {
+                console.error('Error deleting event:', error);
             }
         },
         clearEvents() {
