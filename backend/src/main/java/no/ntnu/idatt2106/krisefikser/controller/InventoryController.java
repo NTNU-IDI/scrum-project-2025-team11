@@ -46,7 +46,6 @@ public class InventoryController {
     /**
      * Retrieves a list of all items in a household's inventory.
      *
-     * @param hhId the ID of the household
      * @param itemId optional ID of the item to filter by
      * @return a list of {@link HouseholdItemResponse} objects representing all items in the household's inventory
      */
@@ -66,7 +65,6 @@ public class InventoryController {
     /**
      * Adds a new item to a household's inventory.
      *
-     * @param hhId the ID of the household
      * @param req the request body containing item details
      * @return a {@link ResponseEntity} containing the created item
      */
@@ -94,7 +92,6 @@ public class InventoryController {
     /**
      * Updates an existing item in a household's inventory by purchase date.
      *
-     * @param hhId the ID of the household
      * @param itemId the ID of the item to update
      * @param acquiredDate the date and time when the item was acquired
      * @param req the request body containing updated item details
@@ -122,7 +119,6 @@ public class InventoryController {
     /**
      * Deletes all purchases of an item in a household's inventory.
      *
-     * @param hhId the ID of the household
      * @param itemId the ID of the item to delete
      * @return a {@link ResponseEntity} indicating the result of the operation
      */
@@ -143,7 +139,6 @@ public class InventoryController {
     /**
      * Deletes a specific purchase of an item in a household's inventory.
      *
-     * @param hhId the ID of the household
      * @param itemId the ID of the item to delete
      * @param acquiredDate the date when the item was acquired
      * @return a {@link ResponseEntity} indicating the result of the operation
@@ -166,7 +161,6 @@ public class InventoryController {
     /**
      * Creates or links an item and adds it to a household's inventory in one call.
      *
-     * @param hhId the ID of the household
      * @param req the request body containing item details
      * @return a {@link ResponseEntity} containing the created item
      */
@@ -191,6 +185,10 @@ public class InventoryController {
         return ResponseEntity.created(location).body(created);
     }
 
+    /**
+     * Gets the household id of the logged in user.
+     * @return int which is the hhId of the logged in user
+     */
     private int getHhId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
