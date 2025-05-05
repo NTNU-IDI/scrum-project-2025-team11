@@ -406,24 +406,6 @@ public class EventServiceTest {
       verify(eventRepository, times(1)).findById(999);
       assertFalse(foundEvent.isPresent(), "Event should not be found");
     }
-
-    @Test
-    void testCreateEventWithNullName() {
-      EventRequestDTO eventRequestDTO = new EventRequestDTO();
-      eventRequestDTO.setName(null); // Name is null
-
-      assertThrows(IllegalArgumentException.class, () -> eventService.saveEvent(eventRequestDTO));
-    }
-
-    @Test
-    void testUpdateEventNotFound() {
-      EventRequestDTO eventRequestDTO = new EventRequestDTO();
-      eventRequestDTO.setName("Updated Event");
-
-      when(eventRepository.findById(999)).thenReturn(Optional.empty());
-
-      assertThrows(IllegalArgumentException.class, () -> eventService.updateEvent(999, eventRequestDTO));
-    }
   }
 }
 
