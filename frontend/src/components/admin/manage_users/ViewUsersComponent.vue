@@ -1,0 +1,113 @@
+<script lang="ts" setup>
+import { onMounted, ref, watch } from 'vue';
+import { useAdminUserStore } from '@/stores/adminUserStore';
+
+// Store imports
+const adminUserStore = useAdminUserStore();
+
+// Props
+const adminUsers = ref<{ id: number; username: string; email: string }[]>([]);
+
+const loadUsers = async () => {
+    await adminUserStore.fetchUsers();
+};
+
+onMounted( async () => {
+    await loadUsers();
+});
+
+watch(() => adminUserStore.adminUsers, async (newUsers) => {
+    adminUsers.value = newUsers.map(user => ({
+        id: user.id,
+        username: user.username,
+        email: user.email
+    }));
+});
+
+const deleteUser = (id: number) => {
+   adminUserStore.deleteUser(id);
+};
+</script>
+<template>
+<div class="page-container">
+    <div class="header-box-container">
+        <h1 class="medium-header">Adminbrukere</h1>
+        <div class="grey-container">
+            <div class="header-cards">
+                <div class="article-card" id="id-header">ID</div>
+                <div class="article-card" id="username-header">Brukernavn</div>
+                <div class="article-card" id="email-header">Epost</div>
+                <div class="article-card" id="delete-header">Slett</div>
+            </div>
+            <div v-for="(user, index) in adminUsers" :key="index" class="user-card">
+                <p class="article-card" id="id">{{ user.id }}</p>
+                <h2 class="article-card" id="username">{{ user.username }}</h2>
+                <p class="article-card" id="email">{{ user.email }}</p>
+                <button class="delete-button" @click="deleteUser(user.id)">X</button>
+            </div>
+        </div>
+    </div>
+</div>
+</template>
+<style scoped>
+.page-container {
+    margin: 1rem;
+}
+
+.grey-container {
+    width: 45rem;
+    height: auto;
+}
+
+.user-card, .header-cards {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.article-card {
+    display: flex; 
+    height: 2rem;
+    padding: 0.5rem;
+    text-align: center;
+    font-weight: normal;
+    margin: 0.5rem;
+    font-size: var(--font-size-medium); 
+}
+
+#id-header, #username-header, #email-header {
+    background-color: var(--light-blue);
+    color: white;
+}
+
+#delete-header {
+    color: var(--darkest-blue);
+    background-color: transparent;
+    border: none;
+}
+
+.delete-button {
+    background-color: transparent;
+    border: none;
+    color: var(--bad-red);
+    width: 3.05rem;
+    padding-left: 1.5rem;
+}
+
+#id-header, #id {
+    width: 2rem;
+    justify-content: center; 
+    align-items: center;
+}
+#username-header, #username {
+    width: 15rem;
+}
+
+#email-header, #email {
+    width: 20rem;
+}
+#delete-header, #delete {
+    width: 2rem;
+    justify-content: center; 
+    align-items: center;
+}
+</style>

@@ -1,22 +1,26 @@
 <template>
-  <div class="map-page">
-    <div class="corner-container">
-      <IconsOverview />
-      <button class="button" @click="findNearestShelter">Finn nærmeste tilfluktsrom</button>
-      <PointForm 
-        v-if="showPointForm" 
-        :selectedPoint="selectedPoint" 
-        :mode="formMode"
-        @close="closePointForm" 
-        @coordinates-updated="updateMarkerPosition"
-      />
-    </div>
+  <div class="layout-map-page">
+    <Header />
+    <div class="map-page">
+      <div class="corner-container">
+        <IconsOverview />
+        <PointForm 
+          v-if="showPointForm" 
+          :selectedPoint="selectedPoint" 
+          :mode="formMode"
+          @close="closePointForm" 
+          @coordinates-updated="updateMarkerPosition"
+          @navigate="handleNavigation"
+        />
+      </div>
 
-    <div id="map" class="map"></div>
+      <div id="map" class="map"></div>
 
-    <div v-if="showCrisisAlert" class="crisis-alert">
-      <p><strong>Viktig melding:</strong> Du er i et kriseområde!</p>
+      <div v-if="showCrisisAlert" class="crisis-alert">
+        <p><strong>Viktig melding:</strong> Du er i et kriseområde!</p>
+      </div>
     </div>
+    <Footer />
   </div>
 </template>
 
@@ -25,16 +29,22 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine';
 import IconsOverview from '../../components/map/IconsOverview.vue';
-import PointForm from '../../components/map/PointForm.vue';
+import PointForm from '../../components/map/PointView.vue';
+import Header from '@/components/Header.vue';
+import Footer from '@/components/Footer.vue';
 import { onMounted, ref } from 'vue';
 import { usePointStore } from '@/stores/pointStore';
 import type { PointOfInterest } from "@/types/PointOfInterest";
-import { calculateDistance, getNearestPoint, getEventColor } from '@/utils/geoService';
+import { calculateDistance, getEventColor } from '@/utils/geoService';
+import {useUserStore} from "@/stores/userStore.ts";
+import {storeToRefs} from "pinia";
 
+const userStore = useUserStore()
+const {role} = storeToRefs(userStore)
 const pointStore = usePointStore(); 
 const showCrisisAlert = ref(false);
 const showPointForm = ref(false);
-const formMode = ref<'edit' | 'create'>('create');
+const formMode = ref<'edit' | 'create' | 'view'>('create');
 const selectedPoint = ref<PointOfInterest>({
   id: 0,
   name: '',
@@ -129,22 +139,24 @@ onMounted(async () => {
     checkIfInCrisisArea(lat, lon);
   });
 
-  // Add marker for new point on click
-  map.on('click', (e: L.LeafletMouseEvent) => {
-  const { lat, lng } = e.latlng;
-  removeTempMarker();
-  createTempMarker(lat, lng);
-  selectedPoint.value = {
-      id: 0,
-      name: '',
-      description: '',
-      iconType: '',
-      latitude: lat,
-      longitude: lng
-    };
-    formMode.value = 'create';
-    showPointForm.value = true;
-  });
+  // ADMIN: New point on click
+  if (role.value === 'admin') {
+    map.on('click', (e: L.LeafletMouseEvent) => {
+    const { lat, lng } = e.latlng;
+    removeTempMarker();
+    createTempMarker(lat, lng);
+    selectedPoint.value = {
+        id: 0,
+        name: '',
+        description: '',
+        iconType: '',
+        latitude: lat,
+        longitude: lng
+      };
+      formMode.value = 'create';
+      showPointForm.value = true;
+    });
+  }
 });
 
 function closePointForm() {
@@ -211,12 +223,21 @@ function addPointsOfInterest(map: L.Map) {
     // Add point to map
     L.marker([point.latitude, point.longitude], {
       icon: customIcon
-    }).addTo(map).bindPopup(`<strong>${point.name}</strong><br>${point.description}`)
+    }).addTo(map)
       .on('click', () => {
-        removeTempMarker();
         selectedPoint.value = { ...point };
-        formMode.value = 'edit';
-        showPointForm.value = true; 
+
+        // ADMIN: Edit on icon click
+        if (role.value === 'admin') {
+          removeTempMarker();
+          formMode.value = 'edit';
+          showPointForm.value = true;
+
+          // R/NR USERS View details
+        } else {
+          formMode.value = 'view';
+          showPointForm.value = true;        
+        }
     });
   });
 }
@@ -234,64 +255,57 @@ function addEvents(map: L.Map) {
   });
 }
 
-async function findNearestShelter() {
-  getUserPosition(async (lat, lon) => {
-    await pointStore.fetchShelters();
-    const shelter = getNearestPoint(lat, lon, pointStore.shelters);
-
-    // Return if no shelter was found
-    if (!shelter) return;
-
+function handleNavigation(coords: { latitude: number, longitude: number }) {
+  getUserPosition((userLat, userLon) => {
     if (window.routingControl) map.removeControl(window.routingControl);
+
     window.routingControl = L.Routing.control({
-      waypoints: [L.latLng(lat, lon), L.latLng(shelter.latitude, shelter.longitude)],
+      waypoints: [L.latLng(userLat, userLon), L.latLng(coords.latitude, coords.longitude)],
       routeWhileDragging: false,
     }).addTo(map);
   });
 }
+
 </script>
 
 <style>
 .corner-container {
   position: absolute;
-  top: 30px;
-  left: 20px;
+  top: 10px;
+  left: 10px;
   z-index: 2;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.button {
-  background-color: var(--dark-blue);
-  color: var(--white);
-  font-size: var(--font-size-small);
-  padding: 13px;
-}
-
-.button:hover {
-  background-color: var(--darkest-blue);
-}
-
-.map-page {
+.layout-map-page {
   display: flex;
-  height: 100vh; 
+  flex-direction: column;
+  height: 100vh;
+}
+.map-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
 }
 
 .map {
-  height: 100%;
+  flex: 1;
   width: 100%;
   z-index: 0;
 }
 
 .crisis-alert {
-  position: fixed;
-  bottom: 40px;
+  position: absolute;
+  bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
   background-color: var(--bad-red);
   color: var(--white);
-  padding: 10px 20px;
+  padding: 0 20px;
   border-radius: 5px;
   font-size: var(--font-size-medium);
   font-weight: bold;
@@ -313,7 +327,6 @@ async function findNearestShelter() {
 
 @media (max-width: 768px) {
   .crisis-alert {
-    padding: 0 20px;
     font-size: var(--font-size-small);
   }
 }

@@ -1,21 +1,21 @@
-import { defineStore } from 'pinia'
+import { defineStore } from "pinia";
 
-export const useUserStore = defineStore('user', {
-    state: () => ({
-        role: ''
-    }),
+export const useUserStore = defineStore("user", {
+  state: () => ({
+    role: "admin",
+  }),
 
-    persist: {
-        storage: sessionStorage,
+  persist: {
+    storage: sessionStorage,
+  },
+
+  actions: {
+    logout() {
+      this.role = "";
     },
 
-    actions: {
-        logout() {
-            this.role = '';
-        },
-
-        setRole(role: string) {
-            this.role = role;
-        },
-    }
-})
+    setRole(role: string) {
+      this.role = role;
+    },
+  },
+});

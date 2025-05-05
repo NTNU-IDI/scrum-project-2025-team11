@@ -156,7 +156,7 @@ button:hover {
   border-radius: 0.5rem;
 }
 
-@media(max-width: 480px) {
+@media (max-width: 480px) {
   .grey-container {
     width: 300px !important;
   }
@@ -193,7 +193,7 @@ button:hover {
 
 .title-map {
   font-size: var(--font-size-xlarge);
-  margin: 7px 0 10px 0;
+  margin: 0;
 }
 
 .point-card {
@@ -211,6 +211,11 @@ button:hover {
 .point-card input,
 select {
   font-size: var(--font-size-small);
+}
+
+.header-box-container {
+  display: flex;
+  flex-direction: column;
 }
 
 .error-message {

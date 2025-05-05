@@ -14,8 +14,10 @@ const USERNAME_IV_SPACE = "Jan NavnHans"
 const USERNAME_IV_SPECIAL_CHARACTER = "Jan123!"
 const EMAIL_V = "janerik@mail.no"
 const EMAIL_IV = "janerik@no"
-const PASSWORD_V = "passord123"
+const PASSWORD_V = "Passord123!"
 const REPEATED_PASSWORD_V = PASSWORD_V
+const PASSWORD_IV = "Test!2"
+const REPEATED_PASSWORD_IV = PASSWORD_IV
 //const HOUSHOLDCODE_V = "???"
 const HOUSEHOLDNAME_V = "Familien Navnesen-Hansen"
 const HOUSEHOLDNAME_IV_NO = "Familien 123"
@@ -190,7 +192,7 @@ describe('RegisterComponent', () => {
 
                 expect(errorMessage.text()).not.toBe(EMPTY_STRING)
             })
-            it('with invalid password, errormessage is shown', async () => {
+            it('with empty password, errormessage is shown', async () => {
                 await iptPassword.setValue(EMPTY_STRING)
                 expect((iptPassword.element as HTMLInputElement).value).toBe(EMPTY_STRING)
                 expect(wrapper.vm.validateFields()).toBeFalsy()
@@ -198,9 +200,19 @@ describe('RegisterComponent', () => {
 
                 expect(errorMessage.text()).not.toBe(EMPTY_STRING)
             })
-            it('with invalid repeated password, errormessage is shown', async () => {
+            it('with empty repeated password, errormessage is shown', async () => {
                 await iptRepeatedPassword.setValue(EMPTY_STRING)
                 expect((iptRepeatedPassword.element as HTMLInputElement).value).toBe(EMPTY_STRING)
+                expect(wrapper.vm.validateFields()).toBeFalsy()
+                await nextTick()
+
+                expect(errorMessage.text()).not.toBe(EMPTY_STRING)
+            })
+            it('with identical passwords, but an invalid one, errormessage is shown', async () => {
+                await iptPassword.setValue(PASSWORD_IV)
+                await iptRepeatedPassword.setValue(REPEATED_PASSWORD_IV)
+                expect((iptPassword.element as HTMLInputElement).value).toBe(REPEATED_PASSWORD_IV)
+                expect((iptRepeatedPassword.element as HTMLInputElement).value).toBe(REPEATED_PASSWORD_IV)
                 expect(wrapper.vm.validateFields()).toBeFalsy()
                 await nextTick()
 
