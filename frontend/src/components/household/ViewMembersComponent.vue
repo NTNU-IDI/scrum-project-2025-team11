@@ -8,7 +8,7 @@ import { HouseholdService } from '@/api/HouseholdService';
 //User store
 const userStore = useUserStore();
 // Remove later
-userStore.setUsername('Madde')
+//userStore.setUsername('Madde')
 
 //Household store
 const householdStore = useHouseholdStore();
@@ -44,7 +44,7 @@ const changeMemberCount = async () => {
             <div class="me-container">
                 <h1 class="medium-header">Deg</h1>
                 <div class="article-card">
-                    <p>{{ userStore.username }}</p>
+                    <p>{{ userStore.role }}</p>
                 </div>
             </div>
 

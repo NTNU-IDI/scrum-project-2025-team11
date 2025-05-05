@@ -6,11 +6,11 @@ import HouseholdView from "@/views/household/HouseholdView.vue";
 import PrivacyPolicyView from "@/views/PrivacyPolicyView.vue";
 import AuthView from "@/views/AuthView.vue";
 import UserHomeView from "@/views/HomeInloggedView.vue";
+import AdminView from "@/views/admin/AdminView.vue";
 import HomeAdminView from "@/views/HomeAdminView.vue";
 import AboutView from "@/views/AboutView.vue";
 import ForgotPassword from "@/views/ForgotPasswordView.vue";
 import ResetPassword from "@/views/ResetPasswordView.vue";
-
 
 import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
@@ -52,6 +52,11 @@ const routes: Array<RouteRecordRaw> = [
     path: "/userhome",
     name: "UserHomeView",
     component: UserHomeView,
+  },
+  {
+    path: "/admin",
+    name: "AdminView",
+    component: AdminView,
   },
   {
     path: "/auth",
