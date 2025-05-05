@@ -24,7 +24,7 @@ const isEditMode = computed(() => itemTypeStore.isEditMode);
 // Load all items of the selected type
 const loadItems = async () => {
     // Get actual household id from the store
-    await householdStore.setHousehold(1);
+    await householdStore.fetchHousehold();
     
     if (!householdStore.id) {
         console.error('Household ID is not available');

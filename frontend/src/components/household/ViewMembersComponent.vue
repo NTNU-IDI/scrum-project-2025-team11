@@ -16,7 +16,7 @@ const newMemberCount = ref(0);
 
 onMounted( async () => {
     // TODO: Get actual household ID from the store
-    await householdStore.setHousehold(1);
+    await householdStore.fetchHousehold();
 
     newMemberCount.value = householdStore.memberCount;
 });
