@@ -305,7 +305,7 @@ function handleNavigation(coords: { latitude: number, longitude: number }) {
   transform: translateX(-50%);
   background-color: var(--bad-red);
   color: var(--white);
-  padding: 10px 20px;
+  padding: 0 20px;
   border-radius: 5px;
   font-size: var(--font-size-medium);
   font-weight: bold;
@@ -327,7 +327,6 @@ function handleNavigation(coords: { latitude: number, longitude: number }) {
 
 @media (max-width: 768px) {
   .crisis-alert {
-    padding: 0 20px;
     font-size: var(--font-size-small);
   }
 }
