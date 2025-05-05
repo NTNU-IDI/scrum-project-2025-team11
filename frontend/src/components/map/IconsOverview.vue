@@ -8,16 +8,16 @@
     </div>
 
     <transition name="fade">
-      <ul v-show="!isCollapsed" class="checkbox-icons-container">
-        <li>
+      <ul v-show="!isCollapsed" class="map-overview-details">
+        <li class="map-li">
           <input type="checkbox" id="shelter" value="shelter" v-model="selectedIcons" />
           <label for="shelter"><span class="map-icon shelter"></span> Tilfluktsrom</label>
         </li>
-        <li>
+        <li class="map-li">
           <input type="checkbox" id="assembly_point" value="assembly_point" v-model="selectedIcons" />
           <label for="assembly_point"><span class="map-icon assembly_point"></span> Møteplass</label>
         </li>
-        <li>
+        <li class="map-li">
           <input type="checkbox" id="medical" value="medical" v-model="selectedIcons" />
           <label for="medical"><span class="map-icon medical"></span> Medisinsk hjelp</label>
         </li>
@@ -41,40 +41,19 @@ watch(selectedIcons, (newIcons) => {
 </script>
 
 <style scoped>
-.checkbox-icons-container {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  padding-top: 7px;
-}
-
-.checkbox-icons-container li {
-  display: flex;
-  align-items: center;
-  margin-bottom: 0.5rem;
-  width: 100%;
-}
-
-.checkbox-icons-container input[type="checkbox"] {
+.map-overview-details input[type="checkbox"] {
   margin: 0;
   flex-shrink: 0;
   width: auto;
   padding: 0;
 }
 
-.checkbox-icons-container label {
+.map-overview-details label {
   display: flex;
   align-items: center;
   margin-left: 0.5rem;
   cursor: pointer;
   flex-grow: 1;
   font-size: var(--font-size-xsmall);
-}
-
-@media (max-width: 768px) {
-    .checkbox-icons-container label {
-      display: flex;
-      font-size: var(--font-size-xsmall);
-  }
 }
 </style>

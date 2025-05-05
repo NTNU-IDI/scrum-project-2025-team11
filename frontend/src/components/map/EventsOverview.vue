@@ -8,10 +8,10 @@
     </div>
 
     <transition name="fade">
-      <ul v-show="!isCollapsed" class="map-overview-box-descriptions">
-        <li><span class="map-icon danger severe"></span> Alvorlig kriseberørt område</li>
-        <li><span class="map-icon danger moderate"></span> Moderat kriseberørt område</li>
-        <li><span class="map-icon danger mild"></span> Lett kriseberørt område</li>
+      <ul v-show="!isCollapsed" class="map-overview-details">
+        <li class="map-li"><span class="map-icon danger severe"></span> Alvorlig kriseberørt område</li>
+        <li class="map-li"><span class="map-icon danger moderate"></span> Moderat kriseberørt område</li>
+        <li class="map-li"><span class="map-icon danger mild"></span> Lett kriseberørt område</li>
       </ul>
     </transition>
   </div>
