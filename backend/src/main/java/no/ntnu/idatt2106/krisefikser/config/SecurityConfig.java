@@ -55,6 +55,9 @@ public class SecurityConfig {
                 config.setAllowCredentials(true);
                 return config;
             }))
+            .headers(headers -> headers
+                .frameOptions(frameOptions -> frameOptions.sameOrigin())
+            )
             .exceptionHandling(exceptions -> exceptions
                     .authenticationEntryPoint((request, response, authException) -> {
                         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
