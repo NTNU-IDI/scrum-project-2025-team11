@@ -27,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
 import no.ntnu.idatt2106.krisefikser.model.Address;
+import no.ntnu.idatt2106.krisefikser.model.Household;
 import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.service.AddressService;
 import no.ntnu.idatt2106.krisefikser.service.UserService;
@@ -87,8 +88,8 @@ public class AddressController {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     String username = authentication.getName();
     User user = userService.getUserByUsername(username).orElse(null);
-    int id = user.getId();
-    Address address = addressService.findById(id).orElse(null);
+    Household household = user.getHousehold();
+    Address address = household.getAddress();
     if (address != null) {
       return ResponseEntity.ok(address);
     } else {
@@ -146,8 +147,9 @@ public class AddressController {
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
       String username = authentication.getName();
       User user = userService.getUserByUsername(username).orElse(null);
-      int id = user.getId();
-      AddressResponseDTO updatedAddress = addressService.updateAddress(id, address);
+      Household household = user.getHousehold();
+      Address currentAddress = household.getAddress();
+      AddressResponseDTO updatedAddress = addressService.updateAddress(currentAddress.getId(), address);
       return ResponseEntity.ok(updatedAddress);
     } catch (RuntimeException e) {
       return ResponseEntity.notFound().header("Error message", e.getMessage()).build();
