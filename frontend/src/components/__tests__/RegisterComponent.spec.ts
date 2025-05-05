@@ -74,7 +74,7 @@ describe('RegisterComponent', () => {
         //Test that link shows and leads to login
         const linkToLogin = wrapper.find(".register-login-text").find(".link")
         expect(linkToLogin.exists()).toBeTruthy()
-        expect(linkToLogin.attributes("href")).toBe("/login")
+        expect(linkToLogin.attributes("to")).toBe("/login")
         expect(linkToLogin.text()).toBe("Logg inn her")
     })
     describe(' in case of ', () => {

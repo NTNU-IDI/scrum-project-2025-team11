@@ -1,5 +1,4 @@
 import { createPinia } from "pinia";
-import piniaPersist from 'pinia-plugin-persistedstate'
 import { createApp } from "vue";
 import piniaPluginPersistedState from 'pinia-plugin-persistedstate'
 import App from "./App.vue";
@@ -13,8 +12,7 @@ const pinia = createPinia();
 
 pinia.use(piniaPluginPersistedState)
 
-pinia.use(piniaPersist)
-app.use(createPinia());
+app.use(pinia);
 
 
 app.use(router);
