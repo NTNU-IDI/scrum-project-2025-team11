@@ -3,7 +3,12 @@ package no.ntnu.idatt2106.krisefikser.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import no.ntnu.idatt2106.krisefikser.dto.*;
+import no.ntnu.idatt2106.krisefikser.model.Household;
+import no.ntnu.idatt2106.krisefikser.model.User;
+import no.ntnu.idatt2106.krisefikser.security.JwtAuthFilter;
+import no.ntnu.idatt2106.krisefikser.security.JwtUtil;
 import no.ntnu.idatt2106.krisefikser.service.HouseholdService;
+import no.ntnu.idatt2106.krisefikser.service.UserService;
 import no.ntnu.idatt2106.krisefikser.config.TestSecurityConfig;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -15,38 +20,52 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.Optional;
+
 @ActiveProfiles("test")
 @Import(TestSecurityConfig.class)
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(HouseholdController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class HouseholdControllerTest {
 
+    @Autowired
     private MockMvc mockMvc;
 
-    @Mock
+    @MockitoBean
+    private JwtUtil jwtUtil;
+
+    @MockitoBean
+    private JwtAuthFilter filter;
+
+    @MockitoBean
+    private UserService userService;
+
+    @MockitoBean
     private HouseholdService householdService;
 
     @InjectMocks
     private HouseholdController householdController;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    @BeforeEach
-    void setUp() {
-        objectMapper.registerModule(new JavaTimeModule());
-        mockMvc = MockMvcBuilders.standaloneSetup(householdController).build();
-    }
-
+    @Autowired
+    private ObjectMapper objectMapper;
+    
     @Test
     void testCreateHousehold() throws Exception {
         // Prepare request DTO with nested Address
@@ -80,12 +99,13 @@ class HouseholdControllerTest {
                 .andExpect(jsonPath("$.memberCount").value(1));
     }
 
+    @WithMockUser(username = "testUser")
     @Test
     void testUpdateHousehold() throws Exception {
         int householdId = 123;
 
         HouseholdUpdateDTO updateDTO = new HouseholdUpdateDTO();
-        updateDTO.setName("Oppdatert hus");
+        updateDTO.setName("Hus");
         updateDTO.setMemberCount(3);
 
         HouseholdResponseDTO responseDTO = new HouseholdResponseDTO();
@@ -93,17 +113,27 @@ class HouseholdControllerTest {
         responseDTO.setName("Oppdatert hus");
         responseDTO.setMemberCount(3);
 
-        when(householdService.existsById(householdId)).thenReturn(true);
-        when(householdService.updateHousehold(any(Integer.class), any(HouseholdUpdateDTO.class))).thenReturn(responseDTO);
+        User mockUser = new User();
+        mockUser.setUsername("testUser");
+        Household hh = new Household();
+        hh.setId(householdId);
+        mockUser.setHousehold(hh);
+        when(userService.getUserByUsername("testUser"))
+                .thenReturn(Optional.of(mockUser));
 
-        mockMvc.perform(put("/api/household/{id}", householdId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateDTO)))
+        when(householdService.existsById(householdId)).thenReturn(true);
+        when(householdService.updateHousehold(eq(householdId), any()))
+                .thenReturn(responseDTO);
+
+        mockMvc.perform(put("/api/household/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(householdId))
                 .andExpect(jsonPath("$.name").value("Oppdatert hus"))
                 .andExpect(jsonPath("$.memberCount").value(3));
     }
+
 
     @Test
     void testUpdateHousehold_NotFound() throws Exception {
