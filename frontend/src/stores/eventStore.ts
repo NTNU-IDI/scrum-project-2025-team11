@@ -49,10 +49,22 @@ export const useEventStore = defineStore('events', {
                 console.error('Error updating event:', error);
             }
         },
+        async save(event: EventRequestDTO) {
+            try {
+                await EventService.save(event).then((data) => {
+                    this.chosenEvent = data;
+                    this.fetchEvents();
+                });
+            } catch (error) {
+                console.error('Error saving event:', error);
+            }
+        },
         async delete(id: number) {
             try {
                 await EventService.delete(id).then(() => {
+                    this.chosenEvent = {} as EventResponseDTO;
                     this.fetchEvents();
+                    console.log(this.chosenEvent.id);
                 });
             } catch (error) {
                 console.error('Error deleting event:', error);
