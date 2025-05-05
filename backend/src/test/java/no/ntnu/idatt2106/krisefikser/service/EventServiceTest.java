@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -116,6 +117,7 @@ public class EventServiceTest {
       
       assertNotNull(createdEvent);
       assertEquals(event.getId(), createdEvent.getId());
+      assertEquals(event.getName(), createdEvent.getName());
     }
     
     @Test
@@ -130,20 +132,39 @@ public class EventServiceTest {
       eventRequestDTO.setLongitude(-160.18513);
       eventRequestDTO.setRadius(9999);
       eventRequestDTO.setSeverity(4);
-      
+
       when(eventRepository.findById(1)).thenReturn(Optional.of(event));
-      when(eventMapper.toEntity(eventRequestDTO)).thenReturn(event);
-      when(eventRepository.save(any(Event.class))).thenReturn(event);
-      when(eventMapper.toResponseDTO(event)).thenReturn(eventResponseDTO);
+
+      ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+      when(eventRepository.save(eventCaptor.capture())).thenReturn(event);
+
+      when(eventMapper.toResponseDTO(any(Event.class))).thenAnswer(invocation -> {
+        Event updatedEvent = invocation.getArgument(0);
+        EventResponseDTO dto = new EventResponseDTO();
+        dto.setId(updatedEvent.getId());
+        dto.setName(updatedEvent.getName());
+        dto.setDescription(updatedEvent.getDescription());
+        dto.setStartTime(updatedEvent.getStartTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        dto.setEndTime(updatedEvent.getEndTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        dto.setIconType(updatedEvent.getIconType().toString());
+        dto.setLatitude(updatedEvent.getLatitude());
+        dto.setLongitude(updatedEvent.getLongitude());
+        dto.setRadius(updatedEvent.getRadius());
+        dto.setSeverity(updatedEvent.getSeverity());
+        return dto;
+      });
 
       EventResponseDTO updatedEvent = eventService.updateEvent(1, eventRequestDTO);
-      
-      verify(eventRepository, times(1)).save(event);
-      
+
+      verify(eventRepository, times(1)).save(eventCaptor.capture());
+
+      Event savedEvent = eventCaptor.getValue();
+      assertEquals("Updated Event", savedEvent.getName());
+      assertEquals(9999, savedEvent.getRadius());
+
       assertNotNull(updatedEvent);
-      assertEquals(event.getName(), updatedEvent.getName());
-      assertEquals(event.getRadius(), updatedEvent.getRadius());
-      assertEquals(event.getSeverity(), updatedEvent.getSeverity());
+      assertEquals(1, updatedEvent.getId());
+      assertEquals("Updated Event", updatedEvent.getName());
     }
     
     @Test
