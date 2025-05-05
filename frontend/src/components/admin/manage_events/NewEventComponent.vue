@@ -1,24 +1,88 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { eventIcons } from '@/utils/icons';
+import { validateLatitude, validateLongitude, validatePointDescription, validatePointName, validateRadius, validateSeverity } from '@/utils/validationService';
+import { useEventStore } from '@/stores/eventStore';
 
 // Props
 const name = ref('');
-const severity = ref('');
+const severity = ref();
 const radius = ref();
 const latitude = ref();
 const longitude = ref();
 const description = ref('');
-const startDate = ref();
-const endDate = ref();
+const startTime = ref();
+const endTime = ref();
 const selectedIcon = ref('none');
 const emit = defineEmits(['hide-new-event-box']);
 const icons = eventIcons;
+const eventStore = useEventStore();
+
+const validateEvent = () => {
+    if (!validatePointName(name.value)) {
+        alert('Hendelsesnavn må fylles ut');
+        return false;
+    }
+    if (!validateSeverity(severity.value)) {
+        alert('Krisenivå må fylles ut');
+        return false;
+    }
+    if (!validateRadius(radius.value)) {
+        alert('Radius må fylles ut');
+        return false;
+    }
+    if (!validateLatitude(latitude.value)) {
+        alert('Lengdegrad må fylles ut');
+        return false;
+    }
+    if (!validateLongitude(longitude.value)) {
+        alert('Breddegrad må fylles ut');
+        return false;
+    }
+    if (!validatePointDescription(description.value)) {
+        alert('Beskrivelse må fylles ut');
+        return false;
+    }
+    if (!startTime.value) {
+        alert('Startdato må fylles ut');
+        return false;
+    }
+    if (endTime.value && new Date(startTime.value) > new Date(endTime.value)) {
+        alert('Sluttdato kan ikke være før startdato');
+        return false;
+    }
+    return true;
+}
 
 // Add event 
 const addEvent = () => {
-    // TODO
-    emit('hide-new-event-box');
+    if (validateEvent()) {
+        if (endTime.value) {
+            eventStore.save({
+                name: name.value,
+                description: description.value,
+                iconType: selectedIcon.value,
+                startTime: startTime.value + ':00',
+                endTime: endTime.value + ':00',
+                latitude: latitude.value,
+                longitude: longitude.value,
+                severity: severity.value,
+                radius: radius.value,
+            });
+        } else {
+            eventStore.save({
+                name: name.value,
+                description: description.value,
+                iconType: selectedIcon.value,
+                startTime: startTime.value + ':00',
+                latitude: latitude.value,
+                longitude: longitude.value,
+                severity: severity.value,
+                radius: radius.value,
+            });
+        }
+        emit('hide-new-event-box');
+    }
 }
 </script>
 <template>
@@ -50,8 +114,8 @@ const addEvent = () => {
                 <label for="end-input">Eventuell Sluttdato</label>
             </div>
             <div class="double-input-container">
-                <input type="date" class="edit-input" id="start-input" v-model="startDate" />    
-                <input type="date" class="edit-input" id="end-input" v-model="endDate" />       
+                <input type="datetime-local" class="edit-input" id="start-input" v-model="startTime" />    
+                <input type="datetime-local" class="edit-input" id="end-input" v-model="endTime" />       
             </div>
             
             <!-- Icon type -->
