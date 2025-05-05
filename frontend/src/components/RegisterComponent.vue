@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import {ref, watch, onMounted} from 'vue'
 import axios from 'axios'
-import {useRouter} from "vue-router";
 import {validateFirstName, validateLastName, validateEmail, validateUsername, validateHouseholdName, validatePassword} from "@/utils/validationService.ts";
-
-const router = useRouter()
+import {registerNormalUser, login} from "@/api/AuthService.ts";
+import type {HouseholdRequestDTO} from "@/types/Household.ts";
+import {HouseholdService} from "@/api/HouseholdService.ts";
 
 const REGISTRATION_FAILURE_WAIT_MESSAGE = "Noe gikk galt under registreringen. Vennligst prøv igjen senere."
 
@@ -96,7 +96,7 @@ async function attemptRegistration() {
         errorMessage.value = ""
         await registerHouseholdAndCreateUser(location.lat, location.lon, location.address.city)
       }
-    } else {
+    } else if(householdChoice.value === "existing") {
       //TODO: Implement how creation of new user joining existing household works when backend is ready
       //Will probably have to firstly use the code in the input-field to retrieve the hhid from backend, and then
       //use the hhid when creating the new user.
@@ -132,45 +132,15 @@ async function registerHouseholdAndCreateUser(latitude: number, longitude: numbe
         if (error.response.status === 400) {
           errorMessage.value = "Ugyldig husstands-informasjon. Vennligst kontroller og prøv igjen."
         } else {
-          errorMessage.value = REGISTRATION_FAILURE_WAIT_MESSAGE
+          alert(REGISTRATION_FAILURE_WAIT_MESSAGE)
         }
       });
 }
 
 async function createNewUser(hhID: number) {
-  await axios.post("http://localhost:8080/api/users", {
-    email: email.value,
-    username: username.value,
-    firstName: firstName.value,
-    lastName: lastName.value,
-    password: password.value,
-    householdId: hhID
-  })
-      .then((response) => {
-        router.push("/")
-      })
-      .catch((error) => {
-        if (error.response.status === 409) {
-          errorMessage.value = "Brukernavn eller email er allerede tatt."
-        } else if (error.response.status === 500) {
-          errorMessage.value = "Backend ga 500"
-        } else {
-          errorMessage.value = REGISTRATION_FAILURE_WAIT_MESSAGE
-        }
-      })
+  registerNormalUser(firstName.value, lastName.value, username.value, email.value, password.value, hhID)
 }
 
-/*
-How to get the relevant information from this request (has to be inside a method):
-  const location = await getLocationDataFromAdressAndPostalCode('Katteberget 17', '3721')
-  const longitude = location.lon
-  const latitude = location.lat
-  const displayName = location.display_name
-  const displayNameArray = displayName.split(',')
-  const city = placeArr[placeArr.length - 4];
-
-The things to retrieve for backend are: longitude, latitude and city
- */
 async function getLocationDataFromAdressAndPostalCode(address: string, postalCode: string) {
   //Got help from ChatGPT with the use of 'street', 'postalcode' and 'country'
   const response = await axios.get(`https://nominatim.openstreetmap.org/search?street=${address}&postalcode=${postalCode}&country=Norway&format=json&limit=1&addressdetails=1`);
@@ -209,7 +179,7 @@ defineExpose({validateFields})
     <h1>Registrer bruker</h1>
     <form v-on:submit.prevent>
       <div id="divConstantInputs">
-        <input type="text" placeholder="Fornavn" v-model="firstName" id="iptFirstName"required>
+        <input type="text" placeholder="Fornavn" v-model="firstName" id="iptFirstName" required>
         <input type="text" placeholder="Etternavn" v-model="lastName" id="iptLastName" required>
         <input type="text" placeholder="Brukernavn" v-model="username" id="iptUsername" required>
         <input type="email" placeholder="Epost" v-model="email" id="iptEmail" required>
@@ -227,10 +197,10 @@ defineExpose({validateFields})
       <label><input type="checkbox" v-model="privacyPolicyCheck" id="cbPrivacyPolicy" required>
         Jeg godtar og har lest <a href="/personvern" id="linkPrivacyPolicy" target="_blank" class="link"> personvernerklæringen</a> </label> <br>
       <button class="good-button" type="submit" @click="attemptRegistration"> Registrer </button>
-      <p id="error">{{errorMessage}}</p>
+      <p id="error" class="error-message">{{errorMessage}}</p>
     </form>
     <p class="register-login-text">
-      Har du allerede en bruker? <a href="/login" class="link">Logg inn her</a>
+      Har du allerede en bruker? <router-link to="/login" class="link">Logg inn her</router-link>
     </p>
   </div>
 </template>
@@ -249,11 +219,6 @@ input[type="radio"], input[type="checkbox"]{
 
 label {
   width: auto;
-}
-
-#error {
-  font-size: var(--font-size-small);
-  color: var(--bad-red);
 }
 
 @media (min-width: 480px) {
