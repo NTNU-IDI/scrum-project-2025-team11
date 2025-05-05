@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +27,9 @@ import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
 import no.ntnu.idatt2106.krisefikser.model.Address;
+import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.service.AddressService;
+import no.ntnu.idatt2106.krisefikser.service.UserService;
 
 /**
  * Controller class for managing address-related operations in the system.
@@ -41,6 +45,7 @@ import no.ntnu.idatt2106.krisefikser.service.AddressService;
 @Tag(name = "Address", description = "Operations related to addresses management")
 public class AddressController {
   private final AddressService addressService;
+  private final UserService userService;
 
   /**
    * Endpoint to retrieve all addresses in the system.
@@ -70,17 +75,19 @@ public class AddressController {
    * @return {@code ResponseEntity} containing the address if found, or a 404 Not Found status if not found.
    */
   @Operation(
-    summary = "Get address by ID", 
+    summary = "Get address of logged in user", 
     description = "Retrieve an address based on its unique identifier"
   )
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "Address retrieved successfully"),
     @ApiResponse(responseCode = "404", description = "Address not found")
   })
-  @GetMapping("/{id}")
-  public ResponseEntity<Address> getAddressById(
-    @Parameter (description = "ID of the address to retrieve", example = "1", required = true)
-    @PathVariable int id) {
+  @GetMapping("/me")
+  public ResponseEntity<Address> getMyAddress() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String username = authentication.getName();
+    User user = userService.getUserByUsername(username).orElse(null);
+    int id = user.getId();
     Address address = addressService.findById(id).orElse(null);
     if (address != null) {
       return ResponseEntity.ok(address);
@@ -121,7 +128,7 @@ public class AddressController {
    * @return {@code ResponseEntity} containing the updated address, or a 404 Not Found status if not found.
    */
   @Operation(
-    summary = "Update an existing address", 
+    summary = "Update a logged in users address", 
     description = "Update an existing address in the system. " + 
                   "Returns a 404 Not Found status if the address does not exist, " +
                   "or a 400 Bad Request status if the address data is invalid."
@@ -131,13 +138,15 @@ public class AddressController {
     @ApiResponse(responseCode = "404", description = "Address not found"),
     @ApiResponse(responseCode = "400", description = "Invalid address data, for example, missing required fields")
   })
-  @PutMapping("/{id}")
+  @PutMapping
   public ResponseEntity<AddressResponseDTO> updateAddress(
-    @Parameter (description = "ID of the address to update", example = "1", required = true)
-    @PathVariable int id, 
     @Parameter (description = "Updated address object", required = true)
     @RequestBody AddressRequestDTO address) {
     try {
+      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+      String username = authentication.getName();
+      User user = userService.getUserByUsername(username).orElse(null);
+      int id = user.getId();
       AddressResponseDTO updatedAddress = addressService.updateAddress(id, address);
       return ResponseEntity.ok(updatedAddress);
     } catch (RuntimeException e) {
