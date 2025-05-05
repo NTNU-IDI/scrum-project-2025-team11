@@ -68,8 +68,8 @@ public class PointOfInterestController {
             @ApiResponse(responseCode = "400", description = "Could not find points based on the given icontype," +
                     " is it a valid icontype?")
     })
-    @GetMapping("/iconType")
-    public ResponseEntity<List<PointOfInterestResponseDTO>> getPointsOfInterestsOnIconType(@RequestParam String iconType) {
+    @GetMapping("/iconTypes")
+    public ResponseEntity<List<PointOfInterestResponseDTO>> getPointsOfInterestsOnIconType(@RequestParam List<String> iconType) {
         List<PointOfInterestResponseDTO> pointsOfInterest = pointOfInterestService.findByIconType(iconType);
         if (pointsOfInterest == null) {
             return ResponseEntity.notFound().build();
