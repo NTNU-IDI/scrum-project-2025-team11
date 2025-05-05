@@ -3,6 +3,7 @@ package no.ntnu.idatt2106.krisefikser.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.dto.PointOfInterestRequestDTO;
@@ -17,7 +18,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/interest")
-@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 @Tag(name = "Point of interest", description = "Operations related to point of interest management")
 public class PointOfInterestController {

@@ -2,16 +2,15 @@ package no.ntnu.idatt2106.krisefikser.controller;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import no.ntnu.idatt2106.krisefikser.security.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,45 +32,12 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
 @RequestMapping("/api/users")
 @CrossOrigin(origins = "*")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "jwtCookieAuth")
+@PreAuthorize("isAuthenticated()")
 @Tag(name = "User", description = "Operations related to user management")
 public class UserController {
   private final UserService userService;
-
-
-  /**
-   * Saves a new user entity.
-   *
-   * @param user the user entity to be saved
-   * @return {@code ResponseEntity} containing the saved user entity
-   */
-  @Operation(
-    summary     = "Register new user",
-    description = "Creates a new user. Authentication *not* required.")
-  @ApiResponses({
-      @ApiResponse(responseCode = "201", description = "User created",
-          content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = UserResponseDTO.class))),
-      @ApiResponse(responseCode = "409", description = "Email or username already taken"),
-  })
-  @PostMapping
-  public ResponseEntity<UserResponseDTO> register(
-        @Parameter(description = "User registration payload", required = true)
-        @RequestBody UserRequestDTO body) {
-    
-    if (userService.emailExists(body.getEmail())) {
-      return ResponseEntity
-          .status(409) // Conflict
-          .body(null);
-    }
-    if (userService.usernameExists(body.getUsername())) {
-      return ResponseEntity
-          .status(409) // Conflict
-          .body(null);
-    }
-        
-    UserResponseDTO saved = userService.saveUser(body);
-    return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-  }
+  private final PasswordEncoder passwordEncoder;
 
 
   /**
@@ -82,8 +48,8 @@ public class UserController {
    *         returns a 404 Not Found response
    */
   @Operation(
-      summary     = "Get user by ID",
-      description = "Retrieves the user details for the specified ID.")
+      summary     = "Get logged in user",
+      description = "Retrieves the user details by login")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "User found",
           content = @Content(mediaType = "application/json",
@@ -91,11 +57,11 @@ public class UserController {
       @ApiResponse(responseCode = "404", description = "User not found",
           content = @Content)
   })
-  @GetMapping("/{id}")
-  public ResponseEntity<UserResponseDTO> getById(
-      @Parameter(description = "Unique user ID", required = true)
-      @PathVariable int id) {
-    User user = userService.getUserById(id).orElse(null);
+  @GetMapping("/me")
+  public ResponseEntity<UserResponseDTO> getUserInfo() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String username = authentication.getName();
+    User user = userService.getUserByUsername(username).orElse(null);
     if (user == null) {
       return ResponseEntity.notFound().build();
     }
@@ -117,7 +83,7 @@ public class UserController {
       @ApiResponse(responseCode = "204", description = "No users found",
           content = @Content)
   })
-  @GetMapping
+  @GetMapping("/all")
   public ResponseEntity<List<UserResponseDTO>> list() {
     List<UserResponseDTO> users = userService.findAll();
     if (users == null) {
@@ -130,7 +96,7 @@ public class UserController {
 
 
   /**
-   * Changes the password of a user by their unique identifier.
+   * Changes the password of a logged in user.
    *
    * @param id the unique identifier of the user
    * @param dto the password change request
@@ -144,17 +110,18 @@ public class UserController {
       @ApiResponse(responseCode = "400", description = "Current password wrong",
           content = @Content)
   })
-  @PostMapping("/{id}/password")
+  @PostMapping("/password")
   public ResponseEntity<Void> changePassword(
-      @Parameter(description = "User ID", required = true)
-      @PathVariable int id,
       @Parameter(description = "Password change payload", required = true)
       @RequestBody PasswordChangeDTO dto) {
-    User user = userService.getUserById(id).orElse(null);
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String username = authentication.getName();
+    User user = userService.getUserByUsername(username).orElse(null);
     if (user == null) {
       return ResponseEntity.notFound().build();
     }
-    if (!user.getPassword().equals(dto.getCurrentPassword())) {
+    if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
       return ResponseEntity
           .status(HttpStatus.BAD_REQUEST) // Bad Request
           .body(null);
@@ -165,6 +132,7 @@ public class UserController {
           .body(null);
     }
 
+    int id = user.getId();
     userService.changePassword(id, dto);
     return ResponseEntity.noContent().build();     // 204
   }
@@ -201,8 +169,7 @@ public class UserController {
 
   /**
    * Updates an existing user entity.
-   * 
-   * @param id the unique identifier of the user to be updated
+   *
    * @param user the updated user entity
    * @return {@code ResponseEntity} containing the updated user entity
    */
@@ -219,13 +186,15 @@ public class UserController {
           content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = UserResponseDTO.class)))
   })
-  @PostMapping("/{id}")
+  @PutMapping
   public ResponseEntity<UserResponseDTO> updateUser(
-    @Parameter(description = "The unique identifier of the user", required = true)
-    @PathVariable int id,
     @Parameter(description = "Updated user object", required = true)
     @RequestBody UserUpdateDTO user) {
-    User existingUser = userService.getUserById(id).orElse(null);
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String username = authentication.getName();
+
+    User existingUser = userService.getUserByUsername(username).orElse(null);
     if (existingUser == null) {
       return ResponseEntity.notFound().build();
     }
@@ -240,7 +209,7 @@ public class UserController {
           .body(null);
     }
 
-    UserResponseDTO updatedUser = userService.updateUser(id, user);
+    UserResponseDTO updatedUser = userService.updateUser(existingUser.getId(), user);
     return ResponseEntity.ok(updatedUser);
   }  
 }

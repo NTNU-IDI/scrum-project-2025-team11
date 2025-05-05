@@ -13,7 +13,6 @@ import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.UserResponseDTO;
 import no.ntnu.idatt2106.krisefikser.dto.UserUpdateDTO;
 import no.ntnu.idatt2106.krisefikser.mapper.UserMapper;
-import no.ntnu.idatt2106.krisefikser.model.Household;
 import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.model.User.Role;
 import no.ntnu.idatt2106.krisefikser.repository.UserRepository;
@@ -95,7 +94,7 @@ public class UserService {
 
     /**
      * Deletes a user by their ID.
-     * @param id
+     *
      */
     public void deleteAllUsers() {
         userRepository.deleteAll();
@@ -104,7 +103,7 @@ public class UserService {
     /**
      * Updates a user by their ID.
      * @param id
-     * @param updatedUser
+     * @param updated
      * @return User object that was updated
      */
     public UserResponseDTO updateUser(int id, UserUpdateDTO updated) {
