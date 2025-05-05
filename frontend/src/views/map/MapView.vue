@@ -4,6 +4,7 @@
     <div class="map-page">
       <div class="corner-container">
         <IconsOverview />
+        <EventsOverview />
         <PointForm 
           v-if="showPointForm" 
           :selectedPoint="selectedPoint" 
@@ -29,6 +30,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine';
 import IconsOverview from '../../components/map/IconsOverview.vue';
+import EventsOverview from '../../components/map/EventsOverview.vue';
 import PointForm from '../../components/map/PointView.vue';
 import Header from '@/components/Header.vue';
 import Footer from '@/components/Footer.vue';
