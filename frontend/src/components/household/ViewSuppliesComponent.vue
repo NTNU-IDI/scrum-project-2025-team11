@@ -83,7 +83,9 @@ const deleteItem =  (itemId: number) => {
             return;
         }
         if (item.id === itemId) {
-            await inventoryStore.deleteItem(householdStore.id, itemId, item.acquiredDate);
+            if(confirm(`Er du sikker på at du vil slette ${item.name} fra lageret?`)) {
+                await inventoryStore.deleteItem(householdStore.id, itemId, item.acquiredDate);
+            }
         }
     });
 }
