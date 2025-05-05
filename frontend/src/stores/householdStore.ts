@@ -23,22 +23,6 @@ export const useHouseholdStore = defineStore('household', {
                 console.error('Error fetching household:', error)
             }
         },
-        async setHousehold(householdId: number) {
-            try {
-                if (householdId === null) {
-                    throw new Error('Household ID is null')
-                }
-                const response = await HouseholdService.findById(householdId)
-                
-                this.id = householdId, 
-                this.name = response.name 
-                this.memberCount = response.memberCount
-                this.addressId = response.address.id.toString() 
-                
-            } catch (error) {
-                console.error('Error fetching household:', error)
-            }
-        },
         clearHousehold() {
             this.id = null;
             this.name = '';
