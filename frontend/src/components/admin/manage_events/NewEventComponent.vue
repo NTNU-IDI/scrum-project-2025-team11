@@ -109,14 +109,11 @@ const addEvent = () => {
 
             <!-- Description and dates -->
             <textarea class="edit-input" placeholder="*Beskrivelse" v-model="description"></textarea>
-            <div class="double-label-container">
-                <label for="start-input">*Startdato</label>
-                <label for="end-input">Eventuell Sluttdato</label>
-            </div>
-            <div class="double-input-container">
-                <input type="datetime-local" class="edit-input" id="start-input" v-model="startTime" />    
-                <input type="datetime-local" class="edit-input" id="end-input" v-model="endTime" />       
-            </div>
+            <label for="start-input">*Startdato</label>
+            <input type="datetime-local" class="edit-input" id="start-input" v-model="startTime" />   
+            <label for="end-input">Eventuell Sluttdato</label>
+            <input type="datetime-local" class="edit-input" id="end-input" v-model="endTime" />       
+            
             
             <!-- Icon type -->
             <select id="icon-select" v-model="selectedIcon" class="edit-input">
@@ -134,7 +131,7 @@ const addEvent = () => {
 </template>
 <style scoped>
 .grey-container {
-   height: 30rem;
+   height: 35rem;
    margin-top: 4.75rem;
 }
 
@@ -165,7 +162,6 @@ const addEvent = () => {
     background-color: white; 
     margin-right: 1rem;
     max-width: 24rem;
-   
 }
 
 textarea {
