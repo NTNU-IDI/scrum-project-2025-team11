@@ -253,7 +253,7 @@ function addEvents(map: L.Map) {
       weight: 1,
       radius,
       fillOpacity: 0.3
-    }).addTo(map).bindPopup(`<strong>${name}</strong><br>${description}`);
+    }).addTo(map);
   });
 }
 
@@ -325,6 +325,10 @@ function handleNavigation(coords: { latitude: number, longitude: number }) {
     display: block;
     visibility: visible;
     pointer-events: auto;
+}
+
+.leaflet-interactive[stroke][fill-opacity] {
+  pointer-events: none;
 }
 
 @media (max-width: 768px) {
