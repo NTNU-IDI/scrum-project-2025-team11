@@ -2,6 +2,8 @@
 import { useEventStore } from '@/stores/eventStore';
 import { onMounted, ref, watch } from 'vue';
 import { eventIcons } from '@/utils/icons';
+import { formatDate, formatDateForInput } from '@/utils/formatDate';
+import { validateIconType, validateLatitude, validateLongitude, validatePointDescription, validateRadius, validateSeverity } from '@/utils/validationService';
 
 // Store imports
 const eventStore = useEventStore();
@@ -12,8 +14,8 @@ const localEvent = ref({
   name: '',
   description: '',
   iconType: '',
-  startDate: '',
-  endDate: '',
+  startTime: '',
+  endTime: '',
   latitude: 0,
   longitude: 0,
   radius: 0,
@@ -23,28 +25,118 @@ const isEventDirty = ref(false);
 const selectedIcon = ref('none');
 const icons = eventIcons;
 
+// Load events from store
 const loadChosenEvent = async () => {
     await eventStore.fetchChosenEvent();
+    if(!eventStore.chosenEvent.endTime) {
+        localEvent.value = {
+            ...eventStore.chosenEvent,
+            startTime: formatDateForInput(eventStore.chosenEvent.startTime)
+    }
+    } else {
+        localEvent.value = {
+            ...eventStore.chosenEvent,
+            startTime: formatDateForInput(eventStore.chosenEvent.startTime),
+            endTime: formatDateForInput(eventStore.chosenEvent.endTime),
+        }
+    }
 }
 
 onMounted( async () => {
     await loadChosenEvent();
 });
 
+// Watch for changes in the chosen event
 watch(() => eventStore.chosenEvent, async (newEvent) => {
+    console.log("startTime from newEvent:", newEvent.startTime);
+
     if(newEvent) {
         localEvent.value = newEvent;
+        selectedIcon.value = newEvent.iconType;
+        console.log(localEvent.value);
     }
 });
 
+// Validate new event data
+const validateEvent = () => {
+    if (!validatePointDescription(localEvent.value.description)) {
+        alert('Fyll inn en gyldig beskrivelse');
+        return false;
+    }
+    if (!localEvent.value.startTime) {
+        alert('Startdato må fylles ut');
+        return false;
+    }
+    if (!validateLatitude(localEvent.value.latitude)) {
+        alert('Fyll inn en gyldig breddegrad');
+        return false;
+    }
+    if (!validateLongitude(localEvent.value.longitude)) {
+        alert('Fyll inn en gyldig lengdegrad');
+        return false;
+    }
+    if (!validateRadius(localEvent.value.radius)) {
+        alert('Fyll inn en gyldig radius');
+        return false;
+    }
+    if (!validateSeverity(localEvent.value.severity)) {
+        alert('Fyll inn et gyldig krisenivå');
+        return false;
+    }
+    if (!validateIconType(localEvent.value.iconType)) {
+        alert('Velg et ikon');
+        return false;
+    }
+    if (localEvent.value.endTime && new Date(localEvent.value.startTime) > new Date(localEvent.value.endTime)) {
+        alert('Sluttdato kan ikke være før startdato');
+        return false;
+    }
+    return true;
+}
+
 // Update event
 const updateEvent = async () => {
-    // TODO
+    if (!validateEvent()) {
+        return;
+    }
+    const formattedStartTime = formatDate(new Date(localEvent.value.startTime));
+    const formattedEndTime = localEvent.value.endTime
+        ? formatDate(new Date(localEvent.value.endTime))
+        : null;
+    if(formattedEndTime) {
+        await eventStore.update(localEvent.value.id, {
+            name: localEvent.value.name,
+            description: localEvent.value.description,
+            iconType: selectedIcon.value,
+            startTime: formattedStartTime,
+            endTime: formattedEndTime,
+            latitude: localEvent.value.latitude,
+            longitude: localEvent.value.longitude,
+            radius: localEvent.value.radius,
+            severity: localEvent.value.severity
+        });
+    } else {
+        await eventStore.update(localEvent.value.id, {
+            name: localEvent.value.name,
+            description: localEvent.value.description,
+            iconType: selectedIcon.value,
+            startTime: formattedStartTime,
+            latitude: localEvent.value.latitude,
+            longitude: localEvent.value.longitude,
+            radius: localEvent.value.radius,
+            severity: localEvent.value.severity
+        });
+    }
+    
     isEventDirty.value = false;
 }
+
 // Delete event
 const deleteEvent = async () => {
-    // TODO
+    if (!confirm('Er du sikker på at du vil slette hendelsen?')) {
+        return;
+    }
+    await eventStore.delete(localEvent.value.id);
 }
 </script>
 <template>
@@ -75,9 +167,9 @@ const deleteEvent = async () => {
                 <label for="description-input">Beskrivelse</label>
                 <textarea class="edit-input" id="description-input" @input="isEventDirty = true" v-model="localEvent.description"></textarea>
                 <label for="start-input">Startdato</label>
-                <input type="date" class="edit-input" id="start-input" @input="isEventDirty = true" v-model="localEvent.startDate" />
+                <input type="datetime-local" class="edit-input" id="start-input" @input="isEventDirty = true" v-model="localEvent.startTime" />
                 <label for="end-input">Eventuell sluttdato</label>
-                <input type="date" class="edit-input" id="end-input" @input="isEventDirty = true" v-model="localEvent.endDate" />
+                <input type="datetime-local" class="edit-input" id="end-input" @input="isEventDirty = true" v-model="localEvent.endTime" />
                 
                 <!-- Icon type -->
                 <select id="icon-select" v-model="selectedIcon" class="edit-input">
