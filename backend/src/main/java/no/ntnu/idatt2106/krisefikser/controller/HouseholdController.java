@@ -62,11 +62,11 @@ public class HouseholdController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         User user = userService.getUserByUsername(username).orElse(null);
-        int id = user.getId();
-        if (!householdService.existsById(id)) {
+        int hhId = user.getHouseholdId();
+        if (!householdService.existsById(hhId)) {
             return ResponseEntity.notFound().build();
         }
-        HouseholdResponseDTO updatedHousehold = householdService.updateHousehold(id, household);
+        HouseholdResponseDTO updatedHousehold = householdService.updateHousehold(hhId, household);
         return ResponseEntity.ok(updatedHousehold);
     }
 
@@ -100,8 +100,8 @@ public class HouseholdController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         User user = userService.getUserByUsername(username).orElse(null);
-        int id = user.getId();
-        Household household = householdService.findById(id).orElse(null);
+        int hhId = user.getHouseholdId();
+        Household household = householdService.findById(hhId).orElse(null);
         if (household == null) {
             return ResponseEntity.notFound().build();
         } else {
