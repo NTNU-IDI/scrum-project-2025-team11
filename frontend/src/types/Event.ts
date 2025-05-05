@@ -2,8 +2,8 @@ export interface EventRequestDTO {
     name: string;
     description: string;
     iconType: string;
-    startDate: string;
-    endDate?: string; 
+    startTime: string;
+    endTime?: string; 
     latitude: number;
     longitude: number;
     radius: number;
@@ -14,8 +14,8 @@ export interface EventResponseDTO {
     name: string;
     description: string;
     iconType: string;
-    startDate: string;
-    endDate: string;
+    startTime: string;
+    endTime: string;
     latitude: number;
     longitude: number;
     radius: number;
