@@ -57,18 +57,6 @@ export function validateLastName(name: string): boolean {
   return lastNameRegex.test(name);
 }
 
-// Function to validate username
-export function validateUsername(username: string): boolean {
-    if(!username) return false;
-    return usernameRegex.test(username);
-}
-
-// Function to validate password
-export function validatePassword(password: string): boolean {
-    if(!password) return false;
-    return passwordRegex.test(password)
-}
-
 // Function to validate email
 export function validateEmail(email: string): boolean {
   if (!email) return false;
