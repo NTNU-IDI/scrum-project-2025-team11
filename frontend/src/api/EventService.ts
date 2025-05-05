@@ -19,6 +19,11 @@ export class EventService {
         return response.data;
     }
 
+    static async save(event: EventRequestDTO): Promise<EventResponseDTO> {
+        const response = await axios.post<EventResponseDTO>(ITEM_API_URL, event);
+        return response.data;
+    }
+
     static async delete(id: number): Promise<void> {
         await axios.delete(`${ITEM_API_URL}/${id}`);
     }
