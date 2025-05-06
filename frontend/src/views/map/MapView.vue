@@ -289,18 +289,21 @@ async function findNearestShelter() {
     pointStore.updateSelectedIcons([...pointStore.selectedIcons, 'shelter']);
     await pointStore.fetchPointsByIconTypes(pointStore.selectedIcons);
   }
-  getUserPosition(async (userLat, userLon) => {
-    nearestShelters.value = await pointStore.fetchNearestShelters(userLat, userLon);
-    
-    if (nearestShelters.value.length === 0) {
-      alert('Ingen tilfluktsrom funnet');
-      return;
-    }
-    currentShelterIndex.value = 0;
-    viewingNearest.value = true;
-    showShelter(currentShelterIndex.value);
-  });
+  const center = map.getCenter();
+  const lat = center.lat;
+  const lon = center.lng;
+  nearestShelters.value = await pointStore.fetchNearestShelters(lat, lon);
+
+  if (nearestShelters.value.length === 0) {
+    alert('Ingen tilfluktsrom funnet');
+    return;
+  }
+
+  currentShelterIndex.value = 0;
+  viewingNearest.value = true;
+  showShelter(currentShelterIndex.value);
 }
+
 
 function showShelter(index: number) {
   selectedPoint.value = nearestShelters.value[index];
