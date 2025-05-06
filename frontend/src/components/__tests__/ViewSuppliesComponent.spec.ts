@@ -5,7 +5,6 @@ import ViewSuppliesComponent from "@/components/household/ViewSuppliesComponent.
 import { useItemTypeStore } from "@/stores/itemStore";
 import { useHouseholdStore } from "@/stores/householdStore";
 import { useInventoryStore } from "@/stores/inventoryStore";
-import { ItemService } from "@/api/ItemService";
 
 vi.mock("@/api/ItemService", () => ({
     ItemService: {
@@ -24,7 +23,7 @@ describe("ViewSuppliesComponent", () => {
 		householdStore = useHouseholdStore();
 		inventoryStore = useInventoryStore();
 
-		householdStore.setHousehold(1);
+		householdStore.fetchHousehold();
 
 		inventoryStore.inventory = [
 		{ householdId: 1, itemName: "Vann", itemId: 1, quantity: 10, unit: "liter", acquiredDate: "2024-01-01" },
@@ -74,7 +73,7 @@ describe("ViewSuppliesComponent", () => {
 
 		await button.trigger("click");
 		expect(wrapper.vm.isEditMode).toBe(true);
-		expect(button.text()).toBe("Large");
+		expect(button.text()).toBe("Ferdig");
 		expect(button.classes()).toContain("active");
 
 		await button.trigger("click");

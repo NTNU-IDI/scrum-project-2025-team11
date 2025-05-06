@@ -68,8 +68,8 @@ public class PointOfInterestController {
             @ApiResponse(responseCode = "400", description = "Could not find points based on the given icontype," +
                     " is it a valid icontype?")
     })
-    @GetMapping("/iconType")
-    public ResponseEntity<List<PointOfInterestResponseDTO>> getPointsOfInterestsOnIconType(@RequestParam String iconType) {
+    @GetMapping("/iconTypes")
+    public ResponseEntity<List<PointOfInterestResponseDTO>> getPointsOfInterestsOnIconType(@RequestParam List<String> iconType) {
         List<PointOfInterestResponseDTO> pointsOfInterest = pointOfInterestService.findByIconType(iconType);
         if (pointsOfInterest == null) {
             return ResponseEntity.notFound().build();
@@ -126,5 +126,22 @@ public class PointOfInterestController {
         }
         PointOfInterestResponseDTO pointOfInterestResponse = pointOfInterestService.updatePointOfInterest(id, updatedPoint);
         return ResponseEntity.ok(pointOfInterestResponse);
+    }
+
+    @Operation(
+            summary = "Find the three closest shelters",
+            description = "Find the three closest shelters to a given point"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Shelters successfully found"),
+            @ApiResponse(responseCode = "400", description = "Could not find shelters based on the given coordinates")
+    })
+    @GetMapping("/closestShelters")
+    public ResponseEntity<List<PointOfInterestResponseDTO>> getClosestShelters(@RequestParam double latitude, @RequestParam double longitude) {
+        List<PointOfInterestResponseDTO> closestShelters = pointOfInterestService.findThreeClosestShelters(latitude, longitude);
+        if (closestShelters == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(closestShelters);
     }
 }

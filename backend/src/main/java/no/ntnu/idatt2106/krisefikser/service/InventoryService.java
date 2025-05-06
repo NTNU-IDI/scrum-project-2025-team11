@@ -12,7 +12,7 @@ import java.util.List;
  * Provides methods to list, add, update, and remove items from a household's inventory.
  */
 public interface InventoryService {
-    List<HouseholdItemResponse> list(Integer householdId);
+    List<HouseholdItemResponse> list(Integer householdId, Integer itemId);
     HouseholdItemResponse upsert(Integer householdId, UpsertInventoryRequest req);
     HouseholdItemResponse add(Integer householdId, HouseholdItemRequest req);
     HouseholdItemResponse update(Integer householdId, Integer itemId, HouseholdItemRequest req);
