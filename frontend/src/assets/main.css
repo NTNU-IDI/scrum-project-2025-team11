@@ -201,23 +201,6 @@ button:hover {
   margin: 0;
 }
 
-.point-card {
-  position: relative;
-  background: var(--white);
-  border-radius: 10px;
-  width: 250px;
-}
-
-.point-card-content {
-  padding: 1.2rem;
-  text-align: left;
-}
-
-.point-card input,
-select {
-  font-size: var(--font-size-small);
-}
-
 .map-overview-box {
   background: var(--white);
   padding: 1rem 1.5rem 1rem 1rem;

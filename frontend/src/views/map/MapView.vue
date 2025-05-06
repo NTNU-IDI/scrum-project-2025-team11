@@ -314,6 +314,8 @@ function handleNextShelter() {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  max-height: calc(100% - 20px); 
+  overflow: hidden; 
 }
 
 .layout-map-page {
@@ -321,6 +323,7 @@ function handleNextShelter() {
   flex-direction: column;
   height: 100vh;
 }
+
 .map-page {
   flex: 1;
   display: flex;
