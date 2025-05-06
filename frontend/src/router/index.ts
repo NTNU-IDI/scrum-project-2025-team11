@@ -10,7 +10,7 @@ import SuperAdminView from "@/views/admin/SuperAdminView.vue";
 import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
 import {useUserStore} from "@/stores/userStore.ts";
-import AdminView from "@/views/admin/AdminView.vue";
+import AdminView from "@/views/HomeAdminView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -73,6 +73,8 @@ const router = createRouter({
   routes,
 });
 
+// Accesse 
+/*
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
 
@@ -88,6 +90,8 @@ router.beforeEach((to, from, next) => {
   } else {
     next()
   }
+  
 })
+  */
 
 export default router;

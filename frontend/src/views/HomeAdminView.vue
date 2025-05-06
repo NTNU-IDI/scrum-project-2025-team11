@@ -12,15 +12,11 @@
       <div class="grid-container">
         <div class="box">
           <h3>Krisehendelser</h3>
-          <p>Her kan du administrere opplysninger om hendelsene.</p>
+          <p>Her kan du administrere opplysninger om krisehendelser.</p>
         </div>
         <div class="box">
           <h3>Kartopplysninger</h3>
           <p>Her kan du administrere opplysninger om kartet.</p>
-        </div>
-        <div class="box">
-          <h3>Adminbrukere</h3>
-          <p>Her kan du administrere opplysninger om adminbrukere.</p>
         </div>
       </div>
     </main>

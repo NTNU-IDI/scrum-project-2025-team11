@@ -6,11 +6,12 @@
       <div class="footer-links" data-tooltip="Disse tjenestene er ikke tilgjengelige enda.">
         |
         <a href="/about">Om oss </a> |
-        <a href="/privacy">Personvern</a> |
+        <a href="/personvern">Personvern</a> |
         <a href="/contact">Kontakt oss</a> |
         <a href="/userhome">User home (for testing)</a> |
-        <a href="/superadmin">Admin (for testing)</a>
+        <a href="/superadmin">Superdmin (for testing)</a>  |
         <a href="/auth">Auth (for testing)</a> |
+        <a href="/admin">Admin (for testing)</a>
         <br />
         <br />
         <br />
