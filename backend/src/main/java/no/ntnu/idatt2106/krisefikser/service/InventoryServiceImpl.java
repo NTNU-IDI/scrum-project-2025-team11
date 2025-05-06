@@ -39,10 +39,13 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public List<HouseholdItemResponse> list(Integer householdId) {
-        return hiRepo.findByHouseholdId(householdId).stream()
-                     .map(mapper::toResponse)
-                     .collect(Collectors.toList());
+    public List<HouseholdItemResponse> list(Integer householdId, Integer itemId) {
+        return (itemId == null
+            ? hiRepo.findByHouseholdId(householdId)
+            : hiRepo.findByHouseholdIdAndItemId(householdId, itemId)
+        ).stream()
+        .map(mapper::toResponse)
+        .collect(Collectors.toList());
     }
 
     @Override
