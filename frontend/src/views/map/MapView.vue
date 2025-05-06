@@ -3,7 +3,7 @@
     <Header />
     <div class="map-page">
       <div class="corner-container">
-        <IconsOverview />
+        <IconsOverview ref="iconsOverviewRef"/>
         <EventsOverview />
         <button class="dark-button small-button" @click="findNearestShelter">
           Finn 3 nærmeste tilflukstrom
@@ -61,6 +61,7 @@ const currentShelterIndex = ref(0);
 const nearestShelters = ref<PointOfInterest[]>([]);
 const viewingNearest = ref(false);
 const isNavigating = ref(false); 
+const iconsOverviewRef = ref();
 const selectedPoint = ref<PointOfInterest>({
   id: 0,
   name: '',
@@ -81,34 +82,6 @@ declare global {
 }
 window.routingControl = null;
 
-// TODO: Delete mock data
-const mockShelters: PointOfInterest[] = [
-  {
-    id: 1,
-    name: "Tilfluktsrom 1 - Sentralt",
-    description: "Hovedtilfluktsrom med plass til 200 personer",
-    iconType: "shelter",
-    latitude: 63.4305,
-    longitude: 10.3951,
-  },
-  {
-    id: 2,
-    name: "Tilfluktsrom 2 - Øst",
-    description: "Mindre tilfluktsrom nær Østbyen",
-    iconType: "shelter",
-    latitude: 63.4350,
-    longitude: 10.4100,
-  },
-  {
-    id: 3,
-    name: "Tilfluktsrom 3 - Vest",
-    description: "Nylig oppgradert tilfluktsrom",
-    iconType: "shelter",
-    latitude: 63.4250,
-    longitude: 10.3800,
-  }
-];
-
 onMounted(async () => {
   // Init map
   map = L.map('map', {
@@ -119,10 +92,8 @@ onMounted(async () => {
 
   await pointStore.initializePolling();
 
-  // POI
+  // POI and events
   addMarkersToMap();
-
-  // Events
   addEvents(map);
 
   watch(pointsDisplaying, () => {
@@ -291,10 +262,13 @@ function clearRouting() {
 }
 
 async function findNearestShelter() {
+  if (!pointStore.selectedIcons.includes('shelter')) {
+    iconsOverviewRef.value?.forceIncludeShelter();
+    pointStore.updateSelectedIcons([...pointStore.selectedIcons, 'shelter']);
+    await pointStore.fetchPointsByIconTypes(pointStore.selectedIcons);
+  }
   getUserPosition(async (userLat, userLon) => {
-    // TODO: Remove mock data
-    nearestShelters.value = mockShelters;
-    // nearestShelters.value = await pointStore.fetchNearestShelters(userLat, userLon);
+    nearestShelters.value = await pointStore.fetchNearestShelters(userLat, userLon);
     
     if (nearestShelters.value.length === 0) {
       alert('Ingen tilfluktsrom funnet');

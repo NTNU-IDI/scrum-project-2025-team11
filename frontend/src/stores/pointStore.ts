@@ -46,6 +46,23 @@ export const usePointStore = defineStore("pointStore", () => {
     }
   };
 
+  const fetchNearestShelters = async (
+    latitude: number,
+    longitude: number
+  ): Promise<PointOfInterest[]> => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/interest/closestShelters?latitude=${latitude}&longitude=${longitude}`
+      );
+      if (!response.ok) throw new Error("Failed fetching nearest shelters");
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching nearest shelters:", error);
+      return [];
+    }
+  };
+
   const fetchPointsByIconTypes = async (iconTypes: string[]) => {
     if (!iconTypes.length) {
       pointsDisplaying.value = [];
@@ -136,11 +153,13 @@ export const usePointStore = defineStore("pointStore", () => {
 
   return {
     pointsDisplaying,
+    selectedIcons,
     startPolling,
     stopPolling,
     initializePolling,
     fetchAllPoints,
     fetchPointsByIconTypes,
+    fetchNearestShelters,
     createPoint,
     updatePointById,
     deletePointById,
