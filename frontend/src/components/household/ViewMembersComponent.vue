@@ -44,7 +44,7 @@ const changeMemberCount = async () => {
             <div class="me-container">
                 <h1 class="medium-header">Deg</h1>
                 <div class="article-card">
-                    <p>{{ userStore.role }}</p>
+                    <p>{{ householdStore.name }}</p>
                 </div>
             </div>
 

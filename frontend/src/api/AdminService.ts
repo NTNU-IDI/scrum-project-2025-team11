@@ -5,17 +5,12 @@ const ITEM_API_URL = 'http://localhost:8080/api/users';
 
 export class AdminService {
     static async findAll(): Promise<UserResponseDTO[]> {
-        const response = await axios.get<UserResponseDTO[]>(`${ITEM_API_URL}/all`);
+        const response = await axios.get<UserResponseDTO[]>(`${ITEM_API_URL}/all`, { withCredentials: true });
         return response.data;
     }
 
     static async deleteUser(id: number): Promise<void> {
         await axios.delete(`${ITEM_API_URL}/${id}`);
-    }
-
-    static async findById(id: number): Promise<UserResponseDTO> {
-        const response = await axios.get<UserResponseDTO>(`${ITEM_API_URL}/${id}`);
-        return response.data;
     }
 
     // TODO: change to admin endpoint with role
