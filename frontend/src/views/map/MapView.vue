@@ -41,6 +41,7 @@ import PointView from '../../components/map/PointView.vue';
 import L from 'leaflet';
 import 'leaflet-routing-machine';
 import 'leaflet/dist/leaflet.css';
+import userMarkerIcon from '@/assets/ikon/user-maker.svg';
 import { usePointStore } from '@/stores/pointStore';
 import { useUserStore } from "@/stores/userStore.ts";
 import type { PointOfInterest } from "@/types/PointOfInterest";
@@ -102,7 +103,17 @@ onMounted(async () => {
 
   // Get user location and set marker
   getUserPosition((lat, lon) => {
-  L.marker([lat, lon]).addTo(map).bindPopup("Din posisjon").openPopup();
+    const userIcon = L.icon({
+      iconUrl: userMarkerIcon,
+      iconSize: [35, 35],   
+      iconAnchor: [20, 40],
+      popupAnchor: [0, -40],
+    });
+
+    L.marker([lat, lon], { icon: userIcon })
+      .addTo(map)
+      .bindPopup("Din posisjon")
+      .openPopup();
     map.setView([lat, lon], 13);
     checkIfInCrisisArea(lat, lon);
   });
