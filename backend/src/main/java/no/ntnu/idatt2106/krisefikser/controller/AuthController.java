@@ -111,8 +111,7 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
         return ResponseEntity.status(401).body("Invalid credentials");
       }
 
-      String email = user.getEmail();
-      twoFactorCodeService.initiateCode(email);
+      twoFactorCodeService.initiateCode(username);
 
       return ResponseEntity.ok().build();
     }
@@ -178,9 +177,7 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
       if (user == null) {
         return ResponseEntity.status(500).body("Failed to retrieve created user");
       }
-
-      String email = user.getEmail();
-      twoFactorCodeService.initiateCode(email);
+      twoFactorCodeService.initiateCode(user.getUsername());
 
       return ResponseEntity.ok().build();
     }
@@ -188,9 +185,8 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
     /**
      * Completes the two-factor authentication process by validating the provided code.
      *
-     * @param request the two-factor authentication confirmation containing the code and either the login information
-     *        or the registration information.
-     * @return a response entity indicating the result of the operation
+     * @param request the two-factor authentication confirmation containing the code and the login information
+     * @return a response entity indicating the result of the operation and cookies such as jwt and refresh token
      */
     @Operation(
             summary = "Confirm two-factor authentication",
