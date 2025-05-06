@@ -17,8 +17,8 @@ const householdNameRegex = /^[a-zA-Z\s\-]+$/;
 
 // Regexes for validating icons (interest points)
 const pointNameRegex = /^[a-zA-Z0-9\s\-_,.æøåÆØÅ]{2,}$/; // Punctuation, letters, numbers
-const pointDescriptionRegex = /^[a-zA-Z0-9\s\-_,.æøåÆØÅ]{5,}$/; // At least 5 characters
-const iconTypeRegex = /^(shelter|assembly_point|medical)$/; // One of these
+const pointDescriptionRegex = /^[a-zA-Z0-9\s\-_,.æøåÆØÅ]{5,}$/u; // At least 5 characters
+const iconTypeRegex = /^(shelter|assembly_point|medical|normal|none|point|danger)$/; // One of these
 const coordinateRegex = /^-?\d+(\.\d+)?$/; // Integer or decimal
 
 // Function to validate item name
@@ -98,6 +98,16 @@ export function validateLatitude(lat: number): boolean {
 // Function to validate longitude
 export function validateLongitude(lon: number): boolean {
   return coordinateRegex.test(lon.toString()) && lon >= -180 && lon <= 180;
+}
+
+// Function to validate radius
+export function validateRadius(radius: number): boolean {
+  return coordinateRegex.test(radius.toString()) && radius >= 0;
+}
+
+// Function to validate severity
+export function validateSeverity(severity: number): boolean {
+  return coordinateRegex.test(severity.toString()) && severity >= 0 && severity <= 5;
 }
 
 export function validatePassword(password: string): boolean {

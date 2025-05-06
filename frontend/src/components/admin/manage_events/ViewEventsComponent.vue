@@ -1,13 +1,12 @@
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue';
 import { useEventStore } from '@/stores/eventStore';
-import { EventService } from '@/api/EventService';
 
 // Store imports
 const eventStore = useEventStore();
 
 // Props
-const events = ref<{ id: number; name: string; description: string; iconType: string; startDate: string; endDate: string; latitude: number; longitude: number; radius: number; severity: number }[]>([]);
+const events = ref<{ id: number; name: string; description: string; iconType: string; startTime: string; endTime: string; latitude: number; longitude: number; radius: number; severity: number }[]>([]);
 const selectedEventId = ref<number>(0);
 const emit = defineEmits(['event-selected']);
 
@@ -25,13 +24,19 @@ watch(() => eventStore.events, async (newEvents) => {
         name: event.name,
         description: event.description,
         iconType: event.iconType,
-        startDate: event.startDate,
-        endDate: event.endDate,
+        startTime: event.startTime,
+        endTime: event.endTime,
         latitude: event.latitude,
         longitude: event.longitude,
         radius: event.radius,
         severity: event.severity
     }));
+});
+
+watch(() => eventStore.chosenEvent, async (newEvent) => {
+    if (newEvent) {
+        selectedEventId.value = newEvent.id;
+    }
 });
 
 // Choose an item in the supply
@@ -64,7 +69,7 @@ const chooseEvent = (eventId: any) => {
     }
 
     .grey-container {
-        height: auto;
+        min-height: 42rem;
     }
 
     .article-card {

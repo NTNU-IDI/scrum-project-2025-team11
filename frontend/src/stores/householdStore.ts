@@ -1,13 +1,6 @@
 import {defineStore} from 'pinia'
 import {HouseholdService} from '@/api/HouseholdService'
 
-interface Household {
-    id: number | null
-    name: string
-    memberCount: number
-    addressId: string
-}
-
 export const useHouseholdStore = defineStore('household', {
     state: () => ({
         id: null as number | null,
@@ -17,14 +10,11 @@ export const useHouseholdStore = defineStore('household', {
     }),
     
     actions: {
-        async setHousehold(householdId: number) {
+        async fetchHousehold() {
             try {
-                if (householdId === null) {
-                    throw new Error('Household ID is null')
-                }
-                const response = await HouseholdService.findById(householdId)
+                const response = await HouseholdService.getHouseholdInformation()
                 
-                this.id = householdId, 
+                this.id = response.id, 
                 this.name = response.name 
                 this.memberCount = response.memberCount
                 this.addressId = response.address.id.toString() 

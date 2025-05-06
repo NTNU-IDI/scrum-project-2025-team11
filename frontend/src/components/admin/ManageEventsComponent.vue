@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import EditEventComponent from './manage_events/EditEventComponent.vue';
 import ViewEventsComponent from './manage_events/ViewEventsComponent.vue';
 import NewEventComponent from './manage_events/NewEventComponent.vue';
@@ -17,6 +17,14 @@ const chooseEventId = (eventId: number) => {
     eventStore.fetchChosenEvent();
     showSingleEventBox.value = true;
 };
+
+watch(() => eventStore.chosenEvent, (newEvent) => {
+    if (newEvent && newEvent.id !==  undefined) {
+        showSingleEventBox.value = true;
+    } else {
+        showSingleEventBox.value = false;
+    }
+});
 </script>
 <template>
 <div class="header-container"> 

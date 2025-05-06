@@ -16,7 +16,7 @@ const newMemberCount = ref(0);
 
 onMounted( async () => {
     // TODO: Get actual household ID from the store
-    await householdStore.setHousehold(1);
+    await householdStore.fetchHousehold();
 
     newMemberCount.value = householdStore.memberCount;
 });
@@ -44,7 +44,7 @@ const changeMemberCount = async () => {
             <div class="me-container">
                 <h1 class="medium-header">Deg</h1>
                 <div class="article-card">
-                    <p>{{ userStore.role }}</p>
+                    <p>{{ householdStore.name }}</p>
                 </div>
             </div>
 

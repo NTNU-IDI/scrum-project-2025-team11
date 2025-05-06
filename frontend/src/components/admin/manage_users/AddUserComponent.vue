@@ -7,8 +7,8 @@ import { useHouseholdStore } from '@/stores/householdStore';
 // Store imports
 const adminUserStore = useAdminUserStore();
 const houseHoldStore = useHouseholdStore();
-// Remove 
-houseHoldStore.setHousehold(1); 
+
+houseHoldStore.fetchHousehold(); 
 
 // Props
 const firstName = ref('');
