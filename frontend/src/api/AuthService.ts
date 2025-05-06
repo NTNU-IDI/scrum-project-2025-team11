@@ -12,9 +12,6 @@ export async function confirm2fa(code: string) {
         router.push("/login")
         return
     }
-    console.log(credentialStore.username)
-    console.log(credentialStore.password)
-    console.log(code)
 
     await axios.post("http://localhost:8080/auth/confirm-authentication", {
         twoFactorCode: {
@@ -29,9 +26,11 @@ export async function confirm2fa(code: string) {
     })
         .then((response) => {
             userStore.setRole(response.data.role)
+            router.push("/")
         })
         .catch((error) => {
             alert("Noe gikk galt under autentiseringen. Vennligst forsøk å logge inn på nytt.")
+            userStore.logout()
             router.push("/login")
         })
 }
