@@ -104,6 +104,15 @@ button:hover {
   transform: scale(1.03);
 }
 
+button:disabled {
+  background-color: var(--grey);
+  cursor: not-allowed;
+}
+
+button:disabled:hover {
+  background-color: var(--grey);
+}
+
 .small-button {
   font-size: var(--font-size-small);
 }
@@ -236,10 +245,11 @@ button:hover {
 }
 
 .error-message {
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-xsmall);
   color: var(--bad-red);
   margin: 0;
   padding-bottom: 10px;
+  padding-top: 10px;
 }
 
 .button:disabled {
