@@ -71,6 +71,12 @@ const selectedPoint = ref<PointOfInterest>({
   latitude: 0,
   longitude: 0,
 });
+const userIcon = L.icon({
+  iconUrl: userMarkerIcon,
+  iconSize: [35, 35],   
+  iconAnchor: [20, 40],
+  popupAnchor: [0, -40],
+});
 
 let map: L.Map;
 let temporaryMarker: L.Marker | null = null;
@@ -103,17 +109,6 @@ onMounted(async () => {
 
   // Get user location and set marker
   getUserPosition((lat, lon) => {
-    const userIcon = L.icon({
-      iconUrl: userMarkerIcon,
-      iconSize: [35, 35],   
-      iconAnchor: [20, 40],
-      popupAnchor: [0, -40],
-    });
-
-    L.marker([lat, lon], { icon: userIcon })
-      .addTo(map)
-      .bindPopup("Din posisjon")
-      .openPopup();
     map.setView([lat, lon], 13);
     checkIfInCrisisArea(lat, lon);
   });
@@ -220,10 +215,21 @@ function getUserPosition(callback: (lat: number, lon: number) => void) {
   // Return if browser does not support geolocation
   if (!navigator.geolocation) return;
 
-  // Get user position
   navigator.geolocation.getCurrentPosition(
-    pos => callback(pos.coords.latitude, pos.coords.longitude),
-    err => console.error("Error getting location: ", err)
+    (pos) => {
+      callback(pos.coords.latitude, pos.coords.longitude);
+      const userLat = pos.coords.latitude;
+      const userLon = pos.coords.longitude;
+
+      L.marker([userLat, userLon], { icon: userIcon })
+        .addTo(map)
+        .bindPopup("Din posisjon")
+        .openPopup();
+
+      map.setView([userLat, userLon], 13);
+      checkIfInCrisisArea(userLat, userLon);
+    },
+    (err) => console.error("Error getting location: ", err)
   );
 }
 
@@ -260,7 +266,10 @@ function handleNavigation(coords: { latitude: number, longitude: number }) {
     window.routingControl = L.Routing.control({
       waypoints: [L.latLng(userLat, userLon), L.latLng(coords.latitude, coords.longitude)],
       routeWhileDragging: false,
-    }).addTo(map);
+      createMarker: function() {
+        return L.marker([userLat, userLon], { icon: userIcon });
+      }
+    } as L.Routing.RoutingControlOptions).addTo(map);
 
     isNavigating.value = true;
   });
@@ -287,7 +296,6 @@ async function findNearestShelter() {
       alert('Ingen tilfluktsrom funnet');
       return;
     }
-
     currentShelterIndex.value = 0;
     viewingNearest.value = true;
     showShelter(currentShelterIndex.value);
