@@ -85,9 +85,8 @@
             <p v-if="addressError" class="error-message">{{ addressError }}</p>
           </div>
 
-          <!-- Error messages -->
+          <!-- Validation error messages -->
           <p v-if="validationError" class="error-message">{{ validationError }}</p>
-          <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
 
           <!-- Create mode buttons -->
           <div v-if="!isEdit" class="point buttons create-buttons">
@@ -121,7 +120,6 @@ const isEdit = computed(() => props.mode === 'edit');
 const isViewMode = computed(() => props.mode === 'view');
 const formTitle = computed(() => isEdit.value ? 'Endre punkt' : 'Nytt punkt');
 const validationError = ref('');
-const errorMessage = ref('');
 const inputMethod = ref('coordinates');
 const address = ref('');
 const addressError = ref('');
@@ -258,24 +256,22 @@ function stopNavigation() {
 }
 
 const createPoint = async () => {
-  errorMessage.value = '';
   try {
     await pointStore.createPoint(pointData.value);
     emit('close-point-view');
 
   } catch (error) {
-    errorMessage.value = "Kunne ikke lage det nye punktet.";
+    throw error;
   }
 };
 
 const savePoint = async () => {
-  errorMessage.value = '';
   try {
     await pointStore.updatePointById(pointData.value);
     emit('close-point-view');
 
   } catch (error) {
-    errorMessage.value = "Kunne ikke oppdatere punktet.";
+    throw error;
   }
 };
 
@@ -288,7 +284,7 @@ const deletePoint = async () => {
       emit('close-point-view');
 
     } catch (error) {
-      errorMessage.value = "Kunne ikke slette punktet.";
+      throw error;
     }
   }
 };
