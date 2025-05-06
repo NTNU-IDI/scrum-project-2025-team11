@@ -83,9 +83,6 @@ const toggleNewMemberBox = () => {
   		flex-direction: column;
   		gap: 1rem;
 	}
-	.new-item-box {
-		margin-top: 4.75rem;
-	}
 
 	#add-button {
         display: flex;
