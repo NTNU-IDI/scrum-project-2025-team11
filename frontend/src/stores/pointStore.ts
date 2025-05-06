@@ -46,7 +46,7 @@ export const usePointStore = defineStore("pointStore", () => {
   const createPoint = async (point: PointOfInterest) => {
     try {
       const newPoint = await PointService.save(point);
-      pointsDisplaying.value.push(newPoint);
+      fetchPointsByIconTypes(selectedIcons.value);
       return newPoint;
     } catch (error) {
       console.error("Error creating point:", error);
@@ -57,7 +57,7 @@ export const usePointStore = defineStore("pointStore", () => {
   const updatePointById = async (point: PointOfInterest) => {
     try {
       const updated = await PointService.update(point.id, point);
-      pointsDisplaying.value.push(updated);
+      fetchPointsByIconTypes(selectedIcons.value);
       return updated;
     } catch (error) {
       console.error("Error updating point:", error);
@@ -68,9 +68,7 @@ export const usePointStore = defineStore("pointStore", () => {
   const deletePointById = async (id: number) => {
     try {
       await PointService.remove(id);
-      pointsDisplaying.value = pointsDisplaying.value.filter(
-        (p) => p.id !== id
-      );
+      fetchPointsByIconTypes(selectedIcons.value);
     } catch (error) {
       console.error("Error deleting point:", error);
       throw error;

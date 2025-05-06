@@ -91,12 +91,12 @@
 
           <!-- Create mode buttons -->
           <div v-if="!isEdit" class="point buttons create-buttons">
-            <button class="button" @click="createPoint" :disabled="hasValidationError">Lag nytt punkt</button>
+            <button class="good-button small-button" @click="createPoint" :disabled="hasValidationError">Lag nytt punkt</button>
           </div>
           <!-- Edit modebuttons -->
           <div v-else class="point-buttons edit-buttons">
-            <button v-if="isEdit" class="button" @click="savePoint" :disabled="hasValidationError">Lagre punkt</button>
-            <button v-if="isEdit" class="delete-button" @click="deletePoint">Slett</button>
+            <button v-if="isEdit" class="good-button small-button" @click="savePoint" :disabled="hasValidationError">Lagre punkt</button>
+            <button v-if="isEdit" class="delete-button small-button" @click="deletePoint">Slett</button>
           </div>
         </div>
       </div>

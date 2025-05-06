@@ -128,7 +128,6 @@ button:hover {
   text-decoration: none;
 }
 
-
 .article-card {
   display: flex;
   align-items: center;
@@ -199,8 +198,9 @@ button:hover {
 }
 
 .title-map {
-  font-size: var(--font-size-xlarge);
+  font-size: var(--font-size-medium);
   margin: 0;
+  text-align: left;
 }
 
 .map-overview-box {
@@ -471,11 +471,4 @@ button:hover {
   background-color: #ffffff;
   border-color: var(--light-blue);
   color: var(--darkest-blue);
-}
-
-
-@media (max-width: 768px) {
-  .title-map {
-    font-size: var(--font-size-medium);
-  }
 }
