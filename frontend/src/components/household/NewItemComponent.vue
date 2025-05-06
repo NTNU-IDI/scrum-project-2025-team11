@@ -45,7 +45,7 @@ const newExpirationDate = ref(new Date().toISOString().split('T')[0]);
  * @property {string} responseMessage
  * @default ''
  */
-const responseMessage = ref('');
+const errorMsg = ref('');
 
 /**
  * Property to define emits
@@ -67,47 +67,39 @@ onMounted(async () => {
  * @returns {Promise<void>}
  */
 const addItem = async () => {
-    if(!newName.value) {
-        responseMessage.value = 'Vennligst fyll inn et navn';
-        emit('set-response-message', responseMessage.value);
-        if(!validateItemName(newName.value)) {
-            responseMessage.value = 'Vennligst skriv inn et gyldig navn';
-            emit('set-response-message', responseMessage.value);
-            return;
-        } 
-    }
+    if(!validateItemName(newName.value)) {
+        errorMsg.value = 'Vennligst velg en eksisterende vare eller opprett en ny';
+        return;
+    } 
     if(!newQuantity.value) {
-        responseMessage.value = 'Vennligst fyll inn en mengde';
-        emit('set-response-message', responseMessage.value);
-        if(!validateItemQuantity(newQuantity.value)){
-            responseMessage.value = 'Vennligst skriv inn en gyldig mengde';
-            emit('set-response-message', responseMessage.value);
-            return;
-        }
+        errorMsg.value = 'Mengde kan ikke være tom';
+        return;
     }
+    if(!validateItemQuantity(newQuantity.value)){
+        errorMsg.value = 'Vennligst skriv inn en gyldig mengde';
+        return;
+    }
+    
     if(!newUnit.value) {
-        responseMessage.value = 'Vennligst fyll inn en enhet';
-        emit('set-response-message', responseMessage.value);
-        if(!validateItemUnit(newUnit.value)) {
-            responseMessage.value = 'Vennligst skriv inn en gyldig enhet';
-            emit('set-response-message', responseMessage.value);
-            return;
-        }
+        errorMsg.value = 'Enhet kan ikke være tom';
+        return;
+    }
+    if(!validateItemUnit(newUnit.value)) {
+        errorMsg.value = 'Vennligst skriv inn en gyldig enhet';
+        return;
     }
     if(!newExpirationDate.value) {
-        responseMessage.value = 'Vennligst fyll inn en utløpsdato';
-        emit('set-response-message', responseMessage.value);
-        if(!validateItemExpirationDate(newExpirationDate.value)) {
-            responseMessage.value = 'Vennligst skriv inn en gyldig utløpsdato';
-            emit('set-response-message', responseMessage.value);
-            return;
-        }
+        errorMsg.value = 'Utløpsdato kan ikke være tom';
+        return;
+    }
+    if(!validateItemExpirationDate(newExpirationDate.value)) {
+        errorMsg.value = 'Vennligst skriv inn en gyldig utløpsdato';
+        return;
     }
     
     const newItemId = existingTypes.value.find(item => item.name === newName.value)?.id;
     if (!newItemId) {
-        responseMessage.value = 'Vennligst velg en eksisterende vare eller opprett en ny';
-        emit('set-response-message', responseMessage.value);
+        errorMsg.value = 'Vennligst velg en eksisterende vare eller opprett en ny';
         return;
     }
     const newHouseholdItem = {
@@ -120,24 +112,20 @@ const addItem = async () => {
         expirationDate: newExpirationDate.value
     };
     if(!householdStore.id) {
-        responseMessage.value = 'Kunne ikke finne husstand';
-        emit('set-response-message', responseMessage.value);
+        errorMsg.value = 'Kunne ikke finne husstand';
         return;
     }
     if(!newHouseholdItem) {
-        responseMessage.value = 'Artikkel er ikke tilgjengelig';
-        emit('set-response-message', responseMessage.value);
+        errorMsg.value = 'Artikkel er ikke tilgjengelig';
         return;
     }
     if(!newHouseholdItem.itemId) {
-        responseMessage.value = 'Artikkelen er ikke tilgjengelig';
-        emit('set-response-message', responseMessage.value);
+        errorMsg.value = 'Artikkelen er ikke tilgjengelig';
         return;
     }
 
     await inventoryStore.upsertItem(householdStore.id, newHouseholdItem);
-    responseMessage.value = `${newHouseholdItem.name} er lagt til i lageret`;
-    emit('set-response-message', responseMessage.value);
+    errorMsg.value = `${newHouseholdItem.name} er lagt til i lageret`;
     emit('hide-new-item-box');
 }
 
@@ -176,6 +164,7 @@ const handleKeydown = (event: KeyboardEvent, name: string) => {
         </div>
 
         <div class="item-input">
+            <p>{{errorMsg}}</p>
             <div class="type-container"> 
                 <input placeholder="*Velg eksisterende eller ny vare..." class="edit-input"
                     v-model="newName"
@@ -216,7 +205,7 @@ const handleKeydown = (event: KeyboardEvent, name: string) => {
 <style scoped>
     .grey-container {
         width: 20rem;
-        height: 18rem;
+        height: auto;
     }
 
     .header-container {
@@ -224,7 +213,12 @@ const handleKeydown = (event: KeyboardEvent, name: string) => {
     }
 
     .medium-header {
-        margin: 0.5rem 0 1rem 0;
+        margin: 0.5rem 0 0 0;
+    }
+
+    p {
+        margin: 0.5rem 0 0.5rem 0;
+        color: var(--bad-red);
     }
 
     .edit-input {
