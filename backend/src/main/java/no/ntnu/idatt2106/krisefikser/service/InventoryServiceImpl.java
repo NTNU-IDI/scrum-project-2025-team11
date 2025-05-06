@@ -39,10 +39,13 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public List<HouseholdItemResponse> list(Integer householdId) {
-        return hiRepo.findByHouseholdId(householdId).stream()
-                     .map(mapper::toResponse)
-                     .collect(Collectors.toList());
+    public List<HouseholdItemResponse> list(Integer householdId, Integer itemId) {
+        return (itemId == null
+            ? hiRepo.findByHouseholdId(householdId)
+            : hiRepo.findByHouseholdIdAndItemId(householdId, itemId)
+        ).stream()
+        .map(mapper::toResponse)
+        .collect(Collectors.toList());
     }
 
     @Override
@@ -93,7 +96,7 @@ public class InventoryServiceImpl implements InventoryService {
             req.getAcquiredDate()
         );
         HouseholdItem hi = new HouseholdItem(
-            pk, hh, item,
+            pk, hh, item, 
             req.getQuantity(),
             req.getUnit(),
             req.getExpirationDate()

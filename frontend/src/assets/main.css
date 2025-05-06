@@ -46,7 +46,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 70vh;
+  padding: 2rem;
   background-color: var(--dark-blue);
 }
 
@@ -213,9 +214,36 @@ select {
   font-size: var(--font-size-small);
 }
 
-.header-box-container {
+.map-overview-box {
+  background: var(--white);
+  padding: 1rem 1.5rem 1rem 1rem;
+  border-radius: 10px;
+  z-index: 1;
   display: flex;
   flex-direction: column;
+}
+
+.map-overview-box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  gap: 20px;
+  margin: 0;
+}
+
+.map-overview-details {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  margin-top: 7px;
+}
+
+.map-li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: var(--font-size-xsmall);
 }
 
 .error-message {
@@ -236,6 +264,6 @@ select {
 
 @media (max-width: 768px) {
   .title-map {
-    font-size: var(--font-size-large);
+    font-size: var(--font-size-medium);
   }
 }

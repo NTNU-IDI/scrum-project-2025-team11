@@ -4,6 +4,7 @@
     <div class="map-page">
       <div class="corner-container">
         <IconsOverview />
+        <EventsOverview />
         <PointForm 
           v-if="showPointForm" 
           :selectedPoint="selectedPoint" 
@@ -29,10 +30,11 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine';
 import IconsOverview from '../../components/map/IconsOverview.vue';
+import EventsOverview from '../../components/map/EventsOverview.vue';
 import PointForm from '../../components/map/PointView.vue';
 import Header from '@/components/Header.vue';
 import Footer from '@/components/Footer.vue';
-import { onMounted, ref } from 'vue';
+import { onMounted, onBeforeUnmount, ref, watch } from 'vue';
 import { usePointStore } from '@/stores/pointStore';
 import type { PointOfInterest } from "@/types/PointOfInterest";
 import { calculateDistance, getEventColor } from '@/utils/geoService';
@@ -40,8 +42,9 @@ import {useUserStore} from "@/stores/userStore.ts";
 import {storeToRefs} from "pinia";
 
 const userStore = useUserStore()
+const pointStore = usePointStore();
 const {role} = storeToRefs(userStore)
-const pointStore = usePointStore(); 
+const { pointsDisplaying } = storeToRefs(pointStore);
 const showCrisisAlert = ref(false);
 const showPointForm = ref(false);
 const formMode = ref<'edit' | 'create' | 'view'>('create');
@@ -56,6 +59,7 @@ const selectedPoint = ref<PointOfInterest>({
 
 let map: L.Map;
 let temporaryMarker: L.Marker | null = null;
+let markers: L.Marker[] = [];
 
 declare global {
   interface Window {
@@ -125,12 +129,17 @@ onMounted(async () => {
   L.control.zoom({ position: 'topright' }).addTo(map);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-  // Add points of interest
-  await pointStore.fetchAllPoints();
-  addPointsOfInterest(map);
+  await pointStore.initializePolling();
 
-  // Add events
+  // POI
+  addMarkersToMap();
+
+  // Events
   addEvents(map);
+
+  watch(pointsDisplaying, () => {
+    updateMarkers();
+  });
 
   // Get user location and set marker
   getUserPosition((lat, lon) => {
@@ -158,6 +167,48 @@ onMounted(async () => {
     });
   }
 });
+
+// Stop polling when component is unmounted
+onBeforeUnmount(() => {
+  pointStore.stopPolling();
+});
+
+function addMarkersToMap() {
+  pointsDisplaying.value.forEach(point => {
+    const customIcon = L.divIcon({
+      html: `<div class="map-icon ${point.iconType}" style="margin: 0;"></div>`,
+      className: '',
+      iconSize: [20, 20],
+      iconAnchor: [10, 10],
+    });
+
+    const marker = L.marker([point.latitude, point.longitude], { icon: customIcon }).addTo(map);
+    markers.push(marker);
+
+    // Marker click behavior for admin and non-admin users
+    marker.on('click', () => {
+      selectedPoint.value = { ...point };
+
+      if (role.value === 'admin') {
+        removeTempMarker();
+        formMode.value = 'edit';
+        showPointForm.value = true;
+      } else {
+        formMode.value = 'view';
+        showPointForm.value = true;        
+      }
+    });
+  });
+}
+
+function updateMarkers() {
+  // Remove all existing markers
+  markers.forEach(marker => map.removeLayer(marker));
+  markers = [];
+
+  // Re-add markers for the updated points
+  addMarkersToMap();
+}
 
 function closePointForm() {
   removeTempMarker();
@@ -210,38 +261,6 @@ function checkIfInCrisisArea(userLatitude: number, userLongitude: number) {
   });
 }
 
-function addPointsOfInterest(map: L.Map) {
-  pointStore.allPoints.forEach(point => {
-    const customIcon = L.divIcon({
-      // Set class based on point type
-      html: `<div class="map-icon ${point.iconType}" style="margin: 0;"></div>`,
-      className: '',
-      iconSize: [20, 20],
-      iconAnchor: [10, 10]
-    });
-
-    // Add point to map
-    L.marker([point.latitude, point.longitude], {
-      icon: customIcon
-    }).addTo(map)
-      .on('click', () => {
-        selectedPoint.value = { ...point };
-
-        // ADMIN: Edit on icon click
-        if (role.value === 'admin') {
-          removeTempMarker();
-          formMode.value = 'edit';
-          showPointForm.value = true;
-
-          // R/NR USERS View details
-        } else {
-          formMode.value = 'view';
-          showPointForm.value = true;        
-        }
-    });
-  });
-}
-
 function addEvents(map: L.Map) {
   testEvents.forEach(({ latitude, longitude, radius, severity, name, description }) => {
     const color = getEventColor(severity);
@@ -251,7 +270,7 @@ function addEvents(map: L.Map) {
       weight: 1,
       radius,
       fillOpacity: 0.3
-    }).addTo(map).bindPopup(`<strong>${name}</strong><br>${description}`);
+    }).addTo(map);
   });
 }
 
@@ -323,6 +342,10 @@ function handleNavigation(coords: { latitude: number, longitude: number }) {
     display: block;
     visibility: visible;
     pointer-events: auto;
+}
+
+.leaflet-interactive[stroke][fill-opacity] {
+  pointer-events: none;
 }
 
 @media (max-width: 768px) {
