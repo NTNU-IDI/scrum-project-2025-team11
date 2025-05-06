@@ -1,9 +1,11 @@
 package no.ntnu.idatt2106.krisefikser.service;
 
 import no.ntnu.idatt2106.krisefikser.dto.EmailRequest;
+import no.ntnu.idatt2106.krisefikser.model.Household;
 import no.ntnu.idatt2106.krisefikser.model.TwoFactorCode;
 import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.repository.TwoFactorCodeRepository;
+import no.ntnu.idatt2106.krisefikser.repository.UserRepository;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,9 +23,14 @@ import java.time.LocalDateTime;
 @ExtendWith(MockitoExtension.class)
 class TwoFactorCodeServiceTest {
 
-    @Mock private TwoFactorCodeRepository codeRepo;
-    @Mock private UserService userService;
-    @Mock private EmailService emailService;
+    @Mock 
+    private TwoFactorCodeRepository codeRepo;
+    @Mock 
+    private UserService userService;
+    @Mock 
+    private EmailService emailService;
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private TwoFactorCodeService service;
@@ -32,16 +39,27 @@ class TwoFactorCodeServiceTest {
     void initiateCode_generatesCodeAndSendsEmail() {
         User user = new User();
         user.setEmail("user@example.com");
-        user.setFirstName("Alice");
+        user.setUsername("HansiBoy__oo");
+        user.setFirstName("Hans");
+        user.setLastName("Meling");
+        user.setPassword("password#123");
 
-        when(userService.getUserByEmail("user@example.com")).thenReturn(Optional.of(user));
+        Household household = new Household();
+        household.setId(1);
+        household.setName("Household 1");
+        household.setMemberCount(1);
+        user.setHousehold(household);
 
-        service.initiateCode("user@example.com");
+        when(userService.getUserByUsername("HansiBoy__oo"))
+                .thenReturn(Optional.of(user));
+
+        service.initiateCode("HansiBoy__oo");
 
         verify(codeRepo).deleteByUser(user);
         verify(codeRepo).save(any(TwoFactorCode.class));
         verify(emailService).sendEmail(any(EmailRequest.class));
     }
+
 
     @Test
     void completeAuthentication_validCode_validatesUser() {
