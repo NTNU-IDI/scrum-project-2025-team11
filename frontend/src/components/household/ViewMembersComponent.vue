@@ -145,7 +145,7 @@ const changeMemberCount = async () => {
 
     .button-container {
         margin-left: auto; 
-        margin-top: 4.75rem;
+        margin-top: 4.5rem;
         align-self: flex-start;
         height: 8rem;
     }
