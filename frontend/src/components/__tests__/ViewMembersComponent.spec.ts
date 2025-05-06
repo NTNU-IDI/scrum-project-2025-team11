@@ -4,7 +4,6 @@ import { useUserStore } from '@/stores/userStore';
 import { useHouseholdStore } from '@/stores/householdStore';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { vModelText } from 'vue';
 
 describe('ViewMembersComponent', () => {
     // Set up Pinia store for testing
@@ -20,9 +19,9 @@ describe('ViewMembersComponent', () => {
         householdStore = useHouseholdStore();
     });
 
-    // Checks that the component renders the correct username
-    it('renders user name correctly after login', async () => {
-        await userStore.setUsername('Madde') 
+    // Checks that the component renders the correct household name
+    it('renders household name correctly after login', async () => {
+        await householdStore.fetchHousehold();
 
         const wrapper = shallowMount(ViewMembersComponent, {
         global: {
@@ -32,7 +31,7 @@ describe('ViewMembersComponent', () => {
 
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.text()).toContain('Madde');
+        expect(wrapper.text()).toContain(householdStore.name);
     });
 
     // Checks that the component renders the correct number of members

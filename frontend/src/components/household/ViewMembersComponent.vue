@@ -1,39 +1,56 @@
 <script lang="ts" setup>
-import { computed, h, onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useUserStore } from '@/stores/userStore';
 import { useHouseholdStore } from '@/stores/householdStore';
 import { storeToRefs } from 'pinia';
 import { HouseholdService } from '@/api/HouseholdService';
 
-//User store
-const userStore = useUserStore();
-// Remove later
-//userStore.setUsername('Madde')
-
-//Household store
+/**
+ *  Store imports
+ * @property {import('@/stores/householdStore').HouseholdStore}
+ */
 const householdStore = useHouseholdStore();
+
+/**
+ * Property to store member count of the household
+ * @property {number} newMemberCount
+ * @default 0
+ */
 const newMemberCount = ref(0);
 
-onMounted( async () => {
-    // TODO: Get actual household ID from the store
-    await householdStore.fetchHousehold();
+/**
+ * Property to store the response message
+ * @property {string} responseMessage
+ * @default ''
+ */
+const responseMessage = ref('');
 
+// Fetch household and set member count when the component is mounted
+onMounted( async () => {
+    await householdStore.fetchHousehold();
     newMemberCount.value = householdStore.memberCount;
 });
 
+// Watch for changes in the member count
 const hasChanges = computed(() => {
-  return newMemberCount.value !== householdStore.memberCount;
+    responseMessage.value = '';
+    return newMemberCount.value !== householdStore.memberCount;
 });
 
+/**
+ * Function to update the member count of the household
+ * @returns {Promise<void>}
+ */
 const changeMemberCount = async () => {
     try{
         if(!householdStore.id){
-            console.error('Household ID is not available');
+            responseMessage.value = 'Kunne ikke finne husstand';
             return;
         }
         await householdStore.setMemberCount(newMemberCount.value); 
+        responseMessage.value = `${newMemberCount.value - householdStore.memberCount} medlemmer er lagt til`;
     } catch (error) {
-        console.error('Failed to update household:', error);
+        responseMessage.value = 'Kunne ikke oppdatere husstand';
     }
 }
 
@@ -71,6 +88,7 @@ const changeMemberCount = async () => {
                 >
                     Inviter
                 </button>
+                <p class="user-response">{{ responseMessage }}</p>
             </div>
         </div>    
     </div>
@@ -129,7 +147,7 @@ const changeMemberCount = async () => {
         margin-left: auto; 
         margin-top: 4.75rem;
         align-self: flex-start;
-
+        height: 8rem;
     }
 
     .dark-button {

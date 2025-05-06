@@ -12,6 +12,8 @@ import { ref } from 'vue';
 const isItemBoxVisible = ref(false);
 // Toggle new member component visibility
 const isMemberBoxVisible = ref(false);
+// Response message
+const responseMessage = ref('');
 
 const toggleNewItemBox = () => {
 	isItemBoxVisible.value = !isItemBoxVisible.value;
@@ -19,6 +21,10 @@ const toggleNewItemBox = () => {
 
 const toggleNewMemberBox = () => {
 	isMemberBoxVisible.value = !isMemberBoxVisible.value;
+}
+
+const setResponseMessage = (message: string) => {
+  responseMessage.value = message;
 }
 </script>
 
@@ -43,7 +49,8 @@ const toggleNewMemberBox = () => {
         <button class="dark-button" id="add-button" @click="toggleNewItemBox">+</button>
 
         <div class="new-item-box">
-          <NewItemComponent v-if="isItemBoxVisible" @hide-new-item-box="isItemBoxVisible = false"/>
+          <p class="user-response">{{ responseMessage }}</p>
+          <NewItemComponent v-if="isItemBoxVisible" @hide-new-item-box="isItemBoxVisible = false" @set-response-message="setResponseMessage"/>
         </div>
 
       </div>

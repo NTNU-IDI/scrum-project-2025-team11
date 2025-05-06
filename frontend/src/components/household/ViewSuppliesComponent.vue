@@ -1,24 +1,53 @@
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue';
 import { useItemTypeStore } from '@/stores/itemStore';
-import { InventoryService } from '@/api/InventoryService';
 import { useHouseholdStore } from '@/stores/householdStore';
 import { ItemService } from '@/api/ItemService';
 import { useInventoryStore } from '@/stores/inventoryStore';
 
-// Store imports
+/**
+ * Store instances
+ * @property {import('@/stores/householdStore').HouseholdStore} 
+ * @property {import('@/stores/inventoryStore').InventoryStore}
+ * @property {import('@/stores/itemStore').ItemTypeStore}
+ */
 const householdStore = useHouseholdStore();
 const inventoryStore = useInventoryStore();
 const itemTypeStore = useItemTypeStore();
 
-// Props
+
+/**
+* Property to store the selected item type ID
+* @property {number | null} selectedTypeId 
+*/
 const selectedTypeId = ref<number | null>(null)
+
+/**
+ * Property to define if the component is in edit mode
+ * @property {boolean} isEditMode
+ * @default false
+ */
 const isEditMode = ref(false);
+
+/**
+ * Property to store the list of items
+ * @property {Array} list
+ * @default []
+ */
 const list = ref<{ id: number; name: string; quantity: number; unit: string; acquiredDate: string }[]>([]);
 
-// Fetch inventory items
+/**
+ * Property to store the response message
+ * @property {string} responseMessage
+ * @default ''
+ */
+const responseMessage = ref('');
+
+/**
+ * Function to load the inventory items
+ * @returns {Promise<void>}
+ */
 const loadInventory = async () => {
-    // TODO: Get actual household id from the store
     await householdStore.fetchHousehold();
 
     if(!householdStore.id) {
@@ -33,8 +62,11 @@ onMounted( async () => {
     await loadInventory();
 });
 
-
-// Watch for changes in the inventory and update the list
+/**
+ * Watch for changes in the inventory and update the list
+ * @param {Array} newItems - The new items in the inventory
+ * @returns {Promise<void>}
+ */
 watch(() => inventoryStore.inventory, async (newItems) => {
     const grouped: Record<number, { quantity: number; unit: string }> = {};
   
@@ -63,7 +95,11 @@ watch(() => inventoryStore.inventory, async (newItems) => {
     }));
 }, { immediate: true });
 
-// Choose an item in the supply
+/**
+ * Function to choose an item in the inventory
+ * @param {number} itemTypeId - The ID of the item type
+ * @param {string} name - The name of the item type
+ */
 const chooseItemType = (itemTypeId: any, name: string) => {
     selectedTypeId.value = itemTypeId;
     itemTypeStore.setItemType(itemTypeId, name);
@@ -73,18 +109,25 @@ const chooseItemType = (itemTypeId: any, name: string) => {
 const toggleEditMode = () => {
     itemTypeStore.toggleEditMode();
     isEditMode.value = !isEditMode.value;
+    responseMessage.value = '';
 }
 
-// Delete an item from the inventory
+/**
+ * Function to delete an item from the inventory
+ * @param {number} itemId - The ID of the item to delete
+ * @returns {Promise<void>}
+ */
 const deleteItem =  (itemId: number) => {
     list.value.forEach(async item => {
         if (!householdStore.id) {
             console.error('Household ID is not available');
+            responseMessage.value = 'Kunne ikke finne husstand';
             return;
         }
         if (item.id === itemId) {
             if(confirm(`Er du sikker på at du vil slette ${item.name} fra lageret?`)) {
                 await inventoryStore.deleteItem(itemId, item.acquiredDate);
+                responseMessage.value = `${item.name} er slettet fra lageret`;
             }
         }
     });
@@ -106,8 +149,9 @@ const deleteItem =  (itemId: number) => {
     </div>
 
     <button :class="['dark-button', { active: isEditMode }]" @click="() => { toggleEditMode(); $emit('hide-new-item-box'); }">
-        {{ isEditMode ? 'Large' : 'Endre lager' }}
+        {{ isEditMode ? 'Ferdig' : 'Endre lager' }}
     </button>
+    <p class="user-response">{{ responseMessage }}</p>
 </template>
 <style scoped>
     .quantity {
