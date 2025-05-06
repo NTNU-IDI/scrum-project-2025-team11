@@ -2,9 +2,12 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import type { PointOfInterest } from "@/types/PointOfInterest";
 
+// TODO: Move code to api/PointService.ts
+
 export const usePointStore = defineStore("pointStore", () => {
   const allPoints = ref<PointOfInterest[]>([]);
   const shelters = ref<PointOfInterest[]>([]);
+  const filteredPoints = ref<PointOfInterest[]>([]);
 
   const fetchAllPoints = async () => {
     try {
@@ -27,6 +30,28 @@ export const usePointStore = defineStore("pointStore", () => {
     } catch (error) {
       console.error("Error fetching shelters:", error);
       shelters.value = [];
+    }
+  };
+
+  const fetchPointsByIconTypes = async (iconTypes: string[]) => {
+    if (!iconTypes.length) {
+      filteredPoints.value = [];
+      return;
+    }
+
+    try {
+      const query = iconTypes
+        .map((type) => `iconType=${encodeURIComponent(type)}`)
+        .join("&");
+      const response = await fetch(
+        `http://localhost:8080/api/interest/iconTypes?${query}`
+      );
+      if (!response.ok) throw new Error("Failed fetching filtered points");
+      filteredPoints.value = await response.json();
+      console.log(filteredPoints);
+    } catch (error) {
+      console.error("Error fetching filtered points:", error);
+      filteredPoints.value = [];
     }
   };
 
@@ -100,6 +125,7 @@ export const usePointStore = defineStore("pointStore", () => {
     shelters,
     fetchAllPoints,
     fetchShelters,
+    fetchPointsByIconTypes,
     createPoint,
     updatePointById,
     deletePointById,

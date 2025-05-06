@@ -36,8 +36,8 @@ const selectedIcons = ref<string[]>([])
 const pointStore = usePointStore()
 
 watch(selectedIcons, (newIcons) => {
-  // TODO: Call PointStore -> Calls Backend
-})
+  pointStore.fetchPointsByIconTypes(newIcons);
+});
 </script>
 
 <style scoped>
