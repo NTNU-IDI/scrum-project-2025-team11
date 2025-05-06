@@ -1,6 +1,7 @@
 package no.ntnu.idatt2106.krisefikser.service;
 
 import no.ntnu.idatt2106.krisefikser.dto.EmailRequest;
+import no.ntnu.idatt2106.krisefikser.dto.LoginRequest;
 import no.ntnu.idatt2106.krisefikser.model.TwoFactorCode;
 import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.repository.TwoFactorCodeRepository;
@@ -46,13 +47,16 @@ class TwoFactorCodeServiceTest {
     @Test
     void completeAuthentication_validCode_validatesUser() {
         User user = new User();
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setUsername(user.getUsername());
+        loginRequest.setPassword(user.getPassword());
         TwoFactorCode code = new TwoFactorCode();
         code.setUser(user);
         code.setExpiryDate(LocalDateTime.now().plusHours(1));
 
         when(codeRepo.findByCode("abc123")).thenReturn(Optional.of(code));
 
-        service.completeAuthentication("abc123");
+        service.completeAuthentication("abc123", loginRequest);
 
         verify(codeRepo).delete(code);
     }

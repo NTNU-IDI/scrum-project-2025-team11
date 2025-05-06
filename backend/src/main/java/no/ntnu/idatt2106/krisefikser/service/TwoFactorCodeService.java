@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import no.ntnu.idatt2106.krisefikser.dto.EmailRequest;
+import no.ntnu.idatt2106.krisefikser.dto.LoginRequest;
 import no.ntnu.idatt2106.krisefikser.model.TwoFactorCode;
 import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.repository.TwoFactorCodeRepository;
@@ -96,13 +97,17 @@ public class TwoFactorCodeService {
      * Completes the two factor process by validating the token.
      * @param token the two factor code to validate
      */
-    public void completeAuthentication(String token) {
+    public void completeAuthentication(String token, LoginRequest user) {
         TwoFactorCode prt = twoFactorRepo.findByCode(token)
             .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
 
         if (prt.isExpired()) {
             twoFactorRepo.delete(prt);
             throw new IllegalStateException("Token expired");
+        }
+
+        if(!prt.getUser().getUsername().matches(user.getUsername())) {
+            throw new IllegalArgumentException("User does not match token");
         }
 
         twoFactorRepo.delete(prt);
