@@ -40,9 +40,9 @@ public class TwoFactorCodeService {
      * Initiates the two factor authentication by generating a token and sending an email to the user.
      * @param email the email address of the user requesting the password reset
      */
-    public void initiateCode(String email) {
-        User user = userService.getUserByEmail(email)
-            .orElseThrow(() -> new IllegalArgumentException("No user with email: " + email));
+    public void initiateCode(String username) {
+        User user = userService.getUserByUsername(username)
+            .orElseThrow(() -> new IllegalArgumentException("No user with username: " + username));
 
         // 1. Remove old code
         twoFactorRepo.deleteByUser(user);

@@ -19,7 +19,7 @@ export const useInventoryStore = defineStore('inventory', {
         setItems(newItems: HouseholdItemResponse[]) {
             this.inventory = newItems;
         },
-        async updateItem(householdId: number, updatedItem: HouseholdItemRequest) {
+        async updateItem(updatedItem: HouseholdItemRequest) {
             try {
                 await InventoryService.update(updatedItem.itemId, updatedItem);
             } catch (error) {
@@ -27,7 +27,7 @@ export const useInventoryStore = defineStore('inventory', {
             }
             await this.fetchInventory();
         },
-        async upsertItem(householdId: number, newItem: HouseholdItemRequest) {
+        async upsertItem(newItem: HouseholdItemRequest) {
             try {
                 await InventoryService.upsert(newItem);
             } catch (error) {
@@ -45,5 +45,5 @@ export const useInventoryStore = defineStore('inventory', {
             await this.fetchInventory();
         },
     },
-    persist: true
+    persist: true,
 });

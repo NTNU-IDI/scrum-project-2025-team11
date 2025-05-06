@@ -38,7 +38,7 @@ public class TwoFactorController {
     })
     @PostMapping("/request-two-factor-code")
     public ResponseEntity<Void> requestTwoFactorCode(@RequestBody @Valid TwoFactorRequestDTO request) {
-        twoFactorCodeService.initiateCode(request.getEmail());
+        twoFactorCodeService.initiateCode(request.getUsername());
         // Always return 200 to avoid user enumeration
         return ResponseEntity.ok().build();
     }

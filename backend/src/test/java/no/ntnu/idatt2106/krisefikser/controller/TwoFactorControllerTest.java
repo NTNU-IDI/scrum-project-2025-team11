@@ -32,9 +32,9 @@ class TwoFactorControllerTest {
 
     @Test
     void twoFactorRequestDTO_ShouldReturnOk() throws Exception {
-        TwoFactorRequestDTO request = new TwoFactorRequestDTO("test@example.com");
+        TwoFactorRequestDTO request = new TwoFactorRequestDTO("testbruker");
 
-        doNothing().when(twoFactorService).initiateCode(request.getEmail());
+        doNothing().when(twoFactorService).initiateCode(request.getUsername());
 
         mockMvc.perform(post("/api/auth/request-two-factor-code")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -55,7 +55,7 @@ class TwoFactorControllerTest {
     }
 
     @Test
-    void requestTwoFactor_InvalidEmail_ShouldReturnBadRequest() throws Exception {
+    void requestTwoFactor_InvalidUsername_ShouldReturnBadRequest() throws Exception {
         TwoFactorRequestDTO request = new TwoFactorRequestDTO(""); // invalid
 
         mockMvc.perform(post("/api/auth/request-two-factor-code")
