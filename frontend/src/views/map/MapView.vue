@@ -156,9 +156,11 @@ function addMarkersToMap() {
         formMode.value = 'edit';
         showPointForm.value = true;
         viewingNearest.value = false;
+        createTempMarker(selectedPoint.value.latitude, selectedPoint.value.longitude);
       } else {
         formMode.value = 'view';
-        showPointForm.value = true;        
+        showPointForm.value = true; 
+        createTempMarker(selectedPoint.value.latitude, selectedPoint.value.longitude);       
       }
     });
   });
@@ -288,6 +290,9 @@ function showShelter(index: number) {
   
   // Center map on shelter showing
   map.setView([selectedPoint.value.latitude, selectedPoint.value.longitude], 15);
+
+  removeTempMarker();
+  createTempMarker(selectedPoint.value.latitude, selectedPoint.value.longitude);
 }
 
 function handleNextShelter() {
