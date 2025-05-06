@@ -12,7 +12,7 @@
       <div class="grid-container">
         <div class="box">
           <h3>Krisehendelser</h3>
-          <p>Her kan du administrere opplysninger om krisehendelser.</p>
+          <p>Her kan du administrere opplysninger om krisehendelse.</p>
         </div>
         <div class="box">
           <h3>Kartopplysninger</h3>
