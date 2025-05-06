@@ -12,8 +12,6 @@ import { ref } from 'vue';
 const isItemBoxVisible = ref(false);
 // Toggle new member component visibility
 const isMemberBoxVisible = ref(false);
-// Response message
-const responseMessage = ref('');
 
 const toggleNewItemBox = () => {
 	isItemBoxVisible.value = !isItemBoxVisible.value;
@@ -21,10 +19,6 @@ const toggleNewItemBox = () => {
 
 const toggleNewMemberBox = () => {
 	isMemberBoxVisible.value = !isMemberBoxVisible.value;
-}
-
-const setResponseMessage = (message: string) => {
-  responseMessage.value = message;
 }
 </script>
 
@@ -34,7 +28,7 @@ const setResponseMessage = (message: string) => {
 		<h1>Min husstand</h1>
 		<div class="members-container">
 			<ViewMembersComponent @show-new-member-box="toggleNewMemberBox" @hide-new-member-box="isMemberBoxVisible = false"/>
-			</div>
+		</div>
 
 		<div class="modal-overlay" v-if="isMemberBoxVisible" @click.self="isMemberBoxVisible = false">
 			<NewMemberComponent
@@ -51,13 +45,15 @@ const setResponseMessage = (message: string) => {
 			<ViewSingleItemComponent />
 			</div>
 			<button class="dark-button" id="add-button" @click="toggleNewItemBox">+</button>
-
-			<div class="new-item-box">
-				<p class="user-response">{{ responseMessage }}</p>
-				<NewItemComponent v-if="isItemBoxVisible" @hide-new-item-box="isItemBoxVisible = false" @set-response-message="setResponseMessage"/>
-			</div>
-
 		</div>
+
+		<div class="modal-overlay" v-if="isItemBoxVisible" @click.self="isItemBoxVisible = false">
+			<NewItemComponent  
+			@close="isItemBoxVisible = false"
+			@hide-new-item-box="isItemBoxVisible = false" 
+			/>
+		</div>
+
   	</div>
 	<Footer />
 </template>
