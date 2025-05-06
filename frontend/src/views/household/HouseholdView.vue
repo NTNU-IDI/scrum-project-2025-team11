@@ -28,13 +28,13 @@ const toggleNewMemberBox = () => {
 		<h1>Min husstand</h1>
 		<div class="members-container">
 			<ViewMembersComponent @show-new-member-box="toggleNewMemberBox" @hide-new-member-box="isMemberBoxVisible = false"/>
-		</div>
-
-		<div class="modal-overlay" v-if="isMemberBoxVisible" @click.self="isMemberBoxVisible = false">
-			<NewMemberComponent
-			@close="isMemberBoxVisible = false"
-			@hide-new-member-box="isMemberBoxVisible = false"
-			/>
+		
+			<div class="modal-overlay" v-if="isMemberBoxVisible" @click.self="isMemberBoxVisible = false">
+				<NewMemberComponent
+				@close="isMemberBoxVisible = false"
+				@hide-new-member-box="isMemberBoxVisible = false"
+				/>
+			</div>
 		</div>
 
 		<div class="items-container">
@@ -45,14 +45,16 @@ const toggleNewMemberBox = () => {
 			<ViewSingleItemComponent />
 			</div>
 			<button class="dark-button" id="add-button" @click="toggleNewItemBox">+</button>
+
+			<div class="modal-overlay" v-if="isItemBoxVisible" @click.self="isItemBoxVisible = false">
+				<NewItemComponent  
+				@close="isItemBoxVisible = false"
+				@hide-new-item-box="isItemBoxVisible = false" 
+				/>
+			</div>
 		</div>
 
-		<div class="modal-overlay" v-if="isItemBoxVisible" @click.self="isItemBoxVisible = false">
-			<NewItemComponent  
-			@close="isItemBoxVisible = false"
-			@hide-new-item-box="isItemBoxVisible = false" 
-			/>
-		</div>
+		
 
   	</div>
 	<Footer />
@@ -64,7 +66,7 @@ const toggleNewMemberBox = () => {
 		flex-direction: column;
 		gap: 2rem;
 		padding: 1rem;
-    margin-right: 0px;
+    	margin-right: 0px;
 	}
 
 	h1 {
@@ -72,16 +74,24 @@ const toggleNewMemberBox = () => {
 		font-weight: normal;
 	}
 
-	.items-container {
+	.items-container{
 		display: flex;
 		flex-direction: row;
 		gap: 2rem;
 		padding: 1rem;
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+		border-radius: 12px;
 	}
+
 	.items-column {
 		display: flex;
   		flex-direction: column;
   		gap: 1rem;
+	}
+
+	.members-container{
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+		border-radius: 12px;
 	}
 
 	#add-button {

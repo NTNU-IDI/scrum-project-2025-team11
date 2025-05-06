@@ -154,6 +154,10 @@ const deleteItem =  (itemId: number) => {
     <p class="user-response">{{ responseMessage }}</p>
 </template>
 <style scoped>
+    .grey-container {
+        width: 500px;
+    }
+
     .quantity {
         display: flex;
         align-items: center;
@@ -179,5 +183,15 @@ const deleteItem =  (itemId: number) => {
     .article-card.active .quantity, .article-card:hover .quantity, .article-card.active .edit-input, .article-card:hover .edit-input {
         color: white;
         background-color: transparent;
+    }
+
+    @media (max-width: 480px) {
+        .grey-container {
+            width: 100%;
+        }
+        .dark-button {
+            width: 5;
+            height: 3rem;
+        }
     }
 </style>

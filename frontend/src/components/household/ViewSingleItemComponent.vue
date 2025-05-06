@@ -174,8 +174,8 @@ const deleteItem = async (item: EditableItem) => {
     <div class="grey-container" v-if="isEditMode">
         <h2 class="small-header">{{ itemTypeName }}</h2>
         <div v-for="item in items" :key="item.expirationDate" class="item-card">
-            <div class="delete-button" @click="deleteItem(item)">X</div>
             <div class="article-card">
+                <div class="delete-button" @click="deleteItem(item)">X</div>
                 <input type="text" class="edit-input" id="quantity-input" @input="item.dirty = true" v-model="item.quantity" /> 
                 <input type="text" class="edit-input" id="unit-input" @input="item.dirty = true" v-model="item.unit" />
                 <div class="info">
@@ -210,6 +210,7 @@ const deleteItem = async (item: EditableItem) => {
     .grey-container {
         background-color: var(--light-blue);
         margin-bottom: 4.1rem;
+        width: 500px;
     }
 
     .small-header {
@@ -231,21 +232,18 @@ const deleteItem = async (item: EditableItem) => {
 
     .edit-input {
         background-color: transparent;
-        border: none;
+        border: 1px solid var(--dark-blue);
         color: var(--darkest-blue);
         font-size: var(--font-size-medium);
         width: 100%;
-        max-width: 4rem;
+        max-width: 5rem;
         margin-top: 17px;
-        padding: 0;
+        padding: 0.5rem;
     }
 
-    #quantity-input {
-        max-width: 3rem;
-    }
 
     #date-input {
-        min-width: 7rem;
+        max-width: 8rem;
         font-family: 'Inter', sans-serif;     
     }
 
@@ -254,4 +252,9 @@ const deleteItem = async (item: EditableItem) => {
         align-items: center;
     }
 
+    @media(max-width: 480px) {
+        .grey-container {
+            width: 100%;
+        }
+    }
 </style>

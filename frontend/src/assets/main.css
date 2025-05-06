@@ -4,6 +4,8 @@ body {
   font-family: "Inter", sans-serif;
   font-weight: normal;
   margin: 0;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .medium-header {
@@ -157,12 +159,6 @@ button:hover {
   border-radius: 0.5rem;
 }
 
-@media (max-width: 480px) {
-  .grey-container {
-    width: 300px !important;
-  }
-}
-
 .delete-button {
   color: var(--bad-red);
   padding: 0.5rem;
@@ -270,5 +266,16 @@ select {
   .map-overview-box li {
     font-size: var(--font-size-xsmall);
     margin-bottom: 0.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .grey-container {
+    width: 300px !important;
+  }
+
+  .dark-button {
+    width: 5rem;
+    height: 3rem;
   }
 }
