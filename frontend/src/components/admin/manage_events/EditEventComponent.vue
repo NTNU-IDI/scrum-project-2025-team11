@@ -190,7 +190,7 @@ const deleteEvent = async () => {
 <style scoped>
     .grey-container {
         background-color: var(--light-blue);
-        min-height: 42rem;
+        max-height: 42rem;
     }
 
     .page-container {

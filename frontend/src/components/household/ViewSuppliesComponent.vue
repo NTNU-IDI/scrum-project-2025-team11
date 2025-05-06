@@ -130,7 +130,7 @@ const deleteItem =  async (itemId: number) => {
     }
 
     responseMessage.value = `${matchingItems[0].itemName || 'Vare'} er slettet fra lageret`;
-    await loadInventory(); // refresh the UI
+    await loadInventory(); 
 }
 </script>
 <template>

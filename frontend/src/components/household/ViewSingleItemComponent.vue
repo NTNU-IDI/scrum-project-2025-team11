@@ -63,7 +63,7 @@ const loadItems = async () => {
     await householdStore.fetchHousehold();
     
     if (!householdStore.id) {
-        console.error('Household ID is not available');
+        responseMessage.value = 'Kunne ikke finne husstand';
         return;
     }
     await inventoryStore.fetchInventory();
@@ -145,23 +145,22 @@ const updateItems = async () => {
  */
 const deleteItem = async (item: EditableItem) => {
     if (!householdStore.id) {
-        console.error('Household ID is not available');
         responseMessage.value = 'Kunne ikke finne husstand';
         return;
     }
     if (!itemTypeId.value) {
-        console.error('Item type ID is not available');
         responseMessage.value = 'Kunne ikke finne artikkeltype';
         return;
     }
     if(confirm('Er du sikker på at du vil slette denne artikkelen?')) {
         await inventoryStore.deleteItem(itemTypeId.value, item.acquiredDate)
-        .then(() => {
-            items.value = items.value.filter(item => item.itemId !== itemTypeId.value);
+        .then( async () => {
             responseMessage.value = `${item.itemName} er slettet fra lageret`;
+            items.value = items.value.filter(item => item.itemId !== itemTypeId.value);
+            await loadItems();
         })
         .catch(error => {
-            console.error('Error deleting item:', error);
+            responseMessage.value = `Feil: ${error.message}`;
         });
     }
 }
