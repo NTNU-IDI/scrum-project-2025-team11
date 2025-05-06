@@ -58,9 +58,11 @@ public class InventoryController {
         @Parameter(description = "ID of the item to filter by", required = false)
         @RequestParam(required = false) Integer itemId
     ) {
-        int hhId = getHhId();
-        return service.list(hhId);
+    // derive household ID from the authenticated user
+    int hhId = getHhId();
+    return service.list(hhId, itemId);
     }
+
 
     /**
      * Adds a new item to a household's inventory.

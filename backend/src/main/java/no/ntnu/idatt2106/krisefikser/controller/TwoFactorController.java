@@ -1,4 +1,4 @@
-package no.ntnu.idatt2106.krisefikser.controller;
+/* package no.ntnu.idatt2106.krisefikser.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Two-Factor Authentication", description = "Operations related to two-factor authentication")
 public class TwoFactorController {
 
-    private final TwoFactorCodeService twoFactorCodeService;
+    private final TwoFactorCodeService twoFactorCodeService; */
 
     /**
      * Initiates the two-factor authentication process by sending a code to the user's email.
@@ -28,7 +28,7 @@ public class TwoFactorController {
      * @param request the two-factor authentication request containing the user's email
      * @return a response entity indicating the result of the operation
      */
-    @Operation(
+/*     @Operation(
             summary = "Request a two-factor authentication code",
             description = "Initiate the two-factor authentication process by sending a code to the user's email."
     )
@@ -38,18 +38,18 @@ public class TwoFactorController {
     })
     @PostMapping("/request-two-factor-code")
     public ResponseEntity<Void> requestTwoFactorCode(@RequestBody @Valid TwoFactorRequestDTO request) {
-        twoFactorCodeService.initiateCode(request.getEmail());
+        twoFactorCodeService.initiateCode(request.getUsername());
         // Always return 200 to avoid user enumeration
         return ResponseEntity.ok().build();
     }
-
+ */
     /**
      * Completes the two-factor authentication process by validating the provided code.
      *
      * @param request the two-factor authentication confirmation containing the code
      * @return a response entity indicating the result of the operation
      */
-    @Operation(
+/*     @Operation(
             summary = "Confirm two-factor authentication",
             description = "Confirm the two-factor authentication process using the provided code."
     )
@@ -62,4 +62,4 @@ public class TwoFactorController {
         twoFactorCodeService.completeAuthentication(request.getCode());
         return ResponseEntity.ok().build();
     }
-}
+} */

@@ -6,30 +6,30 @@ import type {
     UpsertInventoryRequest,
 } from '@/types/Inventory';
 
-const BASE_API_URL = 'http://localhost:8080/api';
+const HOUSEHOLD_API_URL = 'http://localhost:8080/api/households/items';
 
 export class InventoryService {
-    static async list(householdId: number): Promise<HouseholdItemResponse[]> {
-        const res = await axios.get(`${BASE_API_URL}/households/${householdId}/items`);
+    static async list(): Promise<HouseholdItemResponse[]> {
+        const res = await axios.get(`${HOUSEHOLD_API_URL}`, { withCredentials: true });
         return res.data;
     }
 
-    static async add(householdId: number, item: HouseholdItemRequest): Promise<HouseholdItemResponse> {
-        const res = await axios.post(`${BASE_API_URL}/households/${householdId}/items`, item);
+    static async add(item: HouseholdItemRequest): Promise<HouseholdItemResponse> {
+        const res = await axios.post(`${HOUSEHOLD_API_URL}`, item, { withCredentials: true });
         return res.data;
     }
 
-    static async update(householdId: number, itemId: number, item: HouseholdItemRequest): Promise<HouseholdItemResponse> {
-        const res = await axios.put(`${BASE_API_URL}/households/${householdId}/items/${itemId}/${item.acquiredDate}`, item);
+    static async update(itemId: number, item: HouseholdItemRequest): Promise<HouseholdItemResponse> {
+        const res = await axios.put(`${HOUSEHOLD_API_URL}/${itemId}/${item.acquiredDate}`, item, { withCredentials: true });
         return res.data;
     }
     
-    static async upsert(householdId: number, item: UpsertInventoryRequest): Promise<HouseholdItemResponse> {
-        const res = await axios.post(`${BASE_API_URL}/households/${householdId}/items/upsert`, item);
+    static async upsert(item: UpsertInventoryRequest): Promise<HouseholdItemResponse> {
+        const res = await axios.post(`${HOUSEHOLD_API_URL}/upsert`, item, { withCredentials: true });
         return res.data;
     }
     
-    static async remove(householdId: number, itemId: number, acquiredDate: string): Promise<void> {
-        await axios.delete(`${BASE_API_URL}/households/${householdId}/items/${itemId}/${acquiredDate}`);
+    static async remove(itemId: number, acquiredDate: string): Promise<void> {
+        await axios.delete(`${HOUSEHOLD_API_URL}/${itemId}/${acquiredDate}`, { withCredentials: true });
     }
 }

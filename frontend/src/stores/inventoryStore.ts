@@ -8,9 +8,9 @@ export const useInventoryStore = defineStore('inventory', {
     }),
 
     actions: {
-        async fetchInventory(householdId: number) {
+        async fetchInventory() {
             try {
-                const data = await InventoryService.list(householdId);
+                const data = await InventoryService.list();
                 this.inventory = data;
             } catch (error) {
                 console.error('Error fetching inventory:', error);
@@ -19,31 +19,31 @@ export const useInventoryStore = defineStore('inventory', {
         setItems(newItems: HouseholdItemResponse[]) {
             this.inventory = newItems;
         },
-        async updateItem(householdId: number, updatedItem: HouseholdItemRequest) {
+        async updateItem(updatedItem: HouseholdItemRequest) {
             try {
-                await InventoryService.update(householdId, updatedItem.itemId, updatedItem);
+                await InventoryService.update(updatedItem.itemId, updatedItem);
             } catch (error) {
                 console.error('Error updating item:', error);
             }
-            await this.fetchInventory(householdId);
+            await this.fetchInventory();
         },
-        async upsertItem(householdId: number, newItem: HouseholdItemRequest) {
+        async upsertItem(newItem: HouseholdItemRequest) {
             try {
-                await InventoryService.upsert(householdId, newItem);
+                await InventoryService.upsert(newItem);
             } catch (error) {
                 console.error('Error upserting item:', error);
             }
-            await this.fetchInventory(householdId);
+            await this.fetchInventory();
         },
-        async deleteItem(householdId: number, itemId: number, acquiredDate: string) {
+        async deleteItem(itemId: number, acquiredDate: string) {
             try {
-                await InventoryService.remove(householdId, itemId, acquiredDate);
+                await InventoryService.remove(itemId, acquiredDate);
                 this.inventory = this.inventory.filter(item => item.itemId !== itemId);
             } catch (error) {
                 console.error('Failed to delete item:', error);
             }
-            await this.fetchInventory(householdId);
+            await this.fetchInventory();
         },
     },
-    persist: true
+    persist: true,
 });

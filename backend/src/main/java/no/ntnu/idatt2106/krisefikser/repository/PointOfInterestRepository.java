@@ -1,6 +1,7 @@
 package no.ntnu.idatt2106.krisefikser.repository;
 
 import no.ntnu.idatt2106.krisefikser.model.Enums;
+import no.ntnu.idatt2106.krisefikser.model.Enums.IconEnum;
 import no.ntnu.idatt2106.krisefikser.model.PointOfInterest;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -14,4 +15,5 @@ import java.util.List;
  */
 public interface PointOfInterestRepository extends JpaRepository<PointOfInterest, Integer> {
     List<PointOfInterest> findByIconType(Enums.IconEnum iconType);
+    List<PointOfInterest> findByIconTypeIn(List<IconEnum> iconTypes);
 }
