@@ -17,10 +17,18 @@ const responseMessage = ref('');
 
 const toggleNewItemBox = () => {
 	isItemBoxVisible.value = !isItemBoxVisible.value;
+  if(isItemBoxVisible.value) {
+    isMemberBoxVisible.value = false;
+  }
+  responseMessage.value = '';
 }
 
 const toggleNewMemberBox = () => {
 	isMemberBoxVisible.value = !isMemberBoxVisible.value;
+  if(isMemberBoxVisible.value) {
+    isItemBoxVisible.value = false;
+  }
+  responseMessage.value = '';
 }
 
 const setResponseMessage = (message: string) => {
@@ -41,12 +49,12 @@ const setResponseMessage = (message: string) => {
 
       <div class="items-container">
         <div class="items-column">
-          <ViewSuppliesComponent @show-new-item-box="toggleNewItemBox" @hide-new-item-box="isItemBoxVisible = false" />
+          <ViewSuppliesComponent @show-new-item-box="toggleNewItemBox" @hide-new-item-box="() => {isItemBoxVisible = false; setResponseMessage('');}" />
         </div>
         <div class="items-column">
           <ViewSingleItemComponent />
         </div>
-        <button class="dark-button" id="add-button" @click="toggleNewItemBox">+</button>
+        <button class="dark-button" id="add-button" @click="toggleNewItemBox()">+</button>
 
         <div class="new-item-box">
           <p class="user-response">{{ responseMessage }}</p>

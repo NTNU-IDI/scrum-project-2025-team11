@@ -55,6 +55,7 @@ const emit = defineEmits(['hide-new-item-box', 'set-response-message']);
 
 // Fetch existing item types when the component is mounted
 onMounted(async () => {
+    responseMessage.value = '';
     try {
         existingTypes.value = await ItemService.findAll();
     } catch (error) {
@@ -135,7 +136,7 @@ const addItem = async () => {
         return;
     }
 
-    await inventoryStore.upsertItem(householdStore.id, newHouseholdItem);
+    await inventoryStore.upsertItem(newHouseholdItem);
     responseMessage.value = `${newHouseholdItem.name} er lagt til i lageret`;
     emit('set-response-message', responseMessage.value);
     emit('hide-new-item-box');
