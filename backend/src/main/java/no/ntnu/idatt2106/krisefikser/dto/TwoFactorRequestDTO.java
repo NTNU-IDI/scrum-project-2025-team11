@@ -10,7 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class TwoFactorRequestDTO {
     @NotBlank
-    @Email
-    private String email;
+    private String username;
     
 }
