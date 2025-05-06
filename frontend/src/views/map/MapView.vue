@@ -33,26 +33,27 @@
 </template>
 
 <script setup lang="ts">
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import 'leaflet-routing-machine';
-import IconsOverview from '../../components/map/IconsOverview.vue';
-import EventsOverview from '../../components/map/EventsOverview.vue';
-import PointView from '../../components/map/PointView.vue';
-import Header from '@/components/Header.vue';
 import Footer from '@/components/Footer.vue';
-import { onMounted, ref } from 'vue';
+import Header from '@/components/Header.vue';
+import EventsOverview from '../../components/map/EventsOverview.vue';
+import IconsOverview from '../../components/map/IconsOverview.vue';
+import PointView from '../../components/map/PointView.vue';
+import L from 'leaflet';
+import 'leaflet-routing-machine';
+import 'leaflet/dist/leaflet.css';
 import { usePointStore } from '@/stores/pointStore';
+import { useUserStore } from "@/stores/userStore.ts";
 import type { PointOfInterest } from "@/types/PointOfInterest";
 import { calculateDistance, getEventColor } from '@/utils/geoService';
-import {useUserStore} from "@/stores/userStore.ts";
-import {storeToRefs} from "pinia";
+import { storeToRefs } from "pinia";
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useEventStore } from '@/stores/eventStore'; 
 
 const eventStore = useEventStore(); 
 const userStore = useUserStore()
+const pointStore = usePointStore();
 const {role} = storeToRefs(userStore)
-const pointStore = usePointStore(); 
+const { pointsDisplaying } = storeToRefs(pointStore);
 const showCrisisAlert = ref(false);
 const showPointForm = ref(false);
 const formMode = ref<'edit' | 'create' | 'view'>('create');
@@ -71,6 +72,7 @@ const selectedPoint = ref<PointOfInterest>({
 
 let map: L.Map;
 let temporaryMarker: L.Marker | null = null;
+let markers: L.Marker[] = [];
 
 declare global {
   interface Window {
@@ -115,13 +117,17 @@ onMounted(async () => {
   L.control.zoom({ position: 'topright' }).addTo(map);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-  // Add points of interest
-  await pointStore.fetchAllPoints();
-  addPointsOfInterest(map);
+  await pointStore.initializePolling();
 
-  // Add events
-  await eventStore.fetchActiveEvents(); 
+  // POI
+  addMarkersToMap();
+
+  // Events
   addEvents(map);
+
+  watch(pointsDisplaying, () => {
+    updateMarkers();
+  });
 
   // Get user location and set marker
   getUserPosition((lat, lon) => {
@@ -149,6 +155,52 @@ onMounted(async () => {
     });
   }
 });
+
+// Stop polling when component is unmounted
+onBeforeUnmount(() => {
+  pointStore.stopPolling();
+});
+
+function addMarkersToMap() {
+  pointsDisplaying.value.forEach(point => {
+    const customIcon = L.divIcon({
+      html: `<div class="map-icon ${point.iconType}" style="margin: 0;"></div>`,
+      className: '',
+      iconSize: [20, 20],
+      iconAnchor: [10, 10],
+    });
+
+    const marker = L.marker([point.latitude, point.longitude], { icon: customIcon }).addTo(map);
+    markers.push(marker);
+
+    // Marker click behavior for admin and non-admin users
+    marker.on('click', () => {
+      clearRouting();
+      removeTempMarker();
+      selectedPoint.value = { ...point };
+      viewingNearest.value = false;
+
+      if (role.value === 'admin') {
+        removeTempMarker();
+        formMode.value = 'edit';
+        showPointForm.value = true;
+        viewingNearest.value = false;
+      } else {
+        formMode.value = 'view';
+        showPointForm.value = true;        
+      }
+    });
+  });
+}
+
+function updateMarkers() {
+  // Remove all existing markers
+  markers.forEach(marker => map.removeLayer(marker));
+  markers = [];
+
+  // Re-add markers for the updated points
+  addMarkersToMap();
+}
 
 function closePointForm() {
   removeTempMarker();
@@ -198,40 +250,6 @@ function checkIfInCrisisArea(userLatitude: number, userLongitude: number) {
     if (distance <= event.radius) {
       showCrisisAlert.value = true;
     }
-  });
-}
-
-function addPointsOfInterest(map: L.Map) {
-  pointStore.allPoints.forEach(point => {
-    const customIcon = L.divIcon({
-      // Set class based on point type
-      html: `<div class="map-icon ${point.iconType}" style="margin: 0;"></div>`,
-      className: '',
-      iconSize: [20, 20],
-      iconAnchor: [10, 10]
-    });
-
-    // Add point to map
-    L.marker([point.latitude, point.longitude], {
-      icon: customIcon
-    }).addTo(map)
-      .on('click', () => {
-        clearRouting();
-        removeTempMarker();
-        selectedPoint.value = { ...point };
-        viewingNearest.value = false;
-
-        // ADMIN: Edit on icon click
-        if (role.value === 'admin') {
-          formMode.value = 'edit';
-          showPointForm.value = true;
-
-          // R/NR USERS View details
-        } else {
-          formMode.value = 'view';
-          showPointForm.value = true;        
-        }
-    });
   });
 }
 

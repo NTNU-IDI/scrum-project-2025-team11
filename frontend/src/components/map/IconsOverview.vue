@@ -27,17 +27,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { usePointStore } from '@/stores/pointStore';
 
-const isCollapsed = ref(true);
-const selectedIcons = ref<string[]>([])
-
+const isCollapsed = ref(false);
+const selectedIcons = ref<string[]>(['shelter', 'assembly_point', 'medical']);
 const pointStore = usePointStore()
 
 watch(selectedIcons, (newIcons) => {
-  // TODO: Call PointStore -> Calls Backend
-})
+  pointStore.updateSelectedIcons(newIcons);
+});
+
+onMounted(() => {
+  pointStore.updateSelectedIcons(selectedIcons.value);
+  pointStore.initializePolling();
+});
 </script>
 
 <style scoped>
