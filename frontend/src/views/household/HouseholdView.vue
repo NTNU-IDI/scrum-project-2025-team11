@@ -31,29 +31,33 @@ const setResponseMessage = (message: string) => {
 <template>
 	<Header />
   	<div class="page-container">
-      <h1>Min husstand</h1>
-      <div class="members-container">
-        <ViewMembersComponent @show-new-member-box="toggleNewMemberBox" @hide-new-member-box="isMemberBoxVisible = false"/>
-        </div>
-      <div class="new-member-box">
-        <NewMemberComponent v-if="isMemberBoxVisible" @hide-new-member-box="isMemberBoxVisible = false" />
-      </div>
+		<h1>Min husstand</h1>
+		<div class="members-container">
+			<ViewMembersComponent @show-new-member-box="toggleNewMemberBox" @hide-new-member-box="isMemberBoxVisible = false"/>
+			</div>
 
-      <div class="items-container">
-        <div class="items-column">
-          <ViewSuppliesComponent @show-new-item-box="toggleNewItemBox" @hide-new-item-box="isItemBoxVisible = false" />
-        </div>
-        <div class="items-column">
-          <ViewSingleItemComponent />
-        </div>
-        <button class="dark-button" id="add-button" @click="toggleNewItemBox">+</button>
+		<div class="modal-overlay" v-if="isMemberBoxVisible" @click.self="isMemberBoxVisible = false">
+			<NewMemberComponent
+			@close="isMemberBoxVisible = false"
+			@hide-new-member-box="isMemberBoxVisible = false"
+			/>
+		</div>
 
-        <div class="new-item-box">
-          <p class="user-response">{{ responseMessage }}</p>
-          <NewItemComponent v-if="isItemBoxVisible" @hide-new-item-box="isItemBoxVisible = false" @set-response-message="setResponseMessage"/>
-        </div>
+		<div class="items-container">
+			<div class="items-column">
+			<ViewSuppliesComponent @show-new-item-box="toggleNewItemBox" @hide-new-item-box="isItemBoxVisible = false" />
+			</div>
+			<div class="items-column">
+			<ViewSingleItemComponent />
+			</div>
+			<button class="dark-button" id="add-button" @click="toggleNewItemBox">+</button>
 
-      </div>
+			<div class="new-item-box">
+				<p class="user-response">{{ responseMessage }}</p>
+				<NewItemComponent v-if="isItemBoxVisible" @hide-new-item-box="isItemBoxVisible = false" @set-response-message="setResponseMessage"/>
+			</div>
+
+		</div>
   	</div>
 	<Footer />
 </template>
@@ -70,10 +74,6 @@ const setResponseMessage = (message: string) => {
 	h1 {
 		font-size: var(--font-size-xxlarge);
 		font-weight: normal;
-	}
-
-	.new-member-box { 
-        align-self: center;
 	}
 
 	.items-container {
@@ -101,6 +101,28 @@ const setResponseMessage = (message: string) => {
         margin-left: 0px;
         margin-top: 4.75rem;
     }
+
+	.modal-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(0, 0, 0, 0.5);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		z-index: 1000;
+	}
+	  
+	.modal-content {
+		background-color: #fff;
+		padding: 2rem;
+		border-radius: 10px;
+		max-width: 600px;
+		width: 90%;
+		box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+	}
 
   @media(max-width: 480px) {
     .page-container {
