@@ -90,6 +90,9 @@ public class PointOfInterestController {
     @PostMapping
     public ResponseEntity<PointOfInterestResponseDTO> createPointOfInterest(@RequestBody PointOfInterestRequestDTO pointOfInterest) {
         PointOfInterestResponseDTO pointOfInterestResponse = pointOfInterestService.save(pointOfInterest);
+        if (pointOfInterestResponse == null) {
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.ok(pointOfInterestResponse);
     }
 
