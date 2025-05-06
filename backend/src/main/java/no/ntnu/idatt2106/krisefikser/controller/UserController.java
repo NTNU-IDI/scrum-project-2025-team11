@@ -3,7 +3,6 @@ package no.ntnu.idatt2106.krisefikser.controller;
 import java.util.List;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import no.ntnu.idatt2106.krisefikser.security.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,7 +20,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.dto.PasswordChangeDTO;
-import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.UserResponseDTO;
 import no.ntnu.idatt2106.krisefikser.dto.UserUpdateDTO;
 import no.ntnu.idatt2106.krisefikser.mapper.UserMapper;
@@ -123,18 +121,18 @@ public class UserController {
     }
     if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
       return ResponseEntity
-          .status(HttpStatus.BAD_REQUEST) // Bad Request
+          .status(HttpStatus.BAD_REQUEST) 
           .body(null);
     }
     if (dto.getNewPassword() == null || dto.getNewPassword().isEmpty()) {
       return ResponseEntity
-          .status(HttpStatus.BAD_REQUEST) // Bad Request
+          .status(HttpStatus.BAD_REQUEST) 
           .body(null);
     }
 
     int id = user.getId();
     userService.changePassword(id, dto);
-    return ResponseEntity.noContent().build();     // 204
+    return ResponseEntity.noContent().build();   
   }
 
   /**
@@ -200,12 +198,12 @@ public class UserController {
     }
     if (userService.emailExists(user.getEmail())) {
       return ResponseEntity
-          .status(409) // Conflict
+          .status(409) 
           .body(null);
     }
     if (userService.usernameExists(user.getUsername())) {
       return ResponseEntity
-          .status(409) // Conflict
+          .status(409) 
           .body(null);
     }
 
