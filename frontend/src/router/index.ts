@@ -13,6 +13,8 @@ import AboutView from "@/views/AboutView.vue";
 import ForgotPassword from "@/views/ForgotPasswordView.vue";
 import ResetPassword from "@/views/ResetPasswordView.vue";
 
+import Headers from "@/views/AllHeaders.vue";
+
 import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
 import {useUserStore} from "@/stores/userStore.ts";
@@ -92,6 +94,13 @@ const routes: Array<RouteRecordRaw> = [
     path: "/reset",
     name: "ResetPassword",
     component: ResetPassword,
+  },
+
+
+  {
+    path: "/headers",
+    name: "Headers",
+    component: Headers,
   },
 ];
 
