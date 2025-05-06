@@ -7,16 +7,18 @@ import no.ntnu.idatt2106.krisefikser.dto.ItemRequest;
 import no.ntnu.idatt2106.krisefikser.dto.ItemResponse;
 import no.ntnu.idatt2106.krisefikser.mapper.ItemMapper;
 import no.ntnu.idatt2106.krisefikser.model.Item;
+import no.ntnu.idatt2106.krisefikser.security.JwtAuthFilter;
+import no.ntnu.idatt2106.krisefikser.security.JwtUtil;
 import no.ntnu.idatt2106.krisefikser.service.ItemService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -66,16 +68,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * - {@link ItemMapper}: Mocked mapper for converting between entities and DTOs.
  */
 @WebMvcTest(controllers = ItemController.class)
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false) 
 @ActiveProfiles("test")
 @Import(TestSecurityConfig.class)
 class ItemControllerTest {
 
     @Autowired private MockMvc mvc;
     @Autowired private ObjectMapper mapper;
+    @MockitoBean private JwtUtil jwtUtil;
+    @MockitoBean private JwtAuthFilter jwtAuthFilter;
 
-    @MockBean private ItemService service;
-    @MockBean private ItemMapper itemMapper;
+    @MockitoBean private ItemService service;
+    @MockitoBean private ItemMapper itemMapper;
 
     
     @Test
