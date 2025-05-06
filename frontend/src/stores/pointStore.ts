@@ -1,8 +1,7 @@
 import type { PointOfInterest } from "@/types/PointOfInterest";
 import { defineStore } from "pinia";
 import { ref } from "vue";
-
-// TODO: Move code to api/PointService.ts
+import { PointService } from "@/api/PointService";
 
 export const usePointStore = defineStore("pointStore", () => {
   const pointsDisplaying = ref<PointOfInterest[]>([]);
@@ -35,74 +34,18 @@ export const usePointStore = defineStore("pointStore", () => {
     startPolling();
   };
 
-  const fetchAllPoints = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/api/interest");
-      if (!response.ok) throw new Error("Failed fetching all points");
-      pointsDisplaying.value = await response.json();
-    } catch (error) {
-      console.error("Error fetching all points:", error);
-      pointsDisplaying.value = [];
-    }
-  };
-
-  const fetchNearestShelters = async (
-    latitude: number,
-    longitude: number
-  ): Promise<PointOfInterest[]> => {
-    try {
-      const response = await fetch(
-        `http://localhost:8080/api/interest/closestShelters?latitude=${latitude}&longitude=${longitude}`
-      );
-      if (!response.ok) throw new Error("Failed fetching nearest shelters");
-
-      return await response.json();
-    } catch (error) {
-      console.error("Error fetching nearest shelters:", error);
-      return [];
-    }
-  };
-
   const fetchPointsByIconTypes = async (iconTypes: string[]) => {
-    if (!iconTypes.length) {
-      pointsDisplaying.value = [];
-      return;
-    }
+    const points = await PointService.getByIconTypes(iconTypes);
+    pointsDisplaying.value = points;
+  };
 
-    try {
-      const query = iconTypes
-        .map((type) => `iconType=${encodeURIComponent(type)}`)
-        .join("&");
-      const response = await fetch(
-        `http://localhost:8080/api/interest/iconTypes?${query}`
-      );
-      if (!response.ok) throw new Error("Failed fetching filtered points");
-      pointsDisplaying.value = await response.json();
-    } catch (error) {
-      console.error("Error fetching filtered points:", error);
-      pointsDisplaying.value = [];
-    }
+  const fetchNearestShelters = async (latitude: number, longitude: number) => {
+    return await PointService.getNearestShelters(latitude, longitude);
   };
 
   const createPoint = async (point: PointOfInterest) => {
     try {
-      const response = await fetch("http://localhost:8080/api/interest", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: point.name,
-          iconType: point.iconType,
-          description: point.description,
-          latitude: point.latitude,
-          longitude: point.longitude,
-        }),
-      });
-
-      if (!response.ok) throw new Error("Failed to create point");
-
-      const newPoint = await response.json();
+      const newPoint = await PointService.save(point);
       pointsDisplaying.value.push(newPoint);
       return newPoint;
     } catch (error) {
@@ -113,20 +56,7 @@ export const usePointStore = defineStore("pointStore", () => {
 
   const updatePointById = async (point: PointOfInterest) => {
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/interest/${point.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(point),
-        }
-      );
-
-      if (!response.ok) throw new Error("Failed to update point");
-
-      const updated = await response.json();
+      const updated = await PointService.update(point.id, point);
       pointsDisplaying.value.push(updated);
       return updated;
     } catch (error) {
@@ -137,13 +67,9 @@ export const usePointStore = defineStore("pointStore", () => {
 
   const deletePointById = async (id: number) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/interest/${id}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) throw new Error("Failed to delete point");
+      await PointService.remove(id);
       pointsDisplaying.value = pointsDisplaying.value.filter(
-        (point) => point.id !== id
+        (p) => p.id !== id
       );
     } catch (error) {
       console.error("Error deleting point:", error);
@@ -157,7 +83,6 @@ export const usePointStore = defineStore("pointStore", () => {
     startPolling,
     stopPolling,
     initializePolling,
-    fetchAllPoints,
     fetchPointsByIconTypes,
     fetchNearestShelters,
     createPoint,
