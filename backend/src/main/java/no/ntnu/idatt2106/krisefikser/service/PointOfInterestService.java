@@ -78,15 +78,19 @@ public class PointOfInterestService {
      * @param iconTypeString String that will be used to sort after points of interest
      * @return A list of points that match the input parameter
      */
-    public List<PointOfInterestResponseDTO> findByIconType(String iconTypeString) {
-        Enums.IconEnum iconType;
-        try {
-            iconType = Enums.IconEnum.valueOf(iconTypeString.toLowerCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid icon type: " + iconTypeString);
-        }
+    public List<PointOfInterestResponseDTO> findByIconType(List<String> iconTypeString) {
+        List<Enums.IconEnum> iconTypes = iconTypeString.stream()
+        .map(String::toLowerCase)
+        .map(type -> {
+            try {
+                return Enums.IconEnum.valueOf(type);
+            }   catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid icon type: " + type);
+            }
+        })
+        .toList();
 
-        return pointOfInterestRepository.findByIconType(iconType)
+        return pointOfInterestRepository.findByIconTypeIn(iconTypes)
                 .stream()
                 .map(PointOfInterestMapper::toResponseDTO)
                 .toList();
