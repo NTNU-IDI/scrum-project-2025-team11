@@ -34,18 +34,17 @@ import EventsOverview from '../../components/map/EventsOverview.vue';
 import PointForm from '../../components/map/PointView.vue';
 import Header from '@/components/Header.vue';
 import Footer from '@/components/Footer.vue';
-import { onMounted, ref } from 'vue';
+import { onMounted, onBeforeUnmount, ref, watch } from 'vue';
 import { usePointStore } from '@/stores/pointStore';
 import type { PointOfInterest } from "@/types/PointOfInterest";
 import { calculateDistance, getEventColor } from '@/utils/geoService';
 import {useUserStore} from "@/stores/userStore.ts";
 import {storeToRefs} from "pinia";
-import { useEventStore } from '@/stores/eventStore'; 
 
-const eventStore = useEventStore(); 
 const userStore = useUserStore()
+const pointStore = usePointStore();
 const {role} = storeToRefs(userStore)
-const pointStore = usePointStore(); 
+const { pointsDisplaying } = storeToRefs(pointStore);
 const showCrisisAlert = ref(false);
 const showPointForm = ref(false);
 const formMode = ref<'edit' | 'create' | 'view'>('create');
@@ -60,6 +59,7 @@ const selectedPoint = ref<PointOfInterest>({
 
 let map: L.Map;
 let temporaryMarker: L.Marker | null = null;
+let markers: L.Marker[] = [];
 
 declare global {
   interface Window {
@@ -67,6 +67,59 @@ declare global {
   }
 }
 window.routingControl = null;
+
+// TODO: Retrieve event data from backend
+type Event = {
+  id: number;
+  name: string;
+  description: string;
+  icon_type: string;
+  time_start: Date;
+  time_end: Date;
+  latitude: number;
+  longitude: number;
+  radius: number;
+  severity: number;
+};
+
+const testEvents = [
+  {
+    id: 1,
+    name: 'Kriseområde Ila',
+    description: 'Område berørt av hendelse.',
+    icon_type: 'danger',
+    time_start: new Date('2025-04-25'),
+    time_end: new Date('2025-04-26'),
+    latitude: 63.42,
+    longitude: 10.38,
+    radius: 1000,
+    severity: 2 
+  },
+  {
+    id: 2,
+    name: 'Kriseområde Moholt',
+    description: 'Område med moderate hendelser.',
+    icon_type: 'danger',
+    time_start: new Date('2025-04-26'),
+    time_end: new Date('2025-04-27'),
+    latitude: 63.43,
+    longitude: 10.39,
+    radius: 1500,
+    severity: 1 
+  },
+  {
+    id: 3,
+    name: 'Kriseområde Tiller',
+    description: 'Liten hendelse uten alvorlige konsekvenser.',
+    icon_type: 'danger',
+    time_start: new Date('2025-04-26'),
+    time_end: new Date('2025-04-27'),
+    latitude: 63.42,
+    longitude: 10.42,
+    radius: 800,
+    severity: 0 
+  }
+];
 
 onMounted(async () => {
   // Init map
@@ -76,13 +129,17 @@ onMounted(async () => {
   L.control.zoom({ position: 'topright' }).addTo(map);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-  // Add points of interest
-  await pointStore.fetchAllPoints();
-  addPointsOfInterest(map);
+  await pointStore.initializePolling();
 
-  // Add events
-  await eventStore.fetchActiveEvents(); 
+  // POI
+  addMarkersToMap();
+
+  // Events
   addEvents(map);
+
+  watch(pointsDisplaying, () => {
+    updateMarkers();
+  });
 
   // Get user location and set marker
   getUserPosition((lat, lon) => {
@@ -110,6 +167,48 @@ onMounted(async () => {
     });
   }
 });
+
+// Stop polling when component is unmounted
+onBeforeUnmount(() => {
+  pointStore.stopPolling();
+});
+
+function addMarkersToMap() {
+  pointsDisplaying.value.forEach(point => {
+    const customIcon = L.divIcon({
+      html: `<div class="map-icon ${point.iconType}" style="margin: 0;"></div>`,
+      className: '',
+      iconSize: [20, 20],
+      iconAnchor: [10, 10],
+    });
+
+    const marker = L.marker([point.latitude, point.longitude], { icon: customIcon }).addTo(map);
+    markers.push(marker);
+
+    // Marker click behavior for admin and non-admin users
+    marker.on('click', () => {
+      selectedPoint.value = { ...point };
+
+      if (role.value === 'admin') {
+        removeTempMarker();
+        formMode.value = 'edit';
+        showPointForm.value = true;
+      } else {
+        formMode.value = 'view';
+        showPointForm.value = true;        
+      }
+    });
+  });
+}
+
+function updateMarkers() {
+  // Remove all existing markers
+  markers.forEach(marker => map.removeLayer(marker));
+  markers = [];
+
+  // Re-add markers for the updated points
+  addMarkersToMap();
+}
 
 function closePointForm() {
   removeTempMarker();
@@ -153,7 +252,7 @@ function getUserPosition(callback: (lat: number, lon: number) => void) {
 }
 
 function checkIfInCrisisArea(userLatitude: number, userLongitude: number) {
-  eventStore.events.forEach(event => {
+  testEvents.forEach(event => {
     const distance = calculateDistance(userLatitude, userLongitude, event.latitude, event.longitude);
     
     if (distance <= event.radius) {
@@ -162,49 +261,14 @@ function checkIfInCrisisArea(userLatitude: number, userLongitude: number) {
   });
 }
 
-function addPointsOfInterest(map: L.Map) {
-  pointStore.allPoints.forEach(point => {
-    const customIcon = L.divIcon({
-      // Set class based on point type
-      html: `<div class="map-icon ${point.iconType}" style="margin: 0;"></div>`,
-      className: '',
-      iconSize: [20, 20],
-      iconAnchor: [10, 10]
-    });
-
-    // Add point to map
-    L.marker([point.latitude, point.longitude], {
-      icon: customIcon
-    }).addTo(map)
-      .on('click', () => {
-        selectedPoint.value = { ...point };
-
-        // ADMIN: Edit on icon click
-        if (role.value === 'admin') {
-          removeTempMarker();
-          formMode.value = 'edit';
-          showPointForm.value = true;
-
-          // R/NR USERS View details
-        } else {
-          formMode.value = 'view';
-          showPointForm.value = true;        
-        }
-    });
-  });
-}
-
 function addEvents(map: L.Map) {
-  if (eventStore.activeEvents.length === 0) {
-    return;
-  }
-  eventStore.activeEvents.forEach(event => {
-    const color = getEventColor(event.severity);
-    L.circle([event.latitude, event.longitude], {
+  testEvents.forEach(({ latitude, longitude, radius, severity, name, description }) => {
+    const color = getEventColor(severity);
+    L.circle([latitude, longitude], {
       color,
       fillColor: color,
       weight: 1,
-      radius: event.radius,
+      radius,
       fillOpacity: 0.3
     }).addTo(map);
   });
