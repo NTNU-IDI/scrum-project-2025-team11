@@ -137,7 +137,7 @@ class AuthControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-/*  @Test
+    @Test
     void register_WithValidUser_ShouldReturnOk() throws Exception {
         UserRequestDTO userRequest = new UserRequestDTO();
         userRequest.setUsername("newuser");
@@ -152,6 +152,10 @@ class AuthControllerTest {
 
         User user = new User();
         user.setUsername("newuser");
+        user.setEmail("test@example.com");
+        user.setFirstName("Ola");
+        user.setLastName("Nordmann");
+        user.setPassword("P@ssw0rd");
 
         when(userService.emailExists(userRequest.getEmail())).thenReturn(false);
         when(userService.usernameExists(userRequest.getUsername())).thenReturn(false);
@@ -164,6 +168,6 @@ class AuthControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userRequest)))
                 .andExpect(status().isOk());
-    }*/
+    }
 
 }

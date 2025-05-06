@@ -174,9 +174,6 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
       UserResponseDTO saved = userService.saveUser(body);
       User user = userService.getUserByUsername(saved.getUsername()).orElse(null);
 
-      if (user == null) {
-        return ResponseEntity.status(500).body("Failed to retrieve created user");
-      }
       twoFactorCodeService.initiateCode(user.getUsername());
 
       return ResponseEntity.ok().build();
