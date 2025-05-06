@@ -67,7 +67,7 @@ onMounted(async () => {
  * @returns {Promise<void>}
  */
 const addItem = async () => {
-    if(!validateItemName(newName.value)) {
+    if(!newName.value) {
         errorMsg.value = 'Vennligst velg en eksisterende vare eller opprett en ny';
         return;
     } 
