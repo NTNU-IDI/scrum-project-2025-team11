@@ -10,16 +10,6 @@
       </div>
 
       <div class="grid-container">
-        <div class="box">
-          <h3>Krisehendelser</h3>
-          <p>Her kan du administrere opplysninger om krisehendelse.</p>
-        </div>
-        <div class="box">
-          <h3>Kartopplysninger</h3>
-          <p>Her kan du administrere opplysninger om kartet.</p>
-      </div>
-
-      <div class="grid-container">
         <router-link to="/map" class="box registered">
           <h3>Krisehendelser</h3>
           <p>Her kan du legge til, fjerne og redigere krisehendelser. 
