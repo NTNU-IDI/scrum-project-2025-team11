@@ -67,6 +67,7 @@ const toggleNewMemberBox = () => {
 		gap: 2rem;
 		padding: 1rem;
     	margin-right: 0px;
+		margin: 0 3rem 0 3rem ;
 	}
 
 	h1 {
@@ -79,8 +80,7 @@ const toggleNewMemberBox = () => {
 		flex-direction: row;
 		gap: 2rem;
 		padding: 1rem;
-		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-		border-radius: 12px;
+	
 	}
 
 	.items-column {
@@ -89,11 +89,11 @@ const toggleNewMemberBox = () => {
   		gap: 1rem;
 	}
 
-	.members-container{
-		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+	.members-container, .items-container{
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 		border-radius: 12px;
 	}
-
+	
 	#add-button {
         display: flex;
         align-items: center; 

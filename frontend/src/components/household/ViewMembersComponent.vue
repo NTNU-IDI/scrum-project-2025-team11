@@ -59,7 +59,7 @@ const changeMemberCount = async () => {
     <div class="page-container">
         <div class="members-container">
             <div class="me-container">
-                <h1 class="medium-header">Deg</h1>
+                <h1 class="medium-header">Navn på husstanden</h1>
                 <div class="article-card">
                     <p>{{ householdStore.name }}</p>
                 </div>
@@ -134,7 +134,6 @@ const changeMemberCount = async () => {
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         border: none;
         width: auto;
-    
     }
 
     #members-input {
