@@ -125,7 +125,7 @@ const errorMessage = ref('');
 const inputMethod = ref('coordinates');
 const address = ref('');
 const addressError = ref('');
-const emit = defineEmits(['close', 'coordinates-updated', 'navigate', 'next-shelter', 'stop-navigation']);
+const emit = defineEmits(['close', 'coordinates-updated', 'navigate', 'next-shelter', 'stop-navigation', 'close-point-view']);
 
 const props = defineProps({
   selectedPoint: {
@@ -261,6 +261,7 @@ const createPoint = async () => {
   errorMessage.value = '';
   try {
     await pointStore.createPoint(pointData.value);
+    emit('close-point-view');
 
   } catch (error) {
     errorMessage.value = "Kunne ikke lage det nye punktet.";
@@ -271,6 +272,7 @@ const savePoint = async () => {
   errorMessage.value = '';
   try {
     await pointStore.updatePointById(pointData.value);
+    emit('close-point-view');
 
   } catch (error) {
     errorMessage.value = "Kunne ikke oppdatere punktet.";
@@ -283,6 +285,8 @@ const deletePoint = async () => {
   if (confirmDelete) {
     try {
       await pointStore.deletePointById(pointData.value.id);
+      emit('close-point-view');
+
     } catch (error) {
       errorMessage.value = "Kunne ikke slette punktet.";
     }

@@ -2,6 +2,7 @@ import type { PointOfInterest } from "@/types/PointOfInterest";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { PointService } from "@/api/PointService";
+import { useToast } from "vue-toast-notification";
 
 export const usePointStore = defineStore("pointStore", () => {
   const pointsDisplaying = ref<PointOfInterest[]>([]);
@@ -44,33 +45,45 @@ export const usePointStore = defineStore("pointStore", () => {
   };
 
   const createPoint = async (point: PointOfInterest) => {
+    const $toast = useToast();
     try {
       const newPoint = await PointService.save(point);
       fetchPointsByIconTypes(selectedIcons.value);
+      $toast.success("Punktet ble laget!", {
+        duration: 5000,
+      });
       return newPoint;
     } catch (error) {
-      console.error("Error creating point:", error);
+      $toast.warning("Punktet kunne ikke bli lagd", { duration: 5000 });
       throw error;
     }
   };
 
   const updatePointById = async (point: PointOfInterest) => {
+    const $toast = useToast();
     try {
       const updated = await PointService.update(point.id, point);
       fetchPointsByIconTypes(selectedIcons.value);
+      $toast.success("Punktet ble oppdatert!", {
+        duration: 5000,
+      });
       return updated;
     } catch (error) {
-      console.error("Error updating point:", error);
+      $toast.warning("Punktet kunne ikke bli oppdatert", { duration: 5000 });
       throw error;
     }
   };
 
   const deletePointById = async (id: number) => {
+    const $toast = useToast();
     try {
       await PointService.remove(id);
       fetchPointsByIconTypes(selectedIcons.value);
+      $toast.success("Punktet ble slettet!", {
+        duration: 5000,
+      });
     } catch (error) {
-      console.error("Error deleting point:", error);
+      $toast.warning("Punktet kunne ikke bli slettet", { duration: 5000 });
       throw error;
     }
   };
