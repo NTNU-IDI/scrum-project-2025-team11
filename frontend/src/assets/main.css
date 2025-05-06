@@ -103,6 +103,10 @@ button:hover {
   transform: scale(1.03);
 }
 
+.small-button {
+  font-size: var(--font-size-small);
+}
+
 .good-button {
   background-color: var(--good-green);
 }
@@ -197,23 +201,6 @@ button:hover {
   margin: 0;
 }
 
-.point-card {
-  position: relative;
-  background: var(--white);
-  border-radius: 10px;
-  width: 250px;
-}
-
-.point-card-content {
-  padding: 1.2rem;
-  text-align: left;
-}
-
-.point-card input,
-select {
-  font-size: var(--font-size-small);
-}
-
 .map-overview-box {
   background: var(--white);
   padding: 1rem 1.5rem 1rem 1rem;
@@ -243,7 +230,7 @@ select {
   display: flex;
   align-items: center;
   margin-bottom: 0.5rem;
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-xsmall);
 }
 
 .error-message {
@@ -265,10 +252,5 @@ select {
 @media (max-width: 768px) {
   .title-map {
     font-size: var(--font-size-medium);
-  }
-
-  .map-overview-box li {
-    font-size: var(--font-size-xsmall);
-    margin-bottom: 0.3rem;
   }
 }

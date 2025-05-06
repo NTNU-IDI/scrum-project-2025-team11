@@ -22,17 +22,17 @@ describe("EventsOverview.vue", () => {
     const header = wrapper.find(".map-overview-box-header");
 
     // Visible
-    expect(list.isVisible()).toBe(true);
+    expect(list.isVisible()).toBe(false);
 
     // Click to collapse
     await header.trigger("click");
     await wrapper.vm.$nextTick();
-    expect(list.isVisible()).toBe(false);
+    expect(list.isVisible()).toBe(true);
 
     // Click to be visable again
     await header.trigger("click");
     await wrapper.vm.$nextTick();
-    expect(list.isVisible()).toBe(true);
+    expect(list.isVisible()).toBe(false);
 
     wrapper.unmount();
   });
