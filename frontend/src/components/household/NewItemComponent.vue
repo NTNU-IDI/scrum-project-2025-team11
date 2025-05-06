@@ -177,7 +177,7 @@ const handleKeydown = (event: KeyboardEvent, name: string) => {
 
         <div class="item-input">
             <div class="type-container"> 
-                <input placeholder="Velg eksisterende eller ny vare..." class="edit-input"
+                <input placeholder="*Velg eksisterende eller ny vare..." class="edit-input"
                     v-model="newName"
                     type="text"
                     @focus="showDropdown = true"
@@ -196,14 +196,15 @@ const handleKeydown = (event: KeyboardEvent, name: string) => {
             </div>
 
             <div class="quantity-container">
-                <input type="number" class="edit-input" placeholder="Mengde"
+                <input type="number" class="edit-input" placeholder="*Mengde"
                     min="0" 
                     step="1" 
                     aria-label="Quantity" 
                     v-model="newQuantity"
                 />
-                <input type="text" class="edit-input" placeholder="Enhet" v-model="newUnit" />
+                <input type="text" class="edit-input" placeholder="*Enhet" v-model="newUnit" />
             </div>
+            <label for="date-input" class="grey-text">Utløpsdato:</label>
             <input type="date" class="edit-input" v-model="newExpirationDate" />
         </div>
 
