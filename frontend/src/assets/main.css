@@ -245,7 +245,7 @@ select {
   display: flex;
   align-items: center;
   margin-bottom: 0.5rem;
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-xsmall);
 }
 
 .error-message {
@@ -490,10 +490,5 @@ select {
 @media (max-width: 768px) {
   .title-map {
     font-size: var(--font-size-medium);
-  }
-
-  .map-overview-box li {
-    font-size: var(--font-size-xsmall);
-    margin-bottom: 0.3rem;
   }
 }
