@@ -94,7 +94,13 @@ async function attemptRegistration() {
         errorMessage.value = "Addresse og/eller postkode er ugyldig. Vennligst forsikre deg om at disse er riktige og prøv igjen."
       } else {
         errorMessage.value = ""
-        await registerHouseholdAndCreateUser(location.lat, location.lon, location.address.city)
+        let latitude = location.lat
+        let longitude = location.lon
+        let city = location.address.city
+        if (city === undefined) {
+          city = location.address.municipality
+        }
+        await registerHouseholdAndCreateUser(latitude, longitude, city)
       }
     } else if(householdChoice.value === "existing") {
       //TODO: Implement how creation of new user joining existing household works when backend is ready
@@ -186,13 +192,15 @@ defineExpose({validateFields})
         <input type="password" placeholder="Passord" v-model="password" id="iptPassword" required>
         <input type="password" placeholder="Gjenta passord" v-model="repeatedPassword" id="iptRepeatedPassword" required>
       </div>
-      <label><input type="radio" v-model="householdChoice" value="new" @change="handleHouseholdChoice"> Ny husstand</label> <br>
+      <br>
+      <label><input type="radio" v-model="householdChoice" value="new" @change="handleHouseholdChoice"> Ny husstand </label>
+      <label><input type="radio" v-model="householdChoice" value="existing" @change="handleHouseholdChoice"> Eksisterende husstand </label>
+      <br>
       <div id="divNewHouseholdInfo" v-if="hasChosenNewHousehold">
         <input type="text" placeholder="Husholdningsnavn, f.eks. 'Familien Madsen'" v-model="householdName" id="iptHouseholdName" required>
         <input type="text" placeholder="Adresse" v-model="address" id="iptAddress" required>
         <input type="text" placeholder="Postkode" v-model="postalCode" id="iptPostalCode" required>
       </div>
-      <label><input type="radio" v-model="householdChoice" value="existing" @change="handleHouseholdChoice"> Eksisterende husstand </label>
       <input type="text" v-if="!hasChosenNewHousehold" placeholder="Husstandsskode" v-model="householdCode" id="iptHouseholdCode" required><br><br>
       <label><input type="checkbox" v-model="privacyPolicyCheck" id="cbPrivacyPolicy" required>
         Jeg godtar og har lest <a href="/personvern" id="linkPrivacyPolicy" target="_blank" class="link"> personvernerklæringen</a> </label> <br>
