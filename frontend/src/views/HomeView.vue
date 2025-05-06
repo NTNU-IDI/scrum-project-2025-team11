@@ -1,6 +1,6 @@
 <template>
   <div class="page-wrapper">
-    <Header />
+    <HeaderBase />
 
     <main class="main-content">
       <div class="info-header">
@@ -12,23 +12,23 @@
       </div>
 
       <div class="grid-container">
-        <router-link to="/beredskap" class="box">
+        <div class="box">
           <h3>FØR</h3>
           <p>Før en krise bør du forberede deg.</p>
           <p>Det kan være lurt å finne møtesteder, fylle opp beredskapslageret og sjekke nærområdet.</p>
-        </router-link>
+        </div>
 
-        <router-link to="/beredskap" class="box">
+        <div class="box">
           <h3>UNDER</h3>
           <p>Under en krise er det viktig å holde seg oppdatert.</p>
           <p>Følg med på nyheter og lokale varsler.</p>
-        </router-link>
+        </div>
 
-        <router-link to="/beredskap" class="box">
+        <div class="box">
           <h3>ETTER</h3>
           <p>Etter en krise bør du evaluere og lære.</p>
           <p>Følg råd fra myndigheter og noter erfaringer.</p>
-        </router-link>
+        </div>
       </div>
 
       <div class="info-header">
@@ -73,6 +73,6 @@
 </template>
 
 <script lang="ts" setup>
-import Header from '@/components/Header.vue'
+import HeaderBase from '@/components/HeaderBase.vue'
 import Footer from '@/components/Footer.vue'
 </script>

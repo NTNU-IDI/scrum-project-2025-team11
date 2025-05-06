@@ -1,6 +1,6 @@
 <template>
   <div class="admin-page">
-    <Header />
+    <HeaderBase />
 
     <main class="main-content">
       <div class="info-header">
@@ -28,18 +28,7 @@
 </template>
 
 <script lang="ts" setup>
-import Header from '@/components/HeaderAdminComponent.vue'
+import HeaderBase from '@/components/HeaderBase.vue'
 import Footer from '@/components/Footer.vue'
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
-
-const goToHome = () => {
-  router.push('/')
-}
-
-const goToLogout = () => {
-  router.push('/')
-}
 </script>
 

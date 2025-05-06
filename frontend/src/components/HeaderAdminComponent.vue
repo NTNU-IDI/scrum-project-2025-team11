@@ -7,7 +7,7 @@
 
       <div class="header-right">
         <img src="../assets/ikon/map-trifold-fill.png" alt="Kart" class="icon" @click="goToMap" data-tooltip="Til kartet" />
-        <a href="/" class="button logout" @click.prevent="goToLogout">Logg ut</a>
+        <a href="/" class="button logout" @click.prevent="logOutUser">Logg ut</a>
       </div>
     </div>
   </header>
@@ -20,12 +20,9 @@ const router = useRouter()
 const goToAdminHome = () => {
   router.push('/adminhome')
 }
-const goToLogout = () => {
-  router.push('/')
-}
 const goToMap = () => {
   router.push('/map')
 }
 
+import {logOutUser} from '../api/AuthService';
 </script>
-

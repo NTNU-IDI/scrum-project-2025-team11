@@ -54,6 +54,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/userhome",
     name: "UserHomeView",
     component: UserHomeView,
+    meta: { requiresNormalUser: true }
   },
   {
     path: "/superadmin",
@@ -76,6 +77,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/adminhome',
     name: 'HomeAdminView',
     component: HomeAdminView,
+    meta: { requiresAdmin: true }
   },
   { path: '/about',
     name: 'AboutView',

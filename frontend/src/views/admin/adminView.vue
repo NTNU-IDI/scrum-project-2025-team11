@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import Header from '@/components/Header.vue';
-import Footer from '@/components/Footer.vue';
+import HeaderBase from '@/components/HeaderBase.vue'
+import Footer from '@/components/Footer.vue'
 import ManageEventsComponent from '@/components/admin/ManageEventsComponent.vue';
 </script>
 <template>
-<Header />
+<HeaderBase />
 <div class="page-container">
     <ManageEventsComponent />
 </div>

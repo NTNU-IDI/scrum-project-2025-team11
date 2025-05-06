@@ -1,6 +1,6 @@
 <template>
   <div class="page-wrapper">
-    <Header />
+    <HeaderBase />
 
     <main class="main-content">
       <div class="info-header">
@@ -56,6 +56,6 @@
 </template>
 
 <script lang="ts" setup>
-import Header from '@/components/Header.vue'
+import HeaderBase from '@/components/HeaderBase.vue'
 import Footer from '@/components/Footer.vue'
 </script>

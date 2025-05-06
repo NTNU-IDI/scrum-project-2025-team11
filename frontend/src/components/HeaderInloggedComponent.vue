@@ -8,9 +8,13 @@
       <div class="header-right">
         <img src="../assets/ikon/house-line-fill.png" alt="Husstand" class="icon" @click="goToHousehold" />
         <img src="../assets/ikon/list-plus-fill.png" alt="Lager" class="icon" @click="goToStorage" />
-        <a href="/" class="button logout" @click.prevent="goToLogout">Logg ut</a>
+        <a href="/" class="button logout" @click.prevent="logOutUser">Logg ut</a>
       </div>
     </div>
   </header>
 </template>
+
+<script lang="ts" setup>  
+import {logOutUser} from '../api/AuthService';
+</script>
 
