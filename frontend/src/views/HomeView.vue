@@ -1,200 +1,78 @@
-<script lang="ts">
-  export default {
-    name: 'HomeView',
-  }
-</script>
-
 <template>
-<div class="home">
-  <Header />
+  <div class="page-wrapper">
+    <Header />
 
-  <main class="main-content">
-    <div class="info-header">
-      <h1>Velkommen til Krisefikseren!</h1>
-    </div>
-
-    <div clasS="info-header">
-      <p>Vet du hva du bør gjøre FØR, UNDER og ETTER en krise?</p>
-    </div>
-
-    <div class="grid-container">
-      <router-link to="/beredskap" class="box">
-        <h3>FØR</h3>
-        <p>Før en krise bør du forberede deg.</p>
-        <p>Da kan det være lurt å finne lokale møtesteder, fylle opp beredskapslageret ditt og sjekke nærområdet ditt.</p>
-      </router-link>
-
-      <router-link to="/beredskap" class="box">
-        <h3>UNDER</h3>
-        <p>Under en krise er det viktig å holde seg oppdatert.</p>
-        <p>Da kan det være lurt å følge med på nyheter og lokale varsler.</p>
-      </router-link>
-      <router-link to="/beredskap" class="box">
-        <h3>ETTER</h3>
-        <p>Etter en krise er det viktig å vite hva du skal gjøre.</p>
-        <p>Da kan det være lurt å sjekke med lokale myndigheter og følge med på nyheter, og kanskje notere hva du lærte for</p>
-        <p>å være bedre forberedt neste gang.</p>
-      </router-link>
-    </div>
-
-    <div class="info-header">
-      <p>Nedenfor finner du en oversikt over de ulike tjenestene vi kan tilby.</p>
-    </div>
-
-    <div class="grid-container">
-      <router-link to="/map" class="box">
-        <h3>Finn tilfluktsrom</h3>
-        <p>Se oversikt over tilfluktsrom i nærheten.</p>
-      </router-link>
-
-      <router-link to="/map" class="box">
-        <h3>Møtesteder</h3>
-        <p>Se hvor du kan møte andre dersom en krise skulle intreffe.</p>
-      </router-link>
-
-      <div class="box unavailable" data-tooltip="Tjenesten er ikke tilgjengelig enda.">
-        <h3>Nyheter</h3>
-        <p>Hold deg oppdatert på relevante hendelser.</p>
+    <main class="main-content">
+      <div class="info-header">
+        <h1>Velkommen til Krisefikseren!</h1>
       </div>
 
-      <router-link to="/login" class="box unavailable" data-tooltip="Logg inn for å få tilgang til denne tjenesten.">
-        <h3>Husstand</h3>
-        <p>Se oversikt over medlemmene i din husstand.</p>
-      </router-link>
+      <div class="info-header">
+        <p>Vet du hva du bør gjøre FØR, UNDER og ETTER en krise?</p>
+      </div>
 
-      <router-link to="/login" class="box unavailable" data-tooltip="Logg inn for å få tilgang til denne tjenesten.">
-        <h3>Beredskapslager</h3>
-        <p>Se om du har nok mat og drikke til en eventuell krisesituasjon.</p>
-      </router-link>
+      <div class="grid-container">
+        <router-link to="/beredskap" class="box">
+          <h3>FØR</h3>
+          <p>Før en krise bør du forberede deg.</p>
+          <p>Det kan være lurt å finne møtesteder, fylle opp beredskapslageret og sjekke nærområdet.</p>
+        </router-link>
 
-      <router-link to="/login" class="box unavailable" data-tooltip="Logg inn for å få tilgang til denne tjenesten.">
-        <h3>Erfaringer fra en krise?</h3>
-        <p>Skriv et notat fra en krise du har opplevd, og del den med andre!</p>
-      </router-link>
+        <router-link to="/beredskap" class="box">
+          <h3>UNDER</h3>
+          <p>Under en krise er det viktig å holde seg oppdatert.</p>
+          <p>Følg med på nyheter og lokale varsler.</p>
+        </router-link>
 
-    </div>
-  </main>
+        <router-link to="/beredskap" class="box">
+          <h3>ETTER</h3>
+          <p>Etter en krise bør du evaluere og lære.</p>
+          <p>Følg råd fra myndigheter og noter erfaringer.</p>
+        </router-link>
+      </div>
 
-  <Footer />
-</div>
+      <div class="info-header">
+        <p>Nedenfor finner du en oversikt over de ulike tjenestene vi tilbyr.</p>
+      </div>
+
+      <div class="grid-container">
+        <router-link to="/map" class="box">
+          <h3>Finn tilfluktsrom</h3>
+          <p>Se oversikt over tilfluktsrom i nærheten.</p>
+        </router-link>
+
+        <router-link to="/map" class="box">
+          <h3>Møtesteder</h3>
+          <p>Se hvor du kan møte andre ved krise.</p>
+        </router-link>
+
+        <div class="box unavailable" data-tooltip="Tjenesten er ikke tilgjengelig enda.">
+          <h3>Nyheter</h3>
+          <p>Hold deg oppdatert på relevante hendelser.</p>
+        </div>
+
+        <router-link to="/login" class="box unavailable" data-tooltip="Logg inn for å få tilgang.">
+          <h3>Husstand</h3>
+          <p>Se oversikt over medlemmene i din husstand.</p>
+        </router-link>
+
+        <router-link to="/login" class="box unavailable" data-tooltip="Logg inn for å få tilgang.">
+          <h3>Beredskapslager</h3>
+          <p>Sjekk om du har nok mat og drikke.</p>
+        </router-link>
+
+        <router-link to="/login" class="box unavailable" data-tooltip="Logg inn for å få tilgang.">
+          <h3>Erfaringer</h3>
+          <p>Skriv et notat fra en krise du har opplevd.</p>
+        </router-link>
+      </div>
+    </main>
+
+    <Footer />
+  </div>
 </template>
 
 <script lang="ts" setup>
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 </script>
-
-<style scoped>
-.home {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background-color: white;
-}
-
-.main-content {
-  flex: 1;
-  padding: 48px 32px;
-  background-color: white;
-}
-
-.info-header {
-  background-color: #ffffff;
-  color: var(--darkest-blue);
-  padding: 6px;
-  border-radius: 8px;
-  margin: 10px 125px;
-  text-align: center;
-}
-
-.info-header h1 {
-  margin: 0 0 16px 0;
-  font-size: 2.5rem;
-  font-weight: bold;
-}
-
-.info-header p {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 500;
-}
-
-.grid-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-  padding: 40px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  margin: 40px 100px;
-}
-
-.box {
-  background-color: var(--light-blue);
-  border: 2px solid var(--light-blue);
-  color: white;
-  padding: 24px;
-  border-radius: 8px;
-  transition: background-color 0.4s ease;
-  box-shadow: 0 4px 6px rgba(0.5, 0, 0, 0.5);
-  text-decoration: none;
-  display: block;
-  text-align: center;
-}
-
-.box.unavailable {
-  background-color: var(--lightest-blue);
-  border: 2px solid var(--lightest-blue);
-  color: white;
-  position: relative;
-}
-
-.box.unavailable:hover {
-  background-color: var(--lightest-blue);
-  color: white;
-  transform: scale(1);
-  cursor: not-allowed;
-}
-
-/* Tooltip, ikke rør!!! */
-.box.unavailable::after {
-  content: attr(data-tooltip);
-  position: center;
-  bottom: 110%;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: var(--bad-red);
-  color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-  z-index: 10;
-}
-
-/* Vis tooltip på hover */
-.box.unavailable:hover::after {
-  opacity: 1;
-}
-
-.box h3 {
-  margin: 0 0 8px 0;
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-.box p {
-  margin: 0;
-  font-size: 1rem;
-}
-
-.box:hover {
-  background-color: rgb(169, 184, 203);
-  color: var(--darkest-blue);
-  transform: scale(1.02);
-  cursor: pointer;
-}
-</style>
