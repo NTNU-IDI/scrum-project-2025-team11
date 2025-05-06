@@ -1,27 +1,59 @@
 <script lang="ts" setup>
-import { computed, h, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { validateItemName, validateItemQuantity, validateItemUnit, validateItemExpirationDate } from '@/utils/validationService';
 import { ItemService } from '@/api/ItemService';
 import type { Item } from '@/types/Item';
-import { InventoryService } from '@/api/InventoryService';
 import { useHouseholdStore } from '@/stores/householdStore';
 import { useInventoryStore } from '@/stores/inventoryStore';
 
-// Household store
+/**
+ * Store instances
+ * @property {import('@/stores/householdStore').HouseholdStore}
+ * @property {import('@/stores/inventoryStore').InventoryStore}
+ */
 const householdStore = useHouseholdStore();
 const inventoryStore = useInventoryStore();
 
+/**
+ * Property to store the list of existing item types
+ * @property {Array} existingTypes
+ * @default []
+ */
 const existingTypes = ref<Item[]>([])
 
+/**
+ * Property to define if the dropdown is shown
+ * @property {boolean} isEditMode
+ * @default false
+ */
 const showDropdown = ref(false);
+
+/**
+ * Property to store the new item values
+ * @property {string} newName
+ * @property {string} newQuantity
+ * @property {string} newUnit
+ * @property {string} newExpirationDate
+ */
 const newName = ref('');
 const newQuantity = ref('');
 const newUnit = ref('');
 const newExpirationDate = ref(new Date().toISOString().split('T')[0]);
-const errorMsg = ref('');
 
-const emit = defineEmits(['hide-new-item-box']);
+/**
+ * Property to store the response message
+ * @property {string} responseMessage
+ * @default ''
+ */
+const responseMessage = ref('');
 
+/**
+ * Property to define emits
+ * @property {function} emit
+ */
+const emit = defineEmits(['hide-new-item-box', 'set-response-message']);
+
+// Fetch existing item types when the component is mounted
 onMounted(async () => {
     try {
         existingTypes.value = await ItemService.findAll();
@@ -30,37 +62,52 @@ onMounted(async () => {
     }
 });
 
+/**
+ * Function to add a new item to the inventory
+ * @returns {Promise<void>}
+ */
 const addItem = async () => {
-    if(!validateItemName(newName.value)) {
-        errorMsg.value = 'Vennligst skriv inn et gyldig navn';
-        console.log(errorMsg.value);
-        alert(errorMsg.value);
-        return;
+    if(!newName.value) {
+        responseMessage.value = 'Vennligst fyll inn et navn';
+        emit('set-response-message', responseMessage.value);
+        if(!validateItemName(newName.value)) {
+            responseMessage.value = 'Vennligst skriv inn et gyldig navn';
+            emit('set-response-message', responseMessage.value);
+            return;
+        } 
     }
-    if(!validateItemQuantity(newQuantity.value)) {
-        errorMsg.value = 'Vennligst skriv inn en gyldig mengde';
-        console.log(errorMsg.value);
-        alert(errorMsg.value);
-        return;
+    if(!newQuantity.value) {
+        responseMessage.value = 'Vennligst fyll inn en mengde';
+        emit('set-response-message', responseMessage.value);
+        if(!validateItemQuantity(newQuantity.value)){
+            responseMessage.value = 'Vennligst skriv inn en gyldig mengde';
+            emit('set-response-message', responseMessage.value);
+            return;
+        }
     }
-    if(!validateItemUnit(newUnit.value)) {
-        errorMsg.value = 'Vennligst skriv inn en gyldig enhet';
-        console.log(errorMsg.value);
-        alert(errorMsg.value);
-        return;
+    if(!newUnit.value) {
+        responseMessage.value = 'Vennligst fyll inn en enhet';
+        emit('set-response-message', responseMessage.value);
+        if(!validateItemUnit(newUnit.value)) {
+            responseMessage.value = 'Vennligst skriv inn en gyldig enhet';
+            emit('set-response-message', responseMessage.value);
+            return;
+        }
     }
-    if(!validateItemExpirationDate(newExpirationDate.value)) {
-        errorMsg.value = 'Vennligst skriv inn en gyldig utløpsdato';
-        console.log(errorMsg.value);
-        alert(errorMsg.value);
-        return;
+    if(!newExpirationDate.value) {
+        responseMessage.value = 'Vennligst fyll inn en utløpsdato';
+        emit('set-response-message', responseMessage.value);
+        if(!validateItemExpirationDate(newExpirationDate.value)) {
+            responseMessage.value = 'Vennligst skriv inn en gyldig utløpsdato';
+            emit('set-response-message', responseMessage.value);
+            return;
+        }
     }
     
     const newItemId = existingTypes.value.find(item => item.name === newName.value)?.id;
     if (!newItemId) {
-        errorMsg.value = 'Vennligst velg en eksisterende vare eller opprett en ny';
-        console.log(errorMsg.value);
-        alert(errorMsg.value);
+        responseMessage.value = 'Vennligst velg en eksisterende vare eller opprett en ny';
+        emit('set-response-message', responseMessage.value);
         return;
     }
     const newHouseholdItem = {
@@ -73,28 +120,34 @@ const addItem = async () => {
         expirationDate: newExpirationDate.value
     };
     if(!householdStore.id) {
-        console.error('Household ID is not available');
+        responseMessage.value = 'Kunne ikke finne husstand';
+        emit('set-response-message', responseMessage.value);
         return;
     }
     if(!newHouseholdItem) {
-        console.error('New household item is not available');
+        responseMessage.value = 'Artikkel er ikke tilgjengelig';
+        emit('set-response-message', responseMessage.value);
         return;
     }
     if(!newHouseholdItem.itemId) {
-        console.error('Item ID is not available');
+        responseMessage.value = 'Artikkelen er ikke tilgjengelig';
+        emit('set-response-message', responseMessage.value);
         return;
     }
 
     await inventoryStore.upsertItem(householdStore.id, newHouseholdItem);
-
+    responseMessage.value = `${newHouseholdItem.name} er lagt til i lageret`;
+    emit('set-response-message', responseMessage.value);
     emit('hide-new-item-box');
 }
 
+// Select type from dropdown
 const selectOption = (itemName: string) => {
     newName.value = itemName;
     showDropdown.value = false;
 }
 
+// Add option to dropdown
 const addItemOption = async (newName: string) => {
     if (!newName) {
         return;
@@ -106,6 +159,7 @@ const addItemOption = async (newName: string) => {
     }
 }
 
+// Handle enter keydown event
 const handleKeydown = (event: KeyboardEvent, name: string) => {
   if (event.key === 'Enter') {
     addItemOption(name);
@@ -118,7 +172,7 @@ const handleKeydown = (event: KeyboardEvent, name: string) => {
 
         <div class="header-container">
             <h1 class="medium-header">Ny artikkel</h1>
-            <button class="cancel-button" @click="$emit('hide-new-item-box')">X</button> 
+            <button class="cancel-button" @click="() => {$emit('hide-new-item-box'); $emit('set-response-message', '');}">X</button> 
         </div>
 
         <div class="item-input">

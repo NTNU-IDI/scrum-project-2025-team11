@@ -1,29 +1,65 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from 'vue';
 import { useItemTypeStore } from '@/stores/itemStore';
-import { formatDate, formatDateToList } from '@/utils/formatDate';
-import { InventoryService } from '@/api/InventoryService';
 import { useHouseholdStore } from '@/stores/householdStore';
-import { HouseholdService } from '@/api/HouseholdService';
 import type { HouseholdItemRequest, EditableItem } from '@/types/Inventory';
 import { useInventoryStore } from '@/stores/inventoryStore';
-import { ItemService } from '@/api/ItemService';
 
-// Store imports
+/**
+ * Store instances
+ * @property {import('@/stores/householdStore').HouseholdStore}
+ * @property {import('@/stores/inventoryStore').InventoryStore}
+ * @property {import('@/stores/itemStore').ItemTypeStore}
+ */
 const householdStore = useHouseholdStore();
 const itemTypeStore = useItemTypeStore();
 const inventoryStore = useInventoryStore();
 
-// Props
+/**
+ * Property to store the selected item type ID from store
+ * @property {number | null} selectedTypeId 
+ */
 const itemTypeId = computed(() => itemTypeStore.id);
+
+/**
+ * Property to store the name of the selected item type
+ * @property {string} itemTypeName
+ */
 const itemTypeName = computed(() => itemTypeStore.name);
+
+/**
+ * Property to store the list of items
+ * @property {Array} items
+ * @default []
+ */
 const items = ref<EditableItem[]>([]);
+
+/**
+ * Property to store all items of the selected type
+ * @property {Array} allTypeItems
+ * @default []
+ */
 const allTypeItems = ref<EditableItem[]>([]);
+
+/**
+ * Property to define if the component is in edit mode
+ * @property {boolean} isEditMode
+ * @default false
+ */
 const isEditMode = computed(() => itemTypeStore.isEditMode);
 
-// Load all items of the selected type
+/**
+ * Property to store the response message
+ * @property {string} responseMessage
+ * @default ''
+ */
+const responseMessage = ref('');
+
+/**
+ * Function to load the inventory items
+ * @returns {Promise<void>}
+ */
 const loadItems = async () => {
-    // Get actual household id from the store
     await householdStore.fetchHousehold();
     
     if (!householdStore.id) {
@@ -33,6 +69,7 @@ const loadItems = async () => {
     await inventoryStore.fetchInventory();
 }
 
+// Fetch inventory items when the component is mounted
 onMounted( async () => {
     await loadItems();
 });
@@ -45,18 +82,26 @@ watch(() => inventoryStore.inventory, async (newItems) => {
     }
 }, { immediate: true });
 
+// Watch for changes in the selected item type
 watch(itemTypeId, (newId) => {
     if (newId) {
         filterItems();
     }
 });
 
+
+// Watch for changes in the edit mode
 watch(isEditMode, (newValue, oldValue) => {
     if (oldValue && !newValue) {
         updateItems();
+        responseMessage.value = '';
     }
 });
 
+/**
+ * Function to filter items based on selected item type
+ * @returns {void}
+ */
 function filterItems() {
     items.value = allTypeItems.value
         .filter(item => item.itemId === itemTypeId.value)
@@ -72,6 +117,10 @@ function filterItems() {
         }));
 }
 
+/**
+ * Function to update an item
+ * @returns {Promise<void>}
+ */
 const updateItems = async () => {
     for (const item of items.value) {
         if (item.dirty) {
@@ -83,24 +132,33 @@ const updateItems = async () => {
                 acquiredDate: item.acquiredDate,
             };
             await inventoryStore.updateItem(item.householdId, updatedItem)
+            responseMessage.value = `${item.itemName} er oppdatert`;
             item.dirty = false;
         }
     }
 };
 
+/**
+ * Function to delete an item
+ * @param {EditableItem} item - The item to delete
+ * @returns {Promise<void>}
+ */
 const deleteItem = async (item: EditableItem) => {
     if (!householdStore.id) {
         console.error('Household ID is not available');
+        responseMessage.value = 'Kunne ikke finne husstand';
         return;
     }
     if (!itemTypeId.value) {
         console.error('Item type ID is not available');
+        responseMessage.value = 'Kunne ikke finne artikkeltype';
         return;
     }
     if(confirm('Er du sikker på at du vil slette denne artikkelen?')) {
         await inventoryStore.deleteItem(itemTypeId.value, item.acquiredDate)
         .then(() => {
             items.value = items.value.filter(item => item.itemId !== itemTypeId.value);
+            responseMessage.value = `${item.itemName} er slettet fra lageret`;
         })
         .catch(error => {
             console.error('Error deleting item:', error);
@@ -144,6 +202,8 @@ const deleteItem = async (item: EditableItem) => {
             </div>
         </div>
     </div>
+
+    <p class="user-response">{{ responseMessage }}</p>
 </template>
 
 <style scoped>
