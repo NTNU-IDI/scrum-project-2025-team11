@@ -103,6 +103,10 @@ button:hover {
   transform: scale(1.03);
 }
 
+.small-button {
+  font-size: var(--font-size-small);
+}
+
 .good-button {
   background-color: var(--good-green);
 }
@@ -195,23 +199,6 @@ button:hover {
 .title-map {
   font-size: var(--font-size-xlarge);
   margin: 0;
-}
-
-.point-card {
-  position: relative;
-  background: var(--white);
-  border-radius: 10px;
-  width: 250px;
-}
-
-.point-card-content {
-  padding: 1.2rem;
-  text-align: left;
-}
-
-.point-card input,
-select {
-  font-size: var(--font-size-small);
 }
 
 .map-overview-box {

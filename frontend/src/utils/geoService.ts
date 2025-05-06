@@ -1,5 +1,3 @@
-import type { PointOfInterest } from "@/types/PointOfInterest";
-
 export function calculateDistance(
   lat1: number,
   lon1: number,
@@ -26,30 +24,6 @@ export function calculateDistance(
 
 export function toRadians(degrees: number): number {
   return degrees * (Math.PI / 180);
-}
-
-export function getNearestPoint(
-  userLatitude: number,
-  userLongitude: number,
-  points: PointOfInterest[]
-): PointOfInterest | null {
-  let nearestPoint: PointOfInterest | null = null;
-  let minDistance = Infinity;
-
-  // Iterate each point and find closest one
-  points.forEach((point) => {
-    const distance = calculateDistance(
-      userLatitude,
-      userLongitude,
-      point.latitude,
-      point.longitude
-    );
-    if (distance < minDistance) {
-      minDistance = distance;
-      nearestPoint = point;
-    }
-  });
-  return nearestPoint;
 }
 
 export function getEventColor(severity: number) {

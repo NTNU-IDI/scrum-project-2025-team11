@@ -38,7 +38,11 @@
           <p v-if="addressError" class="error-message">{{ addressError }}</p>
 
           <!-- Navigation button -->
-          <button class="button" @click="navigateToPoint">Naviger til dette punktet</button>
+           <div class="point-buttons">
+            <button v-if="!props.isNavigating"class="good-button small-button" @click="navigateToPoint">Naviger til dette punktet</button>
+            <button v-if="props.isNavigating" class="delete-button small-button" @click="stopNavigation">Stopp navigasjon</button>
+            <button v-if="showNextButton && !props.isNavigating" class="dark-button small-button" @click="nextShelter">Neste tilfluktsrom</button>
+           </div>
         </div>
       </div>
 
@@ -121,7 +125,7 @@ const errorMessage = ref('');
 const inputMethod = ref('coordinates');
 const address = ref('');
 const addressError = ref('');
-const emit = defineEmits(['close', 'coordinates-updated', 'navigate']);
+const emit = defineEmits(['close', 'coordinates-updated', 'navigate', 'next-shelter', 'stop-navigation']);
 
 const props = defineProps({
   selectedPoint: {
@@ -131,6 +135,14 @@ const props = defineProps({
   mode: {
     type: String as PropType<'edit' | 'create' | 'view'>,
     default: 'create'
+  },
+  showNextButton: {
+    type: Boolean,
+    default: false
+  },
+  isNavigating: { 
+    type: Boolean,
+    default: false
   }
 });
 
@@ -237,6 +249,14 @@ function navigateToPoint() {
   });
 }
 
+function nextShelter() {
+  emit('next-shelter');
+}
+
+function stopNavigation() {
+  emit('stop-navigation');
+}
+
 const createPoint = async () => {
   errorMessage.value = '';
   try {
@@ -272,6 +292,32 @@ const deletePoint = async () => {
 </script>
 
 <style scoped>
+.point-card {
+  position: relative;
+  background: var(--white);
+  border-radius: 10px;
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.point-card-content {
+  padding: 1.2rem;
+  text-align: left;
+  flex: 1;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--light-gray) var(--white);
+}
+
+.point-card input,
+select {
+  font-size: var(--font-size-small);
+}
+
 .point-buttons {
   display: flex;
   flex-direction: column;
@@ -281,7 +327,7 @@ const deletePoint = async () => {
 .close-icon {
   position: absolute;
   top: 5px;
-  right: 10px;
+  right: 15px;
   font-size: 24px;
   color: black;
   cursor: pointer;
