@@ -184,6 +184,31 @@ public class PointOfInterestControllerTest {
                 .andExpect(jsonPath("$.latitude").value(pointOfInterest.getLatitude()))
                 .andExpect(jsonPath("$.longitude").value(pointOfInterest.getLongitude()));
         }
+
+
+        @Test
+        @DisplayName("Find the three nearest shelters")
+        void findThreeNearestShelters() throws Exception {
+            PointOfInterestResponseDTO pointOfInterest = new PointOfInterestResponseDTO();
+            pointOfInterest.setId(1);
+            pointOfInterest.setName("Test Point");
+            pointOfInterest.setDescription("Test Description");
+            pointOfInterest.setIconType(Enums.IconEnum.shelter);
+            pointOfInterest.setLatitude(54.0);
+            pointOfInterest.setLongitude(10.0);
+
+            when(pointOfInterestService.findThreeClosestShelters(54.0, 10.0))
+                    .thenReturn(List.of(pointOfInterest));
+
+            mockMvc.perform(get(BASE_URL + "/closestShelters?latitude=54.0&longitude=10.0"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(pointOfInterest.getId()))
+                .andExpect(jsonPath("$[0].name").value(pointOfInterest.getName()))
+                .andExpect(jsonPath("$[0].description").value(pointOfInterest.getDescription()))
+                .andExpect(jsonPath("$[0].iconType").value(pointOfInterest.getIconType().toString()))
+                .andExpect(jsonPath("$[0].latitude").value(pointOfInterest.getLatitude()))
+                .andExpect(jsonPath("$[0].longitude").value(pointOfInterest.getLongitude()));
+        }
     }
     
     @Nested
@@ -226,6 +251,16 @@ public class PointOfInterestControllerTest {
             when(pointOfInterestService.findAll()).thenReturn(List.of());
 
             mockMvc.perform(get(BASE_URL))
+                .andExpect(status().isNotFound());
+        }
+
+        @Test
+        @DisplayName("Delete point of interest - Not Found")
+        void deletePointOfInterestNotFound() throws Exception {
+            int id = 1;
+            when(pointOfInterestService.findById(id)).thenReturn(Optional.empty());
+
+            mockMvc.perform(delete(BASE_URL + "/{id}", id))
                 .andExpect(status().isNotFound());
         }
     }
