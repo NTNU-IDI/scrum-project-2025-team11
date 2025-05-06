@@ -93,7 +93,7 @@ public class InventoryServiceImpl implements InventoryService {
             req.getAcquiredDate()
         );
         HouseholdItem hi = new HouseholdItem(
-            pk, hh, item,
+            pk, hh, item, 
             req.getQuantity(),
             req.getUnit(),
             req.getExpirationDate()
