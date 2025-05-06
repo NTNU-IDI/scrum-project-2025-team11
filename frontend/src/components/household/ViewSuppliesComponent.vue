@@ -117,20 +117,20 @@ const toggleEditMode = () => {
  * @param {number} itemId - The ID of the item to delete
  * @returns {Promise<void>}
  */
-const deleteItem =  (itemId: number) => {
-    list.value.forEach(async item => {
-        if (!householdStore.id) {
-            console.error('Household ID is not available');
-            responseMessage.value = 'Kunne ikke finne husstand';
-            return;
-        }
-        if (item.id === itemId) {
-            if(confirm(`Er du sikker på at du vil slette ${item.name} fra lageret?`)) {
-                await inventoryStore.deleteItem(itemId, item.acquiredDate);
-                responseMessage.value = `${item.name} er slettet fra lageret`;
-            }
-        }
-    });
+const deleteItem =  async (itemId: number) => {
+    const matchingItems = inventoryStore.inventory.filter(item => item.itemId === itemId);
+
+    if (matchingItems.length === 0) return;
+
+    const confirmed = confirm(`Er du sikker på at du vil slette alle ${matchingItems[0].itemName || ''}-enheter fra lageret?`);
+    if (!confirmed) return;
+
+    for (const item of matchingItems) {
+        await inventoryStore.deleteItem(itemId, item.acquiredDate);
+    }
+
+    responseMessage.value = `${matchingItems[0].itemName || 'Vare'} er slettet fra lageret`;
+    await loadInventory(); // refresh the UI
 }
 </script>
 <template>
