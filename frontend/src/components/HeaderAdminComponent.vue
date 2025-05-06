@@ -3,11 +3,11 @@
     <div class="header-container">
       <div class="header-left">
         <img src="../assets/invertednew.png" alt="Logo" class="logo" @click="goToAdminHome" />
+        <a href="/map" class="button other"><i class="fa fa-map-o"></i> Rediger kart</a> 
       </div>
 
       <div class="header-right">
-        <img src="../assets/ikon/map-trifold-fill.png" alt="Kart" class="icon" @click="goToMap" data-tooltip="Til kartet" />
-        <a href="/" class="button logout" @click.prevent="logOutUser">Logg ut</a>
+        <a href="/" class="button logout" @click.prevent="logOutUser"><i class="fa fa-sign-out"></i> Logg ut</a>
       </div>
     </div>
   </header>
@@ -19,9 +19,6 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const goToAdminHome = () => {
   router.push('/adminhome')
-}
-const goToMap = () => {
-  router.push('/map')
 }
 
 import {logOutUser} from '../api/AuthService';

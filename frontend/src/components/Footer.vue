@@ -14,6 +14,7 @@
         <a href="/superadmin">Superadmin (for testing)</a> |
         <a href="/forgot">Forgot (for testing)</a> |
         <a href="/reset">Reset (for testing)</a>
+        <a href="/headers">Register (for testing)</a> |
         <br />
         <br />
         <br />

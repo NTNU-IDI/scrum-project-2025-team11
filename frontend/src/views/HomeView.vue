@@ -12,19 +12,19 @@
       </div>
 
       <div class="grid-container">
-        <div class="box">
+        <div class="box info">
           <h3>FØR</h3>
           <p>Før en krise bør du forberede deg.</p>
           <p>Det kan være lurt å finne møtesteder, fylle opp beredskapslageret og sjekke nærområdet.</p>
         </div>
 
-        <div class="box">
+        <div class="box info">
           <h3>UNDER</h3>
           <p>Under en krise er det viktig å holde seg oppdatert.</p>
           <p>Følg med på nyheter og lokale varsler.</p>
         </div>
 
-        <div class="box">
+        <div class="box info">
           <h3>ETTER</h3>
           <p>Etter en krise bør du evaluere og lære.</p>
           <p>Følg råd fra myndigheter og noter erfaringer.</p>
@@ -36,6 +36,12 @@
       </div>
 
       <div class="grid-container">
+        <div class="box info">
+          <h3>Karttjenester</h3>
+          <p>Und</p>
+          <p>Følg råd fra myndigheter og noter erfaringer.</p>
+        </div>
+
         <router-link to="/map" class="box">
           <h3>Finn tilfluktsrom</h3>
           <p>Se oversikt over tilfluktsrom i nærheten.</p>
@@ -76,3 +82,9 @@
 import HeaderBase from '@/components/HeaderBase.vue'
 import Footer from '@/components/Footer.vue'
 </script>
+
+<style scoped>
+.main-content {
+  padding: 20px;
+}
+</style>
