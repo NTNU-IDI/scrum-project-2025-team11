@@ -4,6 +4,8 @@ body {
   font-family: "Inter", sans-serif;
   font-weight: normal;
   margin: 0;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .medium-header {
@@ -171,12 +173,6 @@ button:disabled:hover {
   border-radius: 0.5rem;
 }
 
-@media (max-width: 480px) {
-  .grey-container {
-    width: 300px !important;
-  }
-}
-
 .delete-button {
   color: var(--bad-red);
   padding: 0.5rem;
@@ -261,6 +257,23 @@ button:disabled:hover {
   background-color: var(--grey);
 }
 
+.modal-overlay {
+  position: fixed;
+  top: -5rem;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+@media (max-width: 768px) {
+  .title-map {
+    font-size: var(--font-size-medium);
+  }
 /* ---Styling for hjemmesidene! Ikke rør altså!!--- */
 .page-wrapper {
   display: flex;
@@ -481,4 +494,15 @@ button:disabled:hover {
   background-color: #ffffff;
   border-color: var(--light-blue);
   color: var(--darkest-blue);
+}
+
+@media (max-width: 480px) {
+  .grey-container {
+    width: 300px !important;
+  }
+
+  .dark-button {
+    width: 5rem;
+    height: 3rem;
+  }
 }
