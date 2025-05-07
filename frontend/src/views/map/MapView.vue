@@ -122,6 +122,7 @@ onMounted(async () => {
     $toast.info('Klikk på kartet for å plassere nytt punkt, eller klikk på eksisterende ikon for å redigere det', {duration: 15000});
     map.on('click', (e: L.LeafletMouseEvent) => {
     const { lat, lng } = e.latlng;
+    clearRouting();
     removeTempMarker();
     createTempMarker(lat, lng);
     selectedPoint.value = {
