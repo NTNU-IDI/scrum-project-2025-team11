@@ -17,30 +17,31 @@ const username = ref('');
 const password = ref('');
 const passwordRepeat = ref('');
 const email = ref('');
+const errorMsg = ref('');
 
 const validInput = () => {
     if(!validateFirstName(firstName.value)){
-        alert('Invalid first name');
+        errorMsg.value = ('Invalid first name');
         return false;
     }
     if(!validateLastName(lastName.value)){
-        alert('Invalid last name');
+        errorMsg.value = ('Invalid last name');
         return false;
     }
     if(!validateUsername(username.value)){
-        alert('Invalid username');
+        errorMsg.value = ('Invalid username');
         return false;
     }
     if(!validatePassword(password.value)){
-        alert('Invalid password');
+        errorMsg.value = ('Invalid password');
         return false;
     }
     if(password.value !== passwordRepeat.value){
-        alert('Passwords do not match');
+        errorMsg.value = ('Passwords do not match');
         return false;
     }
     if(!validateEmail(email.value)){
-        alert('Invalid email');
+        errorMsg.value = ('Invalid email');
         return false;
     }
     return true;
@@ -49,7 +50,7 @@ const validInput = () => {
 const createUser = async () => {
     if (validInput()){
         if (houseHoldStore.id === null) {
-            alert('Household ID is not set.');
+            errorMsg.value = ('Household ID is not set.');
             return;
         }   
         await adminUserStore.createUser({
@@ -66,14 +67,15 @@ const createUser = async () => {
             email.value = '';
             password.value = '';
             passwordRepeat.value = '';
+            errorMsg.value = '';
         }).catch((error) => {
-            alert('Error creating user: ' + error.message);
+            errorMsg.value = ('Error creating user: ' + error.message);
         });
     }
 }
 
 const areFieldsEmpty = computed(() => {
-    return username.value.trim() === '' || password.value.trim() === '' || email.value.trim() === '';
+    return firstName.value.trim() === '' ||  lastName.value.trim() === '' || username.value.trim() === '' || email.value.trim() === '' || password.value.trim() === '' || passwordRepeat.value.trim() === '';
 });
 </script>
 
@@ -84,36 +86,54 @@ const areFieldsEmpty = computed(() => {
         <div class="grey-container">
             <div class="input-fields">
                 <div class="header">Opprettelse av ny adminbruker</div>
-                <input type="text" class="user-input" placeholder="*Fornavn" v-model="firstName"></input>
-                <input type="text" class="user-input" placeholder="*Etternavn" v-model="lastName"></input>
-                <input type="text" class="user-input" placeholder="*Brukernavn" v-model="username"></input>
-                <input type="text" class="user-input" placeholder="*E-mail" v-model="email"></input>
-                <input type="password" class="user-input" placeholder="*Passord" v-model="password"></input>
-                <input type="password" class="user-input" placeholder="*Gjenta passord" v-model="passwordRepeat"></input>
+                <button class="cancel-button" @click="$emit('hide-new-user-box')">X</button>
+                <label class="label" for="first-name">*Fornavn</label>
+                <input type="text" class="user-input" id="first-name" v-model="firstName"></input>
+                <label class="label" for="last-name">*Etternavn</label>
+                <input type="text" class="user-input" id="last-name" v-model="lastName"></input>
+                <label class="label" for="username">*Brukernavn</label>
+                <input type="text" class="user-input" id="username" v-model="username"></input>
+                <label class="label" for="email">*E-mail</label>
+                <input type="text" class="user-input" id="email" v-model="email"></input>
+                <label class="label" for="password">*Passord</label>
+                <input type="password" class="user-input" id="password" v-model="password"></input>
+                <label class="label" for="repeat-pass">*Gjenta passord</label>
+                <input type="password" class="user-input" id="repeat-pass" v-model="passwordRepeat"></input>
             </div>
             <button class="dark-button" @click="createUser" :disabled="areFieldsEmpty">+ Opprett adminbruker</button>
+            <p class="error-message">{{ errorMsg }}</p>
         </div>
     </div>
 </div>
 </template>
 <style scoped>
 .grey-container {
-    background-color: var(--light-blue);
-    height: 31rem;
+    height: 40rem;
 }
 
 .header {
+    font-size: var(--font-size-large);
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+    background-color: transparent;
+}
+
+h1 {
+    text-align: left;
+}
+
+.error-message {
+    font-size: var(--font-size-medium);
     color: white;
-    font-weight: bold;
-    margin-bottom: 1.5rem;
 }
 
 .user-input {
     height: 3rem;
+    background-color: white;
 }
 
 .dark-button {
-    background-color: var(--orange);
+    background-color: var(--good-green);
     height: 3rem;
     width: 15rem;
 }
@@ -121,5 +141,13 @@ const areFieldsEmpty = computed(() => {
 .dark-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+.cancel-button {
+    position: absolute;
+    top: 6.5rem;
+    right: -10.5rem;
+    color: var(--bad-red);
+    background-color: transparent;
 }
 </style>
