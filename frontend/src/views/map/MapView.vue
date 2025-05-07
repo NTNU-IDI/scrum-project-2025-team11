@@ -5,7 +5,7 @@
       <div class="corner-container">
         <IconsOverview ref="iconsOverviewRef"/>
         <EventsOverview />
-        <button class="dark-button small-button" @click="findNearestShelter">
+        <button v-if="!isEditMode" class="dark-button small-button" @click="findNearestShelter">
           Finn 3 nærmeste tilflukstrom
         </button>  
         <button id="editToggle" @click="toggleEditMode" :class="{ 'delete-button small-button': isEditMode, 'dark-button small-button': !isEditMode }">
@@ -300,6 +300,7 @@ function clearRouting() {
 }
 
 async function findNearestShelter() {
+  isEditMode.value = false;
   if (!pointStore.selectedIcons.includes('shelter')) {
     iconsOverviewRef.value?.forceIncludeShelter();
     pointStore.updateSelectedIcons([...pointStore.selectedIcons, 'shelter']);
