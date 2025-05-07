@@ -97,7 +97,6 @@ declare global {
 window.routingControl = null;
 
 onMounted(async () => {
-  // Init map
   map = L.map('map', {
     zoomControl: false
   }).setView([63.4305, 10.3951], 12);
@@ -110,7 +109,6 @@ onMounted(async () => {
   // POI and events
   addMarkersToMap();
   addEvents(map);
-
   watch(pointsDisplaying, () => {
     updateMarkers();
   });
@@ -128,12 +126,19 @@ onUnmounted(() => {
   $toast.clear();
 });
 
+function showPointView(mode: 'view' | 'edit' | 'create', point: PointOfInterest) {
+  clearRouting();
+  removeTempMarker();
+  selectedPoint.value = { ...point };
+  formMode.value = mode;
+  showPointForm.value = true;
+  createTempMarker(point.latitude, point.longitude);
+  map.setView([selectedPoint.value.latitude, selectedPoint.value.longitude], 15);
+}
+
 const mapClickHandler = (e: L.LeafletMouseEvent) => {
   if (role.value === 'admin' && isEditMode.value) {
     const { lat, lng } = e.latlng;
-    clearRouting();
-    removeTempMarker();
-    createTempMarker(lat, lng);
     selectedPoint.value = {
       id: 0,
       name: '',
@@ -142,8 +147,7 @@ const mapClickHandler = (e: L.LeafletMouseEvent) => {
       latitude: lat,
       longitude: lng
     };
-    formMode.value = 'create';
-    showPointForm.value = true;
+    showPointView('create', selectedPoint.value);
   }
 };
 
@@ -173,32 +177,20 @@ function addMarkersToMap() {
 
     // Marker click behavior for admin and non-admin users
     marker.on('click', () => {
-      clearRouting();
-      removeTempMarker();
-      selectedPoint.value = { ...point };
       viewingNearest.value = false;
 
       if (role.value === 'admin' && isEditMode.value) {
-        removeTempMarker();
-        formMode.value = 'edit';
-        showPointForm.value = true;
-        viewingNearest.value = false;
-        createTempMarker(selectedPoint.value.latitude, selectedPoint.value.longitude);
+        showPointView('edit', point);
       } else {
-        formMode.value = 'view';
-        showPointForm.value = true; 
-        createTempMarker(selectedPoint.value.latitude, selectedPoint.value.longitude);       
+        showPointView('view', point);
       }
     });
   });
 }
 
 function updateMarkers() {
-  // Remove all existing markers
   markers.forEach(marker => map.removeLayer(marker));
   markers = [];
-
-  // Re-add markers for the updated points
   addMarkersToMap();
 }
 
@@ -222,18 +214,15 @@ function createTempMarker(lat: number, lng: number) {
 }
 
 function updateMarkerPosition(coords: { latitude: number, longitude: number }) {
-  // Update marker position
   removeTempMarker();
   createTempMarker(coords.latitude, coords.longitude);
   map.setView([coords.latitude, coords.longitude], map.getZoom());
   
-  // Update selectedPoint with new coordinates
   selectedPoint.value.latitude = coords.latitude;
   selectedPoint.value.longitude = coords.longitude;
 }
 
 function getUserPosition(callback: (lat: number, lon: number) => void) {
-  // Return if browser does not support geolocation
   if (!navigator.geolocation) return;
 
   navigator.geolocation.getCurrentPosition(
@@ -327,17 +316,7 @@ async function findNearestShelter() {
   }
   currentShelterIndex.value = 0;
   viewingNearest.value = true;
-  showShelter(currentShelterIndex.value);
-}
-
-
-function showShelter(index: number) {
-  selectedPoint.value = nearestShelters.value[index];
-  formMode.value = 'view';
-  showPointForm.value = true;
-    map.setView([selectedPoint.value.latitude, selectedPoint.value.longitude], 15);
-  removeTempMarker();
-  createTempMarker(selectedPoint.value.latitude, selectedPoint.value.longitude);
+  showPointView('view', nearestShelters.value[currentShelterIndex.value]);
 }
 
 function handleNextShelter() {
@@ -345,7 +324,7 @@ function handleNextShelter() {
   
   currentShelterIndex.value = 
     (currentShelterIndex.value + 1) % nearestShelters.value.length;
-  showShelter(currentShelterIndex.value);
+  showPointView('view', nearestShelters.value[currentShelterIndex.value]);
 }
 
 function toggleEditMode() {
@@ -353,14 +332,12 @@ function toggleEditMode() {
   showPointForm.value = false;
   isEditMode.value = !isEditMode.value;
 
-  // Display toast message
   if (isEditMode.value) {
     $toast.info('Redigeringsmodus aktivert. Klikk på et sted for å opprette et punkt, eller klikk på et eksisterende punkt for å redigere det.');
   } else {
     $toast.info('Redigeringsmodus deaktivert. Du er nå i visningsmodus.');
   }
 }
-
 </script>
 
 <style>
