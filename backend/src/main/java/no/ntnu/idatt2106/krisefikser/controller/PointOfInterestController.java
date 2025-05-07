@@ -90,6 +90,9 @@ public class PointOfInterestController {
     @PostMapping
     public ResponseEntity<PointOfInterestResponseDTO> createPointOfInterest(@RequestBody PointOfInterestRequestDTO pointOfInterest) {
         PointOfInterestResponseDTO pointOfInterestResponse = pointOfInterestService.save(pointOfInterest);
+        if (pointOfInterestResponse == null) {
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.ok(pointOfInterestResponse);
     }
 
@@ -137,7 +140,13 @@ public class PointOfInterestController {
             @ApiResponse(responseCode = "400", description = "Could not find shelters based on the given coordinates")
     })
     @GetMapping("/closestShelters")
-    public ResponseEntity<List<PointOfInterestResponseDTO>> getClosestShelters(@RequestParam double latitude, @RequestParam double longitude) {
+    public ResponseEntity<List<PointOfInterestResponseDTO>> getClosestShelters(@RequestParam Double latitude, @RequestParam Double longitude) {
+        if(latitude == null || longitude == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (latitude == 0 || longitude == 0) {
+            return ResponseEntity.badRequest().build();
+        }
         List<PointOfInterestResponseDTO> closestShelters = pointOfInterestService.findThreeClosestShelters(latitude, longitude);
         if (closestShelters == null) {
             return ResponseEntity.notFound().build();
