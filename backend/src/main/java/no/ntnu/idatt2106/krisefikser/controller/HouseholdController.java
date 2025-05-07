@@ -20,6 +20,7 @@ import no.ntnu.idatt2106.krisefikser.dto.HouseholdRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdResponseDTO;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdUpdateDTO;
 import no.ntnu.idatt2106.krisefikser.model.User;
+import no.ntnu.idatt2106.krisefikser.service.HouseholdInviteCodeService;
 import no.ntnu.idatt2106.krisefikser.service.HouseholdService;
 import no.ntnu.idatt2106.krisefikser.service.UserService;
 
@@ -36,6 +37,7 @@ public class HouseholdController {
      */
     private final HouseholdService householdService;
     private final UserService userService;
+    private final HouseholdInviteCodeService householdInviteCodeService;
 
     /**
      * Updates an existing household with new data.
@@ -140,5 +142,51 @@ public class HouseholdController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(householdList);
+    }
+
+
+    @Operation(
+            summary = "Invite someone to a household",
+            description = "Invite someone to a household by writing their email to send them a code to join the household"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Email successfully sent"),
+            @ApiResponse(responseCode = "404", description = "Household could not be found, make sure that the user is in a household"),
+            @ApiResponse(responseCode = "400", description = "Email could not be sent, make sure that the email is valid")
+    })
+    @SecurityRequirement(name = "jwtCookieAuth")
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/invite")
+    public ResponseEntity<Void> inviteToHousehold(@RequestParam String email) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username).orElse(null);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        int hhId = user.getHouseholdId();
+        Household household = householdService.findById(hhId).orElse(null);
+        if (household == null) {
+            return ResponseEntity.notFound().build();
+        }
+        householdInviteCodeService.initiateCode(email, hhId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @Operation(
+            summary = "Find household by invite code",
+            description = "Find household by invite code"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Household fetched"),
+            @ApiResponse(responseCode = "400", description = "Household could not be found, make sure that the invite code is correct")
+    })
+    @GetMapping("/inviteCode")
+    public ResponseEntity<HouseholdResponseDTO> getHouseholdByInviteCode(@RequestParam String inviteCode) {
+        Household household = householdInviteCodeService.consumeInviteCode(inviteCode);
+        if (household == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(HouseholdMapper.toResponseDTO(household));
     }
 }
