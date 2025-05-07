@@ -62,9 +62,6 @@ public class HouseholdService {
         if (newHousehold.getName() == null) {
             throw new IllegalArgumentException("Name is missing");
         }
-        if (newHousehold.getMemberCount() == 0) {
-            throw new IllegalArgumentException("Member count is missing");
-        }
         if (newHousehold.getAddress() == null) {
             throw new IllegalArgumentException("Invalid address format, make sure to fill all fields");
         }
