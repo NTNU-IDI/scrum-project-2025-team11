@@ -1,11 +1,11 @@
 package no.ntnu.idatt2106.krisefikser.dto;
 
 import lombok.Getter;
-
 /**
  * DTO for sending email requests.
  */
 @Getter
+
 public class EmailRequest {
     private final String to;
     private final String subject;
