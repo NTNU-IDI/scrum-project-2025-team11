@@ -18,7 +18,6 @@ const toggleNewItemBox = () => {
   if(isItemBoxVisible.value) {
     isMemberBoxVisible.value = false;
   }
-  responseMessage.value = '';
 }
 
 const toggleNewMemberBox = () => {
@@ -26,7 +25,6 @@ const toggleNewMemberBox = () => {
   if(isMemberBoxVisible.value) {
     isItemBoxVisible.value = false;
   }
-  responseMessage.value = '';
 }
 </script>
 

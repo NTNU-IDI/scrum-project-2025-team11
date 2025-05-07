@@ -274,6 +274,8 @@ button:disabled:hover {
   .title-map {
     font-size: var(--font-size-medium);
   }
+
+}
 /* ---Styling for hjemmesidene! Ikke rør altså!!--- */
 .page-wrapper {
   display: flex;

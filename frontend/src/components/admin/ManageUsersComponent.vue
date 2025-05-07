@@ -5,7 +5,7 @@ import ViewUsersComponent from './manage_users/ViewUsersComponent.vue';
 
 </script>
 <template>
-<div class="header-container"> 
+<div class="header-box"> 
     <h1>Administrere adminbrukere</h1>
     <p>Her kan du administrere adminbrukere. Husk at du igjennom dette grensesnittet har tilgang til krtiske opplysninger -  vennligst ta ansvaret som følger med det.</p>
 </div>   
@@ -15,8 +15,12 @@ import ViewUsersComponent from './manage_users/ViewUsersComponent.vue';
 </div>
 </template>
 <style scoped>
-.header-container {
+.header-box {
     margin-left: 2rem;
+}
+
+h1 {
+    text-align: left;
 }
 
 .page-container {
