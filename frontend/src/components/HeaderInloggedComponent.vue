@@ -23,6 +23,6 @@ import {logOutUser} from '../api/AuthService';
 import { useRouter } from 'vue-router'
 const router = useRouter()
 const goToHome = () => {
-  router.push('/userhome')
+  router.push('/')
 }
 </script>
