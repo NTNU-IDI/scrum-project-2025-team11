@@ -53,9 +53,11 @@
 
         <div class="point-detail-container">
           <!-- Name -->
+          <label class="point-label">Navn*</label>
           <input v-model="pointData.name" type="text" placeholder="Navn" class="point-input" />
 
           <!-- Icon type -->
+          <label class="point-label">Type punkt*</label>
           <select class="point-select" v-model="pointData.iconType">
             <option disabled value="">Velg type punkt</option>
             <option value="shelter">Tilfluktsrom</option>
@@ -64,9 +66,11 @@
           </select>
 
           <!-- Description -->
+          <label class="point-label">Beskrivelse*</label>
           <input class="point-input" v-model="pointData.description" placeholder="Beskrivelse" />
 
           <!-- Choose coordinates or address -->
+          <label class="point-label">Inndata for lokasjon*</label>
           <select class="point-select" v-model="inputMethod">
             <option disabled value="">Velg inndata for lokasjon</option>
             <option value="coordinates">Koordinater</option>
@@ -75,12 +79,15 @@
 
           <!-- Coordinates -->
           <div v-if="inputMethod === 'coordinates'" class="coordinates-input">
+            <label class="point-label">Breddegrad</label>
             <input class="point-input" v-model="pointData.latitude" type="number" placeholder="Breddegrad" />
+            <label class="point-label">Lengdegrad</label>
             <input class="point-input" v-model="pointData.longitude" type="number" placeholder="Lengdegrad" />
           </div>
 
           <!-- Address -->
           <div v-if="inputMethod === 'address'">
+            <label class="point-label">Adresse</label>
             <input class="point-input" v-model="address" type="text" placeholder="Adresse" @blur="resolveAddress" />
             <p v-if="addressError" class="error-message">{{ addressError }}</p>
           </div>
@@ -312,6 +319,13 @@ const deletePoint = async () => {
   scrollbar-width: thin;
   scrollbar-color: var(--light-gray) var(--white);
 }
+
+.point-label {
+  display: block;
+  font-size: var(--font-size-small);
+  color: #333;
+}
+
 
 .point-buttons {
   display: flex;
