@@ -18,6 +18,7 @@
           @navigate="handleNavigation"
           @next-shelter="handleNextShelter"
           @stop-navigation="clearRouting" 
+          @close-point-view="closePointForm"
           :show-next-button="viewingNearest && nearestShelters.length > 1"        
         />
       </div>
@@ -49,7 +50,9 @@ import { calculateDistance, getEventColor } from '@/utils/geoService';
 import { storeToRefs } from "pinia";
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useEventStore } from '@/stores/eventStore'; 
+import { useToast } from 'vue-toast-notification';
 
+const $toast = useToast();
 const eventStore = useEventStore(); 
 const userStore = useUserStore()
 const pointStore = usePointStore();
@@ -115,6 +118,7 @@ onMounted(async () => {
 
   // ADMIN: New point on click
   if (role.value === 'admin') {
+    $toast.info('Klikk på kartet for å plassere nytt punkt, eller klikk på eksisterende ikon for å redigere det', {duration: 15000});
     map.on('click', (e: L.LeafletMouseEvent) => {
     const { lat, lng } = e.latlng;
     removeTempMarker();
@@ -289,27 +293,26 @@ async function findNearestShelter() {
     pointStore.updateSelectedIcons([...pointStore.selectedIcons, 'shelter']);
     await pointStore.fetchPointsByIconTypes(pointStore.selectedIcons);
   }
-  getUserPosition(async (userLat, userLon) => {
-    nearestShelters.value = await pointStore.fetchNearestShelters(userLat, userLon);
-    
-    if (nearestShelters.value.length === 0) {
-      alert('Ingen tilfluktsrom funnet');
-      return;
-    }
-    currentShelterIndex.value = 0;
-    viewingNearest.value = true;
-    showShelter(currentShelterIndex.value);
-  });
+  const center = map.getCenter();
+  const lat = center.lat;
+  const lon = center.lng;
+  nearestShelters.value = await pointStore.fetchNearestShelters(lat, lon);
+
+  if (nearestShelters.value.length === 0) {
+    $toast.warning('Ingen tilfluktsrom funnet i nærheten.', { duration: 5000 });
+    return;
+  }
+  currentShelterIndex.value = 0;
+  viewingNearest.value = true;
+  showShelter(currentShelterIndex.value);
 }
+
 
 function showShelter(index: number) {
   selectedPoint.value = nearestShelters.value[index];
   formMode.value = 'view';
   showPointForm.value = true;
-  
-  // Center map on shelter showing
-  map.setView([selectedPoint.value.latitude, selectedPoint.value.longitude], 15);
-
+    map.setView([selectedPoint.value.latitude, selectedPoint.value.longitude], 15);
   removeTempMarker();
   createTempMarker(selectedPoint.value.latitude, selectedPoint.value.longitude);
 }

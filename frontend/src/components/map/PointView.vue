@@ -53,10 +53,10 @@
 
         <div class="point-detail-container">
           <!-- Name -->
-          <input v-model="pointData.name" type="text" placeholder="Navn" />
+          <input v-model="pointData.name" type="text" placeholder="Navn" class="point-input" />
 
           <!-- Icon type -->
-          <select v-model="pointData.iconType">
+          <select class="point-select" v-model="pointData.iconType">
             <option disabled value="">Velg type punkt</option>
             <option value="shelter">Tilfluktsrom</option>
             <option value="assembly_point">Møteplass</option>
@@ -64,10 +64,10 @@
           </select>
 
           <!-- Description -->
-          <input v-model="pointData.description" placeholder="Beskrivelse" />
+          <input class="point-input" v-model="pointData.description" placeholder="Beskrivelse" />
 
           <!-- Choose coordinates or address -->
-          <select v-model="inputMethod">
+          <select class="point-select" v-model="inputMethod">
             <option disabled value="">Velg inndata for lokasjon</option>
             <option value="coordinates">Koordinater</option>
             <option value="address">Adresse</option>
@@ -75,28 +75,27 @@
 
           <!-- Coordinates -->
           <div v-if="inputMethod === 'coordinates'" class="coordinates-input">
-            <input v-model="pointData.latitude" type="number" placeholder="Breddegrad" />
-            <input v-model="pointData.longitude" type="number" placeholder="Lengdegrad" />
+            <input class="point-input" v-model="pointData.latitude" type="number" placeholder="Breddegrad" />
+            <input class="point-input" v-model="pointData.longitude" type="number" placeholder="Lengdegrad" />
           </div>
 
           <!-- Address -->
           <div v-if="inputMethod === 'address'">
-            <input v-model="address" type="text" placeholder="Adresse" @blur="resolveAddress" />
+            <input class="point-input" v-model="address" type="text" placeholder="Adresse" @blur="resolveAddress" />
             <p v-if="addressError" class="error-message">{{ addressError }}</p>
           </div>
 
-          <!-- Error messages -->
+          <!-- Validation error messages -->
           <p v-if="validationError" class="error-message">{{ validationError }}</p>
-          <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
 
           <!-- Create mode buttons -->
           <div v-if="!isEdit" class="point buttons create-buttons">
-            <button class="button" @click="createPoint" :disabled="hasValidationError">Lag nytt punkt</button>
+            <button class="good-button small-button" @click="createPoint" :disabled="hasValidationError">Lag nytt punkt</button>
           </div>
           <!-- Edit modebuttons -->
           <div v-else class="point-buttons edit-buttons">
-            <button v-if="isEdit" class="button" @click="savePoint" :disabled="hasValidationError">Lagre punkt</button>
-            <button v-if="isEdit" class="delete-button" @click="deletePoint">Slett</button>
+            <button v-if="isEdit" class="good-button small-button" @click="savePoint" :disabled="hasValidationError">Lagre punkt</button>
+            <button v-if="isEdit" class="delete-button small-button" @click="deletePoint">Slett</button>
           </div>
         </div>
       </div>
@@ -121,11 +120,10 @@ const isEdit = computed(() => props.mode === 'edit');
 const isViewMode = computed(() => props.mode === 'view');
 const formTitle = computed(() => isEdit.value ? 'Endre punkt' : 'Nytt punkt');
 const validationError = ref('');
-const errorMessage = ref('');
 const inputMethod = ref('coordinates');
 const address = ref('');
 const addressError = ref('');
-const emit = defineEmits(['close', 'coordinates-updated', 'navigate', 'next-shelter', 'stop-navigation']);
+const emit = defineEmits(['close', 'coordinates-updated', 'navigate', 'next-shelter', 'stop-navigation', 'close-point-view']);
 
 const props = defineProps({
   selectedPoint: {
@@ -258,22 +256,22 @@ function stopNavigation() {
 }
 
 const createPoint = async () => {
-  errorMessage.value = '';
   try {
     await pointStore.createPoint(pointData.value);
+    emit('close-point-view');
 
   } catch (error) {
-    errorMessage.value = "Kunne ikke lage det nye punktet.";
+    throw error;
   }
 };
 
 const savePoint = async () => {
-  errorMessage.value = '';
   try {
     await pointStore.updatePointById(pointData.value);
+    emit('close-point-view');
 
   } catch (error) {
-    errorMessage.value = "Kunne ikke oppdatere punktet.";
+    throw error;
   }
 };
 
@@ -283,8 +281,10 @@ const deletePoint = async () => {
   if (confirmDelete) {
     try {
       await pointStore.deletePointById(pointData.value.id);
+      emit('close-point-view');
+
     } catch (error) {
-      errorMessage.value = "Kunne ikke slette punktet.";
+      throw error;
     }
   }
 };
@@ -313,11 +313,6 @@ const deletePoint = async () => {
   scrollbar-color: var(--light-gray) var(--white);
 }
 
-.point-card input,
-select {
-  font-size: var(--font-size-small);
-}
-
 .point-buttons {
   display: flex;
   flex-direction: column;
@@ -344,6 +339,30 @@ select {
 
 .point-detail {
   margin-bottom: 10px;
+  font-size: var(--font-size-small);
+}
+
+.point-input {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 7px;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--grey);
+  font-size: 1rem;
+  box-sizing: border-box;
+  font-size: var(--font-size-small);
+}
+
+.point-select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 7px;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--grey);
+  font-size: 1rem;
+  box-sizing: border-box;
   font-size: var(--font-size-small);
 }
 
