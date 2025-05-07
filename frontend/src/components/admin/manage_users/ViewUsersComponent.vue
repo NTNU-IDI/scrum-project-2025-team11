@@ -63,6 +63,10 @@ const deleteUser = (id: number) => {
     height: auto;
 }
 
+h1 {
+    text-align: left;
+}
+
 .user-card, .header-cards {
     display: flex;
     flex-direction: row;

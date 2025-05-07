@@ -2,13 +2,22 @@
 import { ref } from 'vue';
 import AddUserComponent from './manage_users/AddUserComponent.vue';
 import ViewUsersComponent from './manage_users/ViewUsersComponent.vue';
+import {useToast} from 'vue-toast-notification';
 
 const showNewUserBox = ref(false);
+const $toast = useToast();
+
+const displaySuccess = () => {
+    $toast.success('Bruker opprettet!', {
+        duration: 3000,
+        position: 'top-right'
+    });
+};
 
 </script>
 <template>
 <div class="container">
-    <div class="header-container"> 
+    <div class="header-box"> 
         <h1>Administrere adminbrukere</h1>
         <p>Her kan du administrere adminbrukere. Husk at du igjennom dette grensesnittet har tilgang til krtiske opplysninger -  vennligst ta ansvaret som følger med det.</p>
     </div>   
@@ -20,6 +29,7 @@ const showNewUserBox = ref(false);
             <AddUserComponent
             @close="showNewUserBox = false"
             @hide-new-user-box="showNewUserBox = false"
+            @new-user-success="showNewUserBox = false && displaySuccess()"
             />
         </div>
     </div>
@@ -29,12 +39,17 @@ const showNewUserBox = ref(false);
 .container{
     min-height: 80vh;
 }
-.header-container {
+.header-box {
     margin: 2rem;
+}
+
+h1 {
+    text-align: left;
 }
 
 p {
     margin-top: 2rem;
+    text-align: left;
 }
 
 .page-container {

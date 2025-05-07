@@ -3,12 +3,15 @@ import { validateUsername, validateEmail, validatePassword, validateFirstName, v
 import { computed, ref } from 'vue';
 import { useAdminUserStore } from '@/stores/adminUserStore';
 import { useHouseholdStore } from '@/stores/householdStore';
+import {useToast} from 'vue-toast-notification';
 
 // Store imports
 const adminUserStore = useAdminUserStore();
 const houseHoldStore = useHouseholdStore();
 
 houseHoldStore.fetchHousehold(); 
+
+const $toast = useToast();
 
 // Props
 const firstName = ref('');
@@ -50,7 +53,10 @@ const validInput = () => {
 const createUser = async () => {
     if (validInput()){
         if (houseHoldStore.id === null) {
-            errorMsg.value = ('Household ID is not set.');
+            $toast.error('Husholdning eksisterer ikke', {
+                duration: 3000,
+                position: 'top-right'
+            });
             return;
         }   
         await adminUserStore.createUser({
@@ -69,7 +75,10 @@ const createUser = async () => {
             passwordRepeat.value = '';
             errorMsg.value = '';
         }).catch((error) => {
-            errorMsg.value = ('Error creating user: ' + error.message);
+            $toast.error('Feil ved opprettelse av bruker!' + error, {
+                duration: 3000,
+                position: 'top-right'
+            });
         });
     }
 }
@@ -100,7 +109,7 @@ const areFieldsEmpty = computed(() => {
                 <label class="label" for="repeat-pass">*Gjenta passord</label>
                 <input type="password" class="user-input" id="repeat-pass" v-model="passwordRepeat"></input>
             </div>
-            <button class="dark-button" @click="createUser" :disabled="areFieldsEmpty">+ Opprett adminbruker</button>
+            <button class="dark-button" @click="() => {createUser; $emit('new-user-success');}" :disabled="areFieldsEmpty">+ Opprett adminbruker</button>
             <p class="error-message">{{ errorMsg }}</p>
         </div>
     </div>
@@ -108,13 +117,15 @@ const areFieldsEmpty = computed(() => {
 </template>
 <style scoped>
 .grey-container {
-    height: 40rem;
+    height: 42rem;
+    padding-bottom: 0;
 }
 
 .header {
+    color: var(--dark-blue);
+    text-align: left;
     font-size: var(--font-size-large);
-    margin-bottom: 1rem;
-    margin-top: 1rem;
+    margin-bottom: 0.5rem;
     background-color: transparent;
 }
 
@@ -124,7 +135,7 @@ h1 {
 
 .error-message {
     font-size: var(--font-size-medium);
-    color: white;
+    color: var(--bad-red);
 }
 
 .user-input {
@@ -136,6 +147,7 @@ h1 {
     background-color: var(--good-green);
     height: 3rem;
     width: 15rem;
+    margin: 0;
 }
 
 .dark-button:disabled {

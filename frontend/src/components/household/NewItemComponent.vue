@@ -51,11 +51,10 @@ const errorMsg = ref('');
  * Property to define emits
  * @property {function} emit
  */
-const emit = defineEmits(['hide-new-item-box', 'set-response-message']);
+const emit = defineEmits(['hide-new-item-box']);
 
 // Fetch existing item types when the component is mounted
 onMounted(async () => {
-    responseMessage.value = '';
     try {
         existingTypes.value = await ItemService.findAll();
     } catch (error) {
@@ -161,7 +160,7 @@ const handleKeydown = (event: KeyboardEvent, name: string) => {
 
         <div class="header-container">
             <h1 class="medium-header">Ny artikkel</h1>
-            <button class="cancel-button" @click="() => {$emit('hide-new-item-box'); $emit('set-response-message', '');}">X</button> 
+            <button class="cancel-button" @click="$emit('hide-new-item-box')">X</button> 
         </div>
 
         <div class="item-input">
