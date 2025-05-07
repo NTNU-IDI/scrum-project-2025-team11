@@ -131,7 +131,7 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
 
       Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
       refreshCookie.setHttpOnly(true);
-      refreshCookie.setSecure(true); // important in production
+      refreshCookie.setSecure(false); // important in production
       refreshCookie.setPath("/auth/refresh");
       refreshCookie.setMaxAge((int) jwtUtil.getRefreshExpiration() / 1000);
       return refreshCookie;
@@ -141,7 +141,7 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
       String token = jwtUtil.generateToken(username, user.getRole().toString());
       Cookie jwtCookie = new Cookie("jwtToken", token);
       jwtCookie.setHttpOnly(true);
-      jwtCookie.setSecure(true);
+      jwtCookie.setSecure(false);
       jwtCookie.setPath("/");
       jwtCookie.setMaxAge((int) jwtUtil.getExpiration() / 1000);
       return jwtCookie;
