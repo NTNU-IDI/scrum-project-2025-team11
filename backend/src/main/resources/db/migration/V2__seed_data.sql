@@ -12,7 +12,10 @@ INSERT INTO `HOUSEHOLD` (name, member_count, address_id) VALUES
 INSERT INTO `USER_ACCOUNT` (email, username, first_name, last_name, password, role, household_id) VALUES
   ('super@beredskap.no', 'thelegend27', 'Trond', 'Bakke',      '$2a$10$mKv8aQpYwh/IwSKzlRx6iuWpnJ.ixUhDisP1mdUlk6rsGHEk2KImu', 'super_admin', 1),
   ('admin@nordberg.no', 'SuperIda', 'Ida', 'Tulliong',      '$2a$10$ouCmMsEaDgrm8OxoVYzsmuq70qcNYmRQvLFkrByyIRgqh9jNk2Cwy', 'admin',       1),
-  ('bruker@solbakken.no', 'SolbakkenJon', 'Jon', 'Solbakken',     '$2a$10$y11CfXG.abqs1zbA6cYOXeqO.n.9D2tFasTeGZvw7XJQjfbA3omiC', 'normal',      2);
+  ('bruker@solbakken.no', 'SolbakkenJon', 'Jon', 'Solbakken',     '$2a$10$y11CfXG.abqs1zbA6cYOXeqO.n.9D2tFasTeGZvw7XJQjfbA3omiC', 'normal',      2),
+  ('spradmn.krisefikser@gmail.com', 'superadmin', 'Garv', 'Sood', '$2a$10$mKv8aQpYwh/IwSKzlRx6iuWpnJ.ixUhDisP1mdUlk6rsGHEk2KImu', 'super_admin',2),
+  ('admn.krisefikser@gmail.com', 'admin','Jonas', 'Johansen', '$2a$10$ouCmMsEaDgrm8OxoVYzsmuq70qcNYmRQvLFkrByyIRgqh9jNk2Cwy', 'admin', 2),
+  ('bruker.krisefikser@gmail.com', 'test', 'August', '', '$2a$10$y11CfXG.abqs1zbA6cYOXeqO.n.9D2tFasTeGZvw7XJQjfbA3omiC', 'normal', 2);
 
 -- Networks (Nettverk)
 INSERT INTO `NETWORK` (name, description) VALUES
