@@ -124,7 +124,7 @@ const addItem = async () => {
         return;
     }
 
-    await inventoryStore.upsertItem(householdStore.id, newHouseholdItem);
+    await inventoryStore.upsertItem(newHouseholdItem);
     errorMsg.value = `${newHouseholdItem.name} er lagt til i lageret`;
     emit('hide-new-item-box');
 }
