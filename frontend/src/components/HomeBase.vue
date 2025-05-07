@@ -1,9 +1,9 @@
 <script setup lang="ts">
 
-import HomeView from "@/views/HomeView.vue";
-import HomeInloggedView from "@/views/HomeInloggedView.vue";
-import HomeAdminView from "@/views/HomeAdminView.vue";
-import HomeSuperAdminView from "@/views/HomeSuperAdminView.vue";
+import HomeNormalComponent from "@/components/homepages/HomeNormalComponent.vue";
+import HomeInloggedComponent from "@/components/homepages/HomeInloggedComponent.vue";
+import HomeAdminComponent  from "@/components/homepages/HomeAdminComponent.vue";
+import HomeSuperAdminComponent  from "@/components/homepages/HomeSuperAdminComponent.vue";
 
 import {useUserStore} from "@/stores/userStore.ts";
 import {storeToRefs} from "pinia";
@@ -14,10 +14,10 @@ const {role} = storeToRefs(userStore)
 </script>
 
 <template>
-  <HomeView v-if="role === ''" />
-  <HomeInloggedView v-if="role === 'normal'" />
-  <HomeAdminView v-if="role === 'admin'" />
-  <HomeSuperAdminView v-if="role === 'super_admin'" />
+  <HomeNormalComponent v-if="role === ''" />
+  <HomeInloggedComponent v-if="role === 'normal'" />
+  <HomeAdminComponent v-if="role === 'admin'" />
+  <HomeSuperAdminComponent v-if="role === 'super_admin'" />
 </template>
 
 <style scoped>
