@@ -24,8 +24,6 @@
 import jakarta.validation.Valid;
 import no.ntnu.idatt2106.krisefikser.dto.ConfirmAuthenticationRequest;
 import no.ntnu.idatt2106.krisefikser.dto.LoginRequest;
-import no.ntnu.idatt2106.krisefikser.dto.TwoFactorConfirmDTO;
-import no.ntnu.idatt2106.krisefikser.dto.TwoFactorRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
   import no.ntnu.idatt2106.krisefikser.dto.UserResponseDTO;
   import no.ntnu.idatt2106.krisefikser.model.User;
@@ -175,7 +173,6 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
       User user = userService.getUserByUsername(saved.getUsername()).orElse(null);
 
       if (user == null) {
-        System.out.println("meowmeowmeow");
         return ResponseEntity.status(500).body("Failed to retrieve created user");
       }
       twoFactorCodeService.initiateCode(user.getUsername());

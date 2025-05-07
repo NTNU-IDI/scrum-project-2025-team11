@@ -7,8 +7,6 @@ import no.ntnu.idatt2106.krisefikser.dto.ConfirmAuthenticationRequest;
 import no.ntnu.idatt2106.krisefikser.dto.LoginRequest;
 import no.ntnu.idatt2106.krisefikser.dto.TwoFactorConfirmDTO;
 import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
-import no.ntnu.idatt2106.krisefikser.dto.UserResponseDTO;
-import no.ntnu.idatt2106.krisefikser.model.Enums;
 import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.security.JwtAuthFilter;
 import no.ntnu.idatt2106.krisefikser.security.JwtUtil;

@@ -3,11 +3,9 @@ package no.ntnu.idatt2106.krisefikser.service;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import no.ntnu.idatt2106.krisefikser.dto.EmailRequest;
