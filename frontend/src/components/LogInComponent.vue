@@ -40,6 +40,10 @@ function simpleValidation() {
       Har du ikke en bruker?
       <router-link to="/register" class="link">Registrer deg her</router-link>
     </p>
+    <p class="register-login-text">
+      Har du glemt passord?
+      <router-link to="/forgot" class="link">Tilbakestill passord</router-link>
+    </p>
   </div>
 </template>
 
