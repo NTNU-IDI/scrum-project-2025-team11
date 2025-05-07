@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdResponseDTO;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdUpdateDTO;
+import no.ntnu.idatt2106.krisefikser.model.Household;
 import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.service.HouseholdInviteCodeService;
 import no.ntnu.idatt2106.krisefikser.service.HouseholdService;
@@ -183,10 +184,10 @@ public class HouseholdController {
     })
     @GetMapping("/inviteCode")
     public ResponseEntity<HouseholdResponseDTO> getHouseholdByInviteCode(@RequestParam String inviteCode) {
-        Household household = householdInviteCodeService.consumeInviteCode(inviteCode);
+        HouseholdResponseDTO household = householdInviteCodeService.consumeInviteCode(inviteCode);
         if (household == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(HouseholdMapper.toResponseDTO(household));
+        return ResponseEntity.ok(household);
     }
 }
