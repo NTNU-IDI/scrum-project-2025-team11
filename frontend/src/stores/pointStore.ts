@@ -3,24 +3,19 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import { PointService } from "@/api/PointService";
 import { useToast } from "vue-toast-notification";
+import { PollingService } from "@/services/PollingService";
 
 export const usePointStore = defineStore("pointStore", () => {
   const pointsDisplaying = ref<PointOfInterest[]>([]);
   const selectedIcons = ref<string[]>([]);
-  let pollingInterval: ReturnType<typeof setInterval> | null = null;
+  const polling = new PollingService();
 
   const startPolling = () => {
-    if (pollingInterval) return;
-    pollingInterval = setInterval(() => {
-      fetchPointsByIconTypes(selectedIcons.value);
-    }, 5000); // 5 seconds
+    polling.start(() => fetchPointsByIconTypes(selectedIcons.value));
   };
 
   const stopPolling = () => {
-    if (pollingInterval) {
-      clearInterval(pollingInterval);
-      pollingInterval = null;
-    }
+    polling.stop();
   };
 
   const initializePolling = async () => {

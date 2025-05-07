@@ -101,6 +101,7 @@ onMounted(async () => {
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
   await pointStore.initializePolling();
+  // TODO: Should also poll active enevts here
 
   // POI and events
   addMarkersToMap();
