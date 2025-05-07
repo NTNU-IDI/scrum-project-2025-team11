@@ -1,9 +1,6 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
-import { validateEmail } from '@/utils/validationService';
-import { useHouseholdStore } from '@/stores/householdStore';    
-
-const householdStore = useHouseholdStore();
+import { ref } from 'vue';
+import { validateEmail } from '@/utils/validationService';    
 
 const email = ref('');
 const errorMsg = ref('');

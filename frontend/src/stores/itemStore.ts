@@ -22,4 +22,5 @@ export const useItemTypeStore = defineStore('itemType', () => {
     setItemType,
     toggleEditMode
   }
-},)
+}, )
+

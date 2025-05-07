@@ -12,8 +12,6 @@ import { ref } from 'vue';
 const isItemBoxVisible = ref(false);
 // Toggle new member component visibility
 const isMemberBoxVisible = ref(false);
-// Response message
-const responseMessage = ref('');
 
 const toggleNewItemBox = () => {
 	isItemBoxVisible.value = !isItemBoxVisible.value;
@@ -30,38 +28,42 @@ const toggleNewMemberBox = () => {
   }
   responseMessage.value = '';
 }
-
-const setResponseMessage = (message: string) => {
-  responseMessage.value = message;
-}
 </script>
 
 <template>
 	<HeaderBase />
   	<div class="page-container">
-      <h1>Min husstand</h1>
-      <div class="members-container">
-        <ViewMembersComponent @show-new-member-box="toggleNewMemberBox" @hide-new-member-box="isMemberBoxVisible = false"/>
-        </div>
-      <div class="new-member-box">
-        <NewMemberComponent v-if="isMemberBoxVisible" @hide-new-member-box="isMemberBoxVisible = false" />
-      </div>
+		<h1>Min husstand</h1>
+		<div class="members-container">
+			<ViewMembersComponent @show-new-member-box="toggleNewMemberBox" @hide-new-member-box="isMemberBoxVisible = false"/>
+		
+			<div class="modal-overlay" v-if="isMemberBoxVisible" @click.self="isMemberBoxVisible = false">
+				<NewMemberComponent
+				@close="isMemberBoxVisible = false"
+				@hide-new-member-box="isMemberBoxVisible = false"
+				/>
+			</div>
+		</div>
 
-      <div class="items-container">
-        <div class="items-column">
-          <ViewSuppliesComponent @show-new-item-box="toggleNewItemBox" @hide-new-item-box="() => {isItemBoxVisible = false; setResponseMessage('');}" />
-        </div>
-        <div class="items-column">
-          <ViewSingleItemComponent />
-        </div>
-        <button class="dark-button" id="add-button" @click="toggleNewItemBox()">+</button>
+		<div class="items-container">
+			<div class="items-column">
+			<ViewSuppliesComponent @show-new-item-box="toggleNewItemBox" @hide-new-item-box="isItemBoxVisible = false" />
+			</div>
+			<div class="items-column">
+			<ViewSingleItemComponent />
+			</div>
+			<button class="dark-button" id="add-button" @click="toggleNewItemBox">+</button> 
 
-        <div class="new-item-box">
-          <p class="user-response">{{ responseMessage }}</p>
-          <NewItemComponent v-if="isItemBoxVisible" @hide-new-item-box="isItemBoxVisible = false" @set-response-message="setResponseMessage"/>
-        </div>
+			<div class="modal-overlay" v-if="isItemBoxVisible" @click.self="isItemBoxVisible = false">
+				<NewItemComponent  
+				@close="isItemBoxVisible = false"
+				@hide-new-item-box="isItemBoxVisible = false" 
+				/>
+			</div>
+		</div>
 
-      </div>
+		
+
   	</div>
 	<Footer />
 </template>
@@ -72,7 +74,8 @@ const setResponseMessage = (message: string) => {
 		flex-direction: column;
 		gap: 2rem;
 		padding: 1rem;
-    margin-right: 0px;
+    	margin-right: 0px;
+		margin: 0 3rem 0 3rem ;
 	}
 
 	h1 {
@@ -80,25 +83,25 @@ const setResponseMessage = (message: string) => {
 		font-weight: normal;
 	}
 
-	.new-member-box { 
-        align-self: center;
-	}
-
-	.items-container {
+	.items-container{
 		display: flex;
 		flex-direction: row;
 		gap: 2rem;
 		padding: 1rem;
+	
 	}
+
 	.items-column {
 		display: flex;
   		flex-direction: column;
   		gap: 1rem;
 	}
-	.new-item-box {
-		margin-top: 4.75rem;
-	}
 
+	.members-container, .items-container{
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+		border-radius: 12px;
+	}
+	
 	#add-button {
         display: flex;
         align-items: center; 

@@ -17,6 +17,7 @@ const selectedIcon = ref('none');
 const emit = defineEmits(['hide-new-event-box']);
 const icons = eventIcons;
 const eventStore = useEventStore();
+const severityLevels = [0, 1, 2, 3, 4, 5];
 
 const validateEvent = () => {
     if (!validatePointName(name.value)) {
@@ -93,18 +94,29 @@ const addEvent = () => {
         </div>
 
         <div class="item-input">
-            <input type="text" class="edit-input" placeholder="*Hendelses-navn" v-model="name" />                    
+            <label for="name-input">*Hendelsesnavn</label>
+            <input type="text" class="edit-input" id="name-input" v-model="name" />                    
 
             <!-- Severity and radius -->
-            <div class="double-input-container">                   
-                <input type="text" class="edit-input" placeholder="*Krisenivå" v-model="severity" />                    
-                <input type="text" class="edit-input" placeholder="*Radius" v-model="radius" />
+            <div class="double-label-container">
+                <label for="severity-input">*Krisenivå</label>
+                <label for="radius-input">*Radius</label>
+            </div>
+            <div class="double-input-container">     
+                <select v-model="severity" id="severity-input" class="dropdown-select">
+                    <option class="edit-input" v-for="level in severityLevels" :key="level" :value="level">{{ level }}</option>
+                </select>           
+                <input type="text" class="edit-input"  v-model="radius" />
             </div>
 
             <!-- Coordinates -->
+             <div class="double-label-container">
+                <label for="coordinate-input">*Lengdegrad</label>
+                <label for="coordinate-input">*Breddegrad</label>
+            </div>
             <div class="double-input-container">
-                <input type="text" class="edit-input" placeholder="*Lengdegrad" v-model="latitude" />
-                <input type="text" class="edit-input" placeholder="*Breddegrad" v-model="longitude" />
+                <input type="text" class="edit-input" id="coordinate-input" v-model="latitude" />
+                <input type="text" class="edit-input" id="coordinate-input" v-model="longitude" />
             </div>
 
             <!-- Description and dates -->
@@ -116,8 +128,8 @@ const addEvent = () => {
             
             
             <!-- Icon type -->
+            <label for="icon-select">*Velg ikon</label>
             <select id="icon-select" v-model="selectedIcon" class="edit-input">
-                <option disabled value="">Velg ikon</option>
                 <option v-for="(icon, index) in icons" :key="index" :value="icon">
                   {{ icon }}
                 </option>
@@ -131,7 +143,7 @@ const addEvent = () => {
 </template>
 <style scoped>
 .grey-container {
-   height: 35rem;
+   height:40rem;
    margin-top: 4.75rem;
 }
 
@@ -146,7 +158,7 @@ const addEvent = () => {
 }
 
 .double-label-container {
-    gap: 9rem;
+    gap: 7rem;
 }
 
 .double-input-container {
@@ -188,9 +200,23 @@ textarea {
 
 .cancel-button {
     position:absolute;
-    top: -0.5rem;
-    right: -9.5rem;
+    top: -1rem;
+    right: -10rem;
     color: var(--bad-red);
     background-color: transparent;
+}
+
+.dropdown-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 200px;
+}
+  
+.dropdown-select {
+    padding: 0.5rem;
+    border-radius: 4px;
+    background-color: white;
+    width: 24rem;
 }
 </style>
