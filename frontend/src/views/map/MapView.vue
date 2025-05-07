@@ -7,7 +7,10 @@
         <EventsOverview />
         <button class="dark-button small-button" @click="findNearestShelter">
           Finn 3 nærmeste tilflukstrom
-        </button>        
+        </button>  
+        <button id="editToggle" @click="toggleEditMode" :class="{ 'delete-button small-button': isEditMode, 'dark-button small-button': !isEditMode }">
+          {{ isEditMode ? 'Avslutt redigering' : 'Redigeringsmodus' }}
+        </button>       
         <PointView 
           v-if="showPointForm" 
           :selectedPoint="selectedPoint" 
@@ -66,6 +69,7 @@ const nearestShelters = ref<PointOfInterest[]>([]);
 const viewingNearest = ref(false);
 const isNavigating = ref(false); 
 const iconsOverviewRef = ref();
+const isEditMode = ref(false);
 const selectedPoint = ref<PointOfInterest>({
   id: 0,
   name: '',
@@ -116,33 +120,43 @@ onMounted(async () => {
     map.setView([lat, lon], 13);
     checkIfInCrisisArea(lat, lon);
   });
-
-  // ADMIN: New point on click
-  if (role.value === 'admin') {
-    $toast.info('Klikk på kartet for å plassere nytt punkt, eller klikk på eksisterende ikon for å redigere det', {duration: 15000});
-    map.on('click', (e: L.LeafletMouseEvent) => {
-    const { lat, lng } = e.latlng;
-    clearRouting();
-    removeTempMarker();
-    createTempMarker(lat, lng);
-    selectedPoint.value = {
-        id: 0,
-        name: '',
-        description: '',
-        iconType: '',
-        latitude: lat,
-        longitude: lng
-      };
-      formMode.value = 'create';
-      showPointForm.value = true;
-    });
-  }
 });
 
 onUnmounted(() => {
   pointStore.stopPolling();
   eventStore.stopPollingActiveEvents();
   $toast.clear();
+});
+
+const mapClickHandler = (e: L.LeafletMouseEvent) => {
+  if (role.value === 'admin' && isEditMode.value) {
+    const { lat, lng } = e.latlng;
+    clearRouting();
+    removeTempMarker();
+    createTempMarker(lat, lng);
+    selectedPoint.value = {
+      id: 0,
+      name: '',
+      description: '',
+      iconType: '',
+      latitude: lat,
+      longitude: lng
+    };
+    formMode.value = 'create';
+    showPointForm.value = true;
+  }
+};
+
+watch(isEditMode, (newValue) => {
+  if (role.value === 'admin') {
+    if (newValue) {
+      map.on('click', mapClickHandler);
+    } else {
+      if (mapClickHandler) {
+        map.off('click', mapClickHandler);
+      }
+    }
+  }
 });
 
 function addMarkersToMap() {
@@ -164,7 +178,7 @@ function addMarkersToMap() {
       selectedPoint.value = { ...point };
       viewingNearest.value = false;
 
-      if (role.value === 'admin') {
+      if (role.value === 'admin' && isEditMode.value) {
         removeTempMarker();
         formMode.value = 'edit';
         showPointForm.value = true;
@@ -334,6 +348,19 @@ function handleNextShelter() {
   showShelter(currentShelterIndex.value);
 }
 
+function toggleEditMode() {
+  $toast.clear();
+  showPointForm.value = false;
+  isEditMode.value = !isEditMode.value;
+
+  // Display toast message
+  if (isEditMode.value) {
+    $toast.info('Redigeringsmodus aktivert. Klikk på et sted for å opprette et punkt, eller klikk på et eksisterende punkt for å redigere det.');
+  } else {
+    $toast.info('Redigeringsmodus deaktivert. Du er nå i visningsmodus.');
+  }
+}
+
 </script>
 
 <style>
@@ -398,6 +425,20 @@ function handleNextShelter() {
 
 .leaflet-interactive[stroke][fill-opacity] {
   pointer-events: none;
+}
+
+.delete-button {
+  border: 2px solid var(--bad-red);
+  border-radius: 8px;
+}
+
+.dark-button:hover,
+.delete-button:hover {
+  transform: none; 
+}
+
+.delete-button:hover {
+  background-color: var(--white); 
 }
 
 @media (max-width: 768px) {
