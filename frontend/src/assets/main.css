@@ -105,6 +105,19 @@ button:hover {
   transform: scale(1.03);
 }
 
+button:disabled {
+  background-color: var(--grey);
+  cursor: not-allowed;
+}
+
+button:disabled:hover {
+  background-color: var(--grey);
+}
+
+.small-button {
+  font-size: var(--font-size-small);
+}
+
 .good-button {
   background-color: var(--good-green);
 }
@@ -124,7 +137,6 @@ button:hover {
   color: var(--orange);
   text-decoration: none;
 }
-
 
 .article-card {
   display: flex;
@@ -196,25 +208,9 @@ button:hover {
 }
 
 .title-map {
-  font-size: var(--font-size-xlarge);
+  font-size: var(--font-size-medium);
   margin: 0;
-}
-
-.point-card {
-  position: relative;
-  background: var(--white);
-  border-radius: 10px;
-  width: 250px;
-}
-
-.point-card-content {
-  padding: 1.2rem;
   text-align: left;
-}
-
-.point-card input,
-select {
-  font-size: var(--font-size-small);
 }
 
 .map-overview-box {
@@ -250,10 +246,11 @@ select {
 }
 
 .error-message {
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-xsmall);
   color: var(--bad-red);
   margin: 0;
   padding-bottom: 10px;
+  padding-top: 10px;
 }
 
 .button:disabled {
@@ -499,11 +496,4 @@ select {
   background-color: #ffffff;
   border-color: var(--light-blue);
   color: var(--darkest-blue);
-}
-
-
-@media (max-width: 768px) {
-  .title-map {
-    font-size: var(--font-size-medium);
-  }
 }

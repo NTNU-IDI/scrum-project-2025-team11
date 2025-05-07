@@ -3,15 +3,23 @@
     <Header />
     <div class="map-page">
       <div class="corner-container">
-        <IconsOverview />
+        <IconsOverview ref="iconsOverviewRef"/>
         <EventsOverview />
-        <PointForm 
+        <button class="dark-button small-button" @click="findNearestShelter">
+          Finn 3 nærmeste tilflukstrom
+        </button>        
+        <PointView 
           v-if="showPointForm" 
           :selectedPoint="selectedPoint" 
           :mode="formMode"
+          :isNavigating="isNavigating"
           @close="closePointForm" 
           @coordinates-updated="updateMarkerPosition"
           @navigate="handleNavigation"
+          @next-shelter="handleNextShelter"
+          @stop-navigation="clearRouting" 
+          @close-point-view="closePointForm"
+          :show-next-button="viewingNearest && nearestShelters.length > 1"        
         />
       </div>
 
@@ -26,21 +34,26 @@
 </template>
 
 <script setup lang="ts">
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import 'leaflet-routing-machine';
-import IconsOverview from '../../components/map/IconsOverview.vue';
-import EventsOverview from '../../components/map/EventsOverview.vue';
-import PointForm from '../../components/map/PointView.vue';
-import Header from '@/components/Header.vue';
 import Footer from '@/components/Footer.vue';
-import { onMounted, onBeforeUnmount, ref, watch } from 'vue';
+import Header from '@/components/Header.vue';
+import EventsOverview from '../../components/map/EventsOverview.vue';
+import IconsOverview from '../../components/map/IconsOverview.vue';
+import PointView from '../../components/map/PointView.vue';
+import L from 'leaflet';
+import 'leaflet-routing-machine';
+import 'leaflet/dist/leaflet.css';
+import userMarkerIcon from '@/assets/ikon/user-maker.svg';
 import { usePointStore } from '@/stores/pointStore';
+import { useUserStore } from "@/stores/userStore.ts";
 import type { PointOfInterest } from "@/types/PointOfInterest";
 import { calculateDistance, getEventColor } from '@/utils/geoService';
-import {useUserStore} from "@/stores/userStore.ts";
-import {storeToRefs} from "pinia";
+import { storeToRefs } from "pinia";
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { useEventStore } from '@/stores/eventStore'; 
+import { useToast } from 'vue-toast-notification';
 
+const $toast = useToast();
+const eventStore = useEventStore(); 
 const userStore = useUserStore()
 const pointStore = usePointStore();
 const {role} = storeToRefs(userStore)
@@ -48,6 +61,11 @@ const { pointsDisplaying } = storeToRefs(pointStore);
 const showCrisisAlert = ref(false);
 const showPointForm = ref(false);
 const formMode = ref<'edit' | 'create' | 'view'>('create');
+const currentShelterIndex = ref(0);
+const nearestShelters = ref<PointOfInterest[]>([]);
+const viewingNearest = ref(false);
+const isNavigating = ref(false); 
+const iconsOverviewRef = ref();
 const selectedPoint = ref<PointOfInterest>({
   id: 0,
   name: '',
@@ -55,6 +73,12 @@ const selectedPoint = ref<PointOfInterest>({
   iconType: '',
   latitude: 0,
   longitude: 0,
+});
+const userIcon = L.icon({
+  iconUrl: userMarkerIcon,
+  iconSize: [35, 35],   
+  iconAnchor: [20, 40],
+  popupAnchor: [0, -40],
 });
 
 let map: L.Map;
@@ -68,59 +92,6 @@ declare global {
 }
 window.routingControl = null;
 
-// TODO: Retrieve event data from backend
-type Event = {
-  id: number;
-  name: string;
-  description: string;
-  icon_type: string;
-  time_start: Date;
-  time_end: Date;
-  latitude: number;
-  longitude: number;
-  radius: number;
-  severity: number;
-};
-
-const testEvents = [
-  {
-    id: 1,
-    name: 'Kriseområde Ila',
-    description: 'Område berørt av hendelse.',
-    icon_type: 'danger',
-    time_start: new Date('2025-04-25'),
-    time_end: new Date('2025-04-26'),
-    latitude: 63.42,
-    longitude: 10.38,
-    radius: 1000,
-    severity: 2 
-  },
-  {
-    id: 2,
-    name: 'Kriseområde Moholt',
-    description: 'Område med moderate hendelser.',
-    icon_type: 'danger',
-    time_start: new Date('2025-04-26'),
-    time_end: new Date('2025-04-27'),
-    latitude: 63.43,
-    longitude: 10.39,
-    radius: 1500,
-    severity: 1 
-  },
-  {
-    id: 3,
-    name: 'Kriseområde Tiller',
-    description: 'Liten hendelse uten alvorlige konsekvenser.',
-    icon_type: 'danger',
-    time_start: new Date('2025-04-26'),
-    time_end: new Date('2025-04-27'),
-    latitude: 63.42,
-    longitude: 10.42,
-    radius: 800,
-    severity: 0 
-  }
-];
-
 onMounted(async () => {
   // Init map
   map = L.map('map', {
@@ -131,10 +102,8 @@ onMounted(async () => {
 
   await pointStore.initializePolling();
 
-  // POI
+  // POI and events
   addMarkersToMap();
-
-  // Events
   addEvents(map);
 
   watch(pointsDisplaying, () => {
@@ -143,13 +112,13 @@ onMounted(async () => {
 
   // Get user location and set marker
   getUserPosition((lat, lon) => {
-  L.marker([lat, lon]).addTo(map).bindPopup("Din posisjon").openPopup();
     map.setView([lat, lon], 13);
     checkIfInCrisisArea(lat, lon);
   });
 
   // ADMIN: New point on click
   if (role.value === 'admin') {
+    $toast.info('Klikk på kartet for å plassere nytt punkt, eller klikk på eksisterende ikon for å redigere det', {duration: 15000});
     map.on('click', (e: L.LeafletMouseEvent) => {
     const { lat, lng } = e.latlng;
     removeTempMarker();
@@ -187,15 +156,21 @@ function addMarkersToMap() {
 
     // Marker click behavior for admin and non-admin users
     marker.on('click', () => {
+      clearRouting();
+      removeTempMarker();
       selectedPoint.value = { ...point };
+      viewingNearest.value = false;
 
       if (role.value === 'admin') {
         removeTempMarker();
         formMode.value = 'edit';
         showPointForm.value = true;
+        viewingNearest.value = false;
+        createTempMarker(selectedPoint.value.latitude, selectedPoint.value.longitude);
       } else {
         formMode.value = 'view';
-        showPointForm.value = true;        
+        showPointForm.value = true; 
+        createTempMarker(selectedPoint.value.latitude, selectedPoint.value.longitude);       
       }
     });
   });
@@ -244,15 +219,26 @@ function getUserPosition(callback: (lat: number, lon: number) => void) {
   // Return if browser does not support geolocation
   if (!navigator.geolocation) return;
 
-  // Get user position
   navigator.geolocation.getCurrentPosition(
-    pos => callback(pos.coords.latitude, pos.coords.longitude),
-    err => console.error("Error getting location: ", err)
+    (pos) => {
+      callback(pos.coords.latitude, pos.coords.longitude);
+      const userLat = pos.coords.latitude;
+      const userLon = pos.coords.longitude;
+
+      L.marker([userLat, userLon], { icon: userIcon })
+        .addTo(map)
+        .bindPopup("Din posisjon")
+        .openPopup();
+
+      map.setView([userLat, userLon], 13);
+      checkIfInCrisisArea(userLat, userLon);
+    },
+    (err) => console.error("Error getting location: ", err)
   );
 }
 
 function checkIfInCrisisArea(userLatitude: number, userLongitude: number) {
-  testEvents.forEach(event => {
+  eventStore.events.forEach(event => {
     const distance = calculateDistance(userLatitude, userLongitude, event.latitude, event.longitude);
     
     if (distance <= event.radius) {
@@ -262,13 +248,16 @@ function checkIfInCrisisArea(userLatitude: number, userLongitude: number) {
 }
 
 function addEvents(map: L.Map) {
-  testEvents.forEach(({ latitude, longitude, radius, severity, name, description }) => {
-    const color = getEventColor(severity);
-    L.circle([latitude, longitude], {
+  if (eventStore.activeEvents.length === 0) {
+    return;
+  }
+  eventStore.activeEvents.forEach(event => {
+    const color = getEventColor(event.severity);
+    L.circle([event.latitude, event.longitude], {
       color,
       fillColor: color,
       weight: 1,
-      radius,
+      radius: event.radius,
       fillOpacity: 0.3
     }).addTo(map);
   });
@@ -276,13 +265,64 @@ function addEvents(map: L.Map) {
 
 function handleNavigation(coords: { latitude: number, longitude: number }) {
   getUserPosition((userLat, userLon) => {
-    if (window.routingControl) map.removeControl(window.routingControl);
+    clearRouting();
 
     window.routingControl = L.Routing.control({
       waypoints: [L.latLng(userLat, userLon), L.latLng(coords.latitude, coords.longitude)],
       routeWhileDragging: false,
-    }).addTo(map);
+      createMarker: function() {
+        return L.marker([userLat, userLon], { icon: userIcon });
+      }
+    } as L.Routing.RoutingControlOptions).addTo(map);
+
+    isNavigating.value = true;
   });
+}
+
+function clearRouting() {
+  if (window.routingControl) {
+    map.removeControl(window.routingControl);
+    window.routingControl = null;
+  }
+  isNavigating.value = false;
+}
+
+async function findNearestShelter() {
+  if (!pointStore.selectedIcons.includes('shelter')) {
+    iconsOverviewRef.value?.forceIncludeShelter();
+    pointStore.updateSelectedIcons([...pointStore.selectedIcons, 'shelter']);
+    await pointStore.fetchPointsByIconTypes(pointStore.selectedIcons);
+  }
+  const center = map.getCenter();
+  const lat = center.lat;
+  const lon = center.lng;
+  nearestShelters.value = await pointStore.fetchNearestShelters(lat, lon);
+
+  if (nearestShelters.value.length === 0) {
+    $toast.warning('Ingen tilfluktsrom funnet i nærheten.', { duration: 5000 });
+    return;
+  }
+  currentShelterIndex.value = 0;
+  viewingNearest.value = true;
+  showShelter(currentShelterIndex.value);
+}
+
+
+function showShelter(index: number) {
+  selectedPoint.value = nearestShelters.value[index];
+  formMode.value = 'view';
+  showPointForm.value = true;
+    map.setView([selectedPoint.value.latitude, selectedPoint.value.longitude], 15);
+  removeTempMarker();
+  createTempMarker(selectedPoint.value.latitude, selectedPoint.value.longitude);
+}
+
+function handleNextShelter() {
+  if (nearestShelters.value.length <= 1) return;
+  
+  currentShelterIndex.value = 
+    (currentShelterIndex.value + 1) % nearestShelters.value.length;
+  showShelter(currentShelterIndex.value);
 }
 
 </script>
@@ -296,6 +336,8 @@ function handleNavigation(coords: { latitude: number, longitude: number }) {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  max-height: calc(100% - 20px); 
+  overflow: hidden; 
 }
 
 .layout-map-page {
@@ -303,6 +345,7 @@ function handleNavigation(coords: { latitude: number, longitude: number }) {
   flex-direction: column;
   height: 100vh;
 }
+
 .map-page {
   flex: 1;
   display: flex;

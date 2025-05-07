@@ -21,13 +21,16 @@
   import jakarta.servlet.http.Cookie;
   import jakarta.servlet.http.HttpServletRequest;
   import jakarta.servlet.http.HttpServletResponse;
-  import no.ntnu.idatt2106.krisefikser.dto.LoginRequest;
-  import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
+import jakarta.validation.Valid;
+import no.ntnu.idatt2106.krisefikser.dto.ConfirmAuthenticationRequest;
+import no.ntnu.idatt2106.krisefikser.dto.LoginRequest;
+import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
   import no.ntnu.idatt2106.krisefikser.dto.UserResponseDTO;
   import no.ntnu.idatt2106.krisefikser.model.User;
   import no.ntnu.idatt2106.krisefikser.security.JwtUtil;
   import no.ntnu.idatt2106.krisefikser.service.RefreshTokenService;
-  import no.ntnu.idatt2106.krisefikser.service.UserService;
+import no.ntnu.idatt2106.krisefikser.service.TwoFactorCodeService;
+import no.ntnu.idatt2106.krisefikser.service.UserService;
 
   @RestController
   @RequiredArgsConstructor
@@ -38,6 +41,7 @@
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
     private final PasswordEncoder passwordEncoder;
+    private final TwoFactorCodeService twoFactorCodeService;
 
     @Operation(
       summary = "Refresh JWT token",
@@ -81,9 +85,16 @@
       return ResponseEntity.ok().body(Map.of("role ", user.getRole()));
     }
 
+    /**
+     * Checks the information provided by the client wether the information is 
+     * valid for log in. If it is valid then backend will send a mail to the users
+     * mail address containing the authentication code
+     * 
+     * @param loginRequest a DTO of the information that is sent such as username and password 
+     */
     @Operation(
-      summary = "Logs in user",
-      description = "Checks login credentials and returns a jwt token on successfull login")
+      summary = "Checks login credentials",
+      description = "Checks login credentials and sends a mail to the registered mail address")
     @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Login successful"),
       @ApiResponse(responseCode = "401", description = "Invalid credentials")
@@ -98,14 +109,9 @@
         return ResponseEntity.status(401).body("Invalid credentials");
       }
 
-      Cookie jwtCookie = generateJwtToken(username, user);
-      Cookie refreshCookie = generateRefreshToken(username, user);
+      twoFactorCodeService.initiateCode(username);
 
-      response.addCookie(refreshCookie);
-      response.addCookie(jwtCookie);
-
-      //return ResponseEntity.ok(Map.of("token", token));
-      return ResponseEntity.ok().body(Map.of("role",user.getRole()));
+      return ResponseEntity.ok().build();
     }
 
     private Cookie generateRefreshToken(String username, User user) {
@@ -118,7 +124,6 @@
       refreshCookie.setSecure(true); // important in production
       refreshCookie.setPath("/auth/refresh");
       refreshCookie.setMaxAge((int) jwtUtil.getRefreshExpiration() / 1000);
-
       return refreshCookie;
     }
 
@@ -132,16 +137,17 @@
       return jwtCookie;
     }
     /**
-     * Saves a new user entity.
+     * Checks wether the information given by the client is valid. If it is then it will send
+     * a two factor mail to the email provided by the user and register that user in the db.
      *
-     * @param body the user entity to be saved
-     * @return {@code ResponseEntity} containing the saved user entity
+     * @param body the user entity to be checked
+     * @return {@code ResponseEntity} 
      */
     @Operation(
       summary     = "Register new user",
-      description = "Creates a new user. Authentication *not* required.")
+      description = "Creates a new user. Sends mail for authentication.")
     @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "User created",
+        @ApiResponse(responseCode = "200", description = "User created",
             content = @Content(mediaType = "application/json",
                       schema = @Schema(implementation = UserResponseDTO.class))),
         @ApiResponse(responseCode = "409", description = "Email or username already taken"),
@@ -169,17 +175,42 @@
       if (user == null) {
         return ResponseEntity.status(500).body("Failed to retrieve created user");
       }
+      twoFactorCodeService.initiateCode(user.getUsername());
 
-      // Generate tokens
-      Cookie jwtCookie = generateJwtToken(body.getUsername(), user);
-      Cookie refreshCookie = generateRefreshToken(user.getUsername(), user);
-      response.addCookie(jwtCookie);
-      response.addCookie(refreshCookie);
+      return ResponseEntity.ok().build();
+    }
 
-      // Return both the saved user and access token
-      return ResponseEntity
-          .status(HttpStatus.CREATED)
-          .body(Map.of("role", user.getRole()));
+    /**
+     * Completes the two-factor authentication process by validating the provided code.
+     *
+     * @param request the two-factor authentication confirmation containing the code and the login information
+     * @return a response entity indicating the result of the operation and cookies such as jwt and refresh token
+     */
+    @Operation(
+            summary = "Confirm two-factor authentication",
+            description = "Confirm the two-factor authentication process using the provided code."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Two-factor authentication confirmed successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid or expired code.")
+    })
+    @PostMapping("/confirm-authentication")
+    public ResponseEntity<?> confirmAuthentication(
+      @RequestBody @Valid ConfirmAuthenticationRequest request,
+      HttpServletRequest servletRequest, 
+      HttpServletResponse response) {
+        twoFactorCodeService.completeAuthentication(request.getTwoFactorCode().getCode(), request.getLogin());
+        if (request.getLogin() != null) {
+
+          User loginUser = userService.getUserByUsername(request.getLogin().getUsername()).orElse(null);
+          Cookie jwtCookie = generateJwtToken(loginUser.getUsername(), loginUser);
+          Cookie refreshCookie = generateRefreshToken(loginUser.getUsername(), loginUser);
+          response.addCookie(jwtCookie);
+          response.addCookie(refreshCookie);
+          return ResponseEntity.ok().body(Map.of("role", loginUser.getRole())); 
+
+        }
+        return ResponseEntity.status(500).body("Failed to retrieve created user"); 
     }
   }
 

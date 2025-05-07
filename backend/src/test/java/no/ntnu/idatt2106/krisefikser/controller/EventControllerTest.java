@@ -18,6 +18,8 @@ import no.ntnu.idatt2106.krisefikser.dto.EventResponseDTO;
 import no.ntnu.idatt2106.krisefikser.dto.EventRequestDTO;
 import no.ntnu.idatt2106.krisefikser.model.Enums.IconEnum;
 import no.ntnu.idatt2106.krisefikser.repository.EventRepository;
+import no.ntnu.idatt2106.krisefikser.security.JwtAuthFilter;
+import no.ntnu.idatt2106.krisefikser.security.JwtUtil;
 import no.ntnu.idatt2106.krisefikser.service.EventService;
 
 import static org.mockito.ArgumentMatchers.eq;
@@ -34,10 +36,17 @@ import java.util.Optional;
 @ActiveProfiles("test")
 @Import(TestSecurityConfig.class)
 @WebMvcTest(EventController.class)
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 public class EventControllerTest {
   @Autowired
   private MockMvc mvc;
+
+  @MockitoBean 
+  private JwtUtil jwtUtil;           
+
+  
+  @MockitoBean 
+  private JwtAuthFilter jwtAuthFilter;
 
   @MockitoBean
   private EventService eventService;
