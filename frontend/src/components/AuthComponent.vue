@@ -41,7 +41,7 @@ const confirmCodee = async () => { // Function to confirm the verification code
 </script>
 
 <template>
-  <div class="register-login-wrapper">
+  <div class="register-login-wrapper" id="authWrapper">
     <div class="register-login-container">
       <form v-on:submit.prevent>
       <h1>Totrinnsbekreftelse</h1>
@@ -55,5 +55,8 @@ const confirmCodee = async () => { // Function to confirm the verification code
 </template> 
 
 <style>
-
+#authWrapper {
+  height: 100vh;
+  padding: 0rem;
+}
 </style>
