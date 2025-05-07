@@ -4,11 +4,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
-import no.ntnu.idatt2106.krisefikser.dto.PointOfInterestResponseDTO;
-import no.ntnu.idatt2106.krisefikser.mapper.PointOfInterestMapper;
 import no.ntnu.idatt2106.krisefikser.model.RefreshToken;
 import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.repository.RefreshTokenRepository;
