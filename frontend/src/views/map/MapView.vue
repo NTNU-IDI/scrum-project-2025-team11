@@ -48,7 +48,7 @@ import { useUserStore } from "@/stores/userStore.ts";
 import type { PointOfInterest } from "@/types/PointOfInterest";
 import { calculateDistance, getEventColor } from '@/utils/geoService';
 import { storeToRefs } from "pinia";
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { onUnmounted, onMounted, ref, watch } from 'vue';
 import { useEventStore } from '@/stores/eventStore'; 
 import { useToast } from 'vue-toast-notification';
 
@@ -100,7 +100,8 @@ onMounted(async () => {
   L.control.zoom({ position: 'topright' }).addTo(map);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-  await pointStore.initializePolling();
+  pointStore.startPolling();
+  eventStore.startPollingActiveEvents();
 
   // POI and events
   addMarkersToMap();
@@ -121,6 +122,7 @@ onMounted(async () => {
     $toast.info('Klikk på kartet for å plassere nytt punkt, eller klikk på eksisterende ikon for å redigere det', {duration: 15000});
     map.on('click', (e: L.LeafletMouseEvent) => {
     const { lat, lng } = e.latlng;
+    clearRouting();
     removeTempMarker();
     createTempMarker(lat, lng);
     selectedPoint.value = {
@@ -137,9 +139,10 @@ onMounted(async () => {
   }
 });
 
-// Stop polling when component is unmounted
-onBeforeUnmount(() => {
+onUnmounted(() => {
   pointStore.stopPolling();
+  eventStore.stopPollingActiveEvents();
+  $toast.clear();
 });
 
 function addMarkersToMap() {
@@ -270,9 +273,15 @@ function handleNavigation(coords: { latitude: number, longitude: number }) {
     window.routingControl = L.Routing.control({
       waypoints: [L.latLng(userLat, userLon), L.latLng(coords.latitude, coords.longitude)],
       routeWhileDragging: false,
-      createMarker: function() {
-        return L.marker([userLat, userLon], { icon: userIcon });
-      }
+      createMarker: () => L.marker([userLat, userLon], { icon: userIcon }),
+      lineOptions: {
+        styles: [
+          {
+            color: 'var(--navigation)',
+            weight: 6  
+          }
+        ]
+      } as L.Routing.LineOptions
     } as L.Routing.RoutingControlOptions).addTo(map);
 
     isNavigating.value = true;

@@ -2,11 +2,11 @@ package no.ntnu.idatt2106.krisefikser.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.servlet.http.Cookie;
 import no.ntnu.idatt2106.krisefikser.dto.ConfirmAuthenticationRequest;
 import no.ntnu.idatt2106.krisefikser.dto.LoginRequest;
 import no.ntnu.idatt2106.krisefikser.dto.TwoFactorConfirmDTO;
 import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
-import no.ntnu.idatt2106.krisefikser.dto.UserResponseDTO;
 import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.security.JwtAuthFilter;
 import no.ntnu.idatt2106.krisefikser.security.JwtUtil;
@@ -44,6 +44,7 @@ import java.util.Optional;
 @AutoConfigureMockMvc(addFilters = false)
 class AuthControllerTest {
 
+    
     @Autowired
     private MockMvc mockMvc;
 
@@ -61,9 +62,6 @@ class AuthControllerTest {
 
     @MockitoBean
     private ConfirmAuthenticationRequest confirmAuthenticationRequest;
-
-    @MockitoBean
-    private LoginRequest loginRequest;
 
     @MockitoBean
     private RefreshTokenService refreshTokenService;
@@ -137,33 +135,43 @@ class AuthControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-/*  @Test
-    void register_WithValidUser_ShouldReturnOk() throws Exception {
+    @Test
+    void register_WithDuplicateEmail_ShouldReturnConflict() throws Exception {
         UserRequestDTO userRequest = new UserRequestDTO();
-        userRequest.setUsername("newuser");
-        userRequest.setEmail("test@example.com");
-        userRequest.setFirstName("Ola");
-        userRequest.setLastName("Nordmann");
-        userRequest.setHouseholdId(1);
-        userRequest.setPassword("P@ssw0rd");
+        userRequest.setUsername("user");
+        userRequest.setEmail("taken@example.com");
 
-        UserResponseDTO savedResponse = new UserResponseDTO();
-        savedResponse.setUsername("newuser");
-
-        User user = new User();
-        user.setUsername("newuser");
-
-        when(userService.emailExists(userRequest.getEmail())).thenReturn(false);
-        when(userService.usernameExists(userRequest.getUsername())).thenReturn(false);
-        when(userService.saveUser(userRequest)).thenReturn(savedResponse);
-        when(userService.getUserByUsername("newuser")).thenReturn(Optional.of(user));
-
-        doNothing().when(twoFactorCodeService).initiateCode("newuser");
+        when(userService.emailExists(userRequest.getEmail())).thenReturn(true);
 
         mockMvc.perform(post("/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userRequest)))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void refreshJwtToken_WithValidToken_ShouldReturnOk() throws Exception {
+        String validRefreshToken = "valid.token";
+        String username = "user";
+        User user = new User();
+        user.setUsername(username);
+
+        Cookie refreshCookie = new Cookie("refreshToken", validRefreshToken);
+
+        when(jwtUtil.validateToken(validRefreshToken)).thenReturn(true);
+        when(jwtUtil.extractUsername(validRefreshToken)).thenReturn(username);
+        when(userService.getUserByUsername(username)).thenReturn(Optional.of(user));
+        doNothing().when(refreshTokenService).revokeToken(validRefreshToken);
+
+        mockMvc.perform(post("/auth/refresh").cookie(refreshCookie))
                 .andExpect(status().isOk());
-    }*/
+    }
+
+    @Test
+    void refreshJwtToken_WithoutToken_ShouldReturnUnauthorized() throws Exception {
+        mockMvc.perform(post("/auth/refresh"))
+                .andExpect(status().isUnauthorized());
+    }
+
 
 }
