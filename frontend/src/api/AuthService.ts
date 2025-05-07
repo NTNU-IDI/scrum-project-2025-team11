@@ -50,7 +50,7 @@ export async function login(username: string, password: string) {
             router.push("/auth")
         })
         .catch((error) => {
-            if (error.status === 401) {
+            if (error.status === 400) {
                 alert("Kunne ikke logge inn med gitt brukernavn og passord. " +
                     "Forsikre deg om at de er riktige og prøv igjen.")
             } else if (error.status === 500) {
