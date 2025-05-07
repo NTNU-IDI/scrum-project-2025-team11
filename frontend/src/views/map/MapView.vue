@@ -132,13 +132,16 @@ onUnmounted(() => {
   $toast.clear();
 });
 
-function showPointView(mode: 'view' | 'edit' | 'create', point: PointOfInterest) {
+function showPointView(mode: 'view' | 'edit' | 'create', point: PointOfInterest, showMarker: boolean) {
   clearRouting();
   removeTempMarker();
   selectedPoint.value = { ...point };
   formMode.value = mode;
   showPointForm.value = true;
   createTempMarker(point.latitude, point.longitude);
+  if (showMarker) {
+    map.setView([selectedPoint.value.latitude, selectedPoint.value.longitude], 15);
+  }
 }
 
 const mapClickHandler = (e: L.LeafletMouseEvent) => {
@@ -152,7 +155,7 @@ const mapClickHandler = (e: L.LeafletMouseEvent) => {
       latitude: lat,
       longitude: lng
     };
-    showPointView('create', selectedPoint.value);
+    showPointView('create', selectedPoint.value, false);
   }
 };
 
@@ -187,9 +190,9 @@ function addMarkersToMap() {
       viewingNearest.value = false;
 
       if (role.value === 'admin' && isEditMode.value) {
-        showPointView('edit', point);
+        showPointView('edit', point, true);
       } else {
-        showPointView('view', point);
+        showPointView('view', point, true);
       }
     });
   });
@@ -323,7 +326,7 @@ async function findNearestShelter() {
   }
   currentShelterIndex.value = 0;
   viewingNearest.value = true;
-  showPointView('view', nearestShelters.value[currentShelterIndex.value]);
+  showPointView('view', nearestShelters.value[currentShelterIndex.value], true);
 }
 
 function handleNextShelter() {
@@ -331,7 +334,7 @@ function handleNextShelter() {
   
   currentShelterIndex.value = 
     (currentShelterIndex.value + 1) % nearestShelters.value.length;
-  showPointView('view', nearestShelters.value[currentShelterIndex.value]);
+  showPointView('view', nearestShelters.value[currentShelterIndex.value], true);
 }
 
 function toggleEditMode() {
