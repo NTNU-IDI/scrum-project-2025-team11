@@ -55,6 +55,7 @@ const emit = defineEmits(['hide-new-item-box', 'set-response-message']);
 
 // Fetch existing item types when the component is mounted
 onMounted(async () => {
+    responseMessage.value = '';
     try {
         existingTypes.value = await ItemService.findAll();
     } catch (error) {

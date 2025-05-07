@@ -71,8 +71,7 @@ public class AddressController {
   }
 
   /**
-   * Endpoint to retrieve an address by its ID.
-   * @param id the ID of the address to retrieve.
+   * Endpoint to retrieve the address of the logged-in user.
    * @return {@code ResponseEntity} containing the address if found, or a 404 Not Found status if not found.
    */
   @Operation(
@@ -123,9 +122,8 @@ public class AddressController {
   }
 
   /**
-   * Endpoint to update an existing address.
-   * @param id the ID of the address to update.
-   * @param address the updated address data as a DTO.
+   * Endpoint to update user's address.
+   * @param address as a {@code AddressRequestDTO} object containing the updated address data.
    * @return {@code ResponseEntity} containing the updated address, or a 404 Not Found status if not found.
    */
   @Operation(

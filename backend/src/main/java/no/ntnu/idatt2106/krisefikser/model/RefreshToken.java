@@ -1,7 +1,5 @@
 package no.ntnu.idatt2106.krisefikser.model;
 
-import java.sql.Date;
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -1,15 +1,26 @@
 import axios from "axios";
 import {useUserStore} from "@/stores/userStore.ts";
+import {useCredentialStore} from "@/stores/credentialStore.ts";
 import {useRouter} from "vue-router";
 import router from "@/router";
 
-
-export async function login(username: string, password: string) {
+export async function confirm2fa(code: string) {
+    const credentialStore = useCredentialStore()
     const userStore = useUserStore()
+    if (credentialStore.username === '' || credentialStore.password === '') {
+        alert("Nettsiden støtte på et problem med to-faktor-autentiseringen. Vennligst forsøk å logge inn på nytt.")
+        router.push("/login")
+        return
+    }
 
-    await axios.post("http://localhost:8080/auth/login", {
-        username: username,
-        password: password
+    await axios.post("http://localhost:8080/auth/confirm-authentication", {
+        twoFactorCode: {
+            code: code
+        },
+        login: {
+            username: credentialStore.username,
+            password: credentialStore.password
+        }
     }, {
         withCredentials: true
     })
@@ -18,7 +29,27 @@ export async function login(username: string, password: string) {
             router.push("/")
         })
         .catch((error) => {
-            //console.log(error)
+            alert("Noe gikk galt under autentiseringen. Vennligst forsøk å logge inn på nytt.")
+            userStore.logout()
+            router.push("/login")
+        })
+}
+
+
+export async function login(username: string, password: string) {
+    const credentialStore = useCredentialStore()
+
+    await axios.post("http://localhost:8080/auth/login", {
+        username: username,
+        password: password
+    }, {
+        withCredentials: true
+    })
+        .then(() => {
+            credentialStore.setCredentials(username, password)
+            router.push("/auth")
+        })
+        .catch((error) => {
             if (error.status === 401) {
                 alert("Kunne ikke logge inn med gitt brukernavn og passord. " +
                     "Forsikre deg om at de er riktige og prøv igjen.")
@@ -32,7 +63,7 @@ export async function login(username: string, password: string) {
 
 export async function registerNormalUser(firstName: string, lastName: string, username: string, email: string,
                                           password: string, householdId: number) {
-    const userStore = useUserStore()
+    const credentialStore = useCredentialStore()
 
     await axios.post("http://localhost:8080/auth/register", {
         firstName: firstName,
@@ -45,8 +76,8 @@ export async function registerNormalUser(firstName: string, lastName: string, us
         withCredentials: true
     })
         .then((response) => {
-            userStore.setRole(response.data.role)
-            router.push("/")
+            credentialStore.setCredentials(username, password)
+            router.push("/auth")
         })
         .catch((error) => {
             if (error.status === 409) {
@@ -61,7 +92,7 @@ export async function refreshToken() {
     const userStore = useUserStore()
     const router = useRouter()
 
-    await axios.post("http://localhost:8080/auth/refresh")
+    await axios.post("http://localhost:8080/auth/refresh", {},{withCredentials: true})
         .then((response) => {
             userStore.setRole(response.data.role)
         })
