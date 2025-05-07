@@ -14,6 +14,7 @@ export const useEventStore = defineStore("events", {
 
   actions: {
     startPollingActiveEvents() {
+      this.fetchActiveEvents();
       pollingService.start(() => this.fetchActiveEvents());
     },
     stopPollingActiveEvents() {
@@ -24,7 +25,6 @@ export const useEventStore = defineStore("events", {
         await EventService.findAll().then((data) => {
           this.events = data;
         });
-        console.log(this.events);
       } catch (error) {
         console.error("Error fetching event:", error);
       }

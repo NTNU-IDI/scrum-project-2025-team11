@@ -61,6 +61,7 @@ const userStore = useUserStore()
 const pointStore = usePointStore();
 const {role} = storeToRefs(userStore)
 const { pointsDisplaying } = storeToRefs(pointStore);
+const { activeEvents } = storeToRefs(eventStore);
 const showCrisisAlert = ref(false);
 const showPointForm = ref(false);
 const formMode = ref<'edit' | 'create' | 'view'>('create');
@@ -88,6 +89,7 @@ const userIcon = L.icon({
 let map: L.Map;
 let temporaryMarker: L.Marker | null = null;
 let markers: L.Marker[] = [];
+let eventLayers: L.Circle[] = [];
 
 declare global {
   interface Window {
@@ -110,7 +112,10 @@ onMounted(async () => {
   addMarkersToMap();
   addEvents(map);
   watch(pointsDisplaying, () => {
-    updateMarkers();
+    addMarkersToMap();
+  });
+  watch(activeEvents, () => {
+    addEvents(map);
   });
 
   // Get user location and set marker
@@ -123,6 +128,7 @@ onMounted(async () => {
 onUnmounted(() => {
   pointStore.stopPolling();
   eventStore.stopPollingActiveEvents();
+  isEditMode.value = false;
   $toast.clear();
 });
 
@@ -133,7 +139,6 @@ function showPointView(mode: 'view' | 'edit' | 'create', point: PointOfInterest)
   formMode.value = mode;
   showPointForm.value = true;
   createTempMarker(point.latitude, point.longitude);
-  map.setView([selectedPoint.value.latitude, selectedPoint.value.longitude], 15);
 }
 
 const mapClickHandler = (e: L.LeafletMouseEvent) => {
@@ -164,6 +169,8 @@ watch(isEditMode, (newValue) => {
 });
 
 function addMarkersToMap() {
+  markers.forEach(marker => map.removeLayer(marker));
+  markers = [];
   pointsDisplaying.value.forEach(point => {
     const customIcon = L.divIcon({
       html: `<div class="map-icon ${point.iconType}" style="margin: 0;"></div>`,
@@ -186,12 +193,6 @@ function addMarkersToMap() {
       }
     });
   });
-}
-
-function updateMarkers() {
-  markers.forEach(marker => map.removeLayer(marker));
-  markers = [];
-  addMarkersToMap();
 }
 
 function closePointForm() {
@@ -244,7 +245,8 @@ function getUserPosition(callback: (lat: number, lon: number) => void) {
 }
 
 function checkIfInCrisisArea(userLatitude: number, userLongitude: number) {
-  eventStore.events.forEach(event => {
+  showCrisisAlert.value = false;
+  eventStore.activeEvents.forEach(event => {
     const distance = calculateDistance(userLatitude, userLongitude, event.latitude, event.longitude);
     
     if (distance <= event.radius) {
@@ -254,19 +256,23 @@ function checkIfInCrisisArea(userLatitude: number, userLongitude: number) {
 }
 
 function addEvents(map: L.Map) {
-  if (eventStore.activeEvents.length === 0) {
-    return;
-  }
+  clearEventLayers();
   eventStore.activeEvents.forEach(event => {
     const color = getEventColor(event.severity);
-    L.circle([event.latitude, event.longitude], {
+    const circle = L.circle([event.latitude, event.longitude], {
       color,
       fillColor: color,
       weight: 1,
       radius: event.radius,
       fillOpacity: 0.3
     }).addTo(map);
+    eventLayers.push(circle);
   });
+}
+
+function clearEventLayers() {
+  eventLayers.forEach(layer => map.removeLayer(layer));
+  eventLayers = [];
 }
 
 function handleNavigation(coords: { latitude: number, longitude: number }) {
@@ -335,8 +341,13 @@ function toggleEditMode() {
 
   if (isEditMode.value) {
     $toast.info('Redigeringsmodus aktivert. Klikk på et sted for å opprette et punkt, eller klikk på et eksisterende punkt for å redigere det.');
+    clearEventLayers();
+    eventStore.stopPollingActiveEvents();
   } else {
     $toast.info('Redigeringsmodus deaktivert. Du er nå i visningsmodus.');
+    eventStore.startPollingActiveEvents();
+    removeTempMarker();
+    addEvents(map);
   }
 }
 </script>
