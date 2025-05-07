@@ -36,9 +36,13 @@ watch(() => eventStore.chosenEvent, (newEvent) => {
 </div>   
 <div class="page-container">
     <ViewEventsComponent @event-selected="chooseEventId"/>
-    <EditEventComponent v-if="showSingleEventBox" />
-    <div v-if="showNewEventBox">
-        <NewEventComponent @hide-new-event-box="toggleNewEventBox" />
+    <EditEventComponent v-if="showSingleEventBox" @hide-edit-box="showSingleEventBox = false"/>
+
+    <div class="modal-overlay" v-if="showNewEventBox" @click.self="showNewEventBox = false">
+        <NewEventComponent
+        @close="showNewEventBox = false"
+        @hide-new-event-box="showNewEventBox = false"
+        />
     </div>
 </div>
 </template>

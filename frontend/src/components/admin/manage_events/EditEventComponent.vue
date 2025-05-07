@@ -24,6 +24,7 @@ const localEvent = ref({
 const isEventDirty = ref(false);
 const selectedIcon = ref('none');
 const icons = eventIcons;
+const severityLevels = [0, 1, 2, 3, 4, 5];
 
 // Load events from store
 const loadChosenEvent = async () => {
@@ -145,14 +146,17 @@ const deleteEvent = async () => {
         <h1 class="medium-header">Rediger hendelse</h1>
         <div class="grey-container">
             <h2 class="small-header">{{ localEvent.name }}</h2>
+            <button class="cancel-button" @click="$emit('hide-edit-box')">X</button>
             
                 <!-- Severity and radius -->
                 <div class="double-label-container">
                     <label for="severity-input">Krisenivå</label>
                     <label for="radius-input">Radius</label>
                 </div>
-                <div class="double-input-container">                   
-                    <input type="text" class="edit-input" id="severity-input" @input="isEventDirty = true" v-model="localEvent.severity" />                    
+                <div class="double-input-container">     
+                    <select v-model="localEvent.severity" id="severity-input" class="dropdown-select">
+                        <option v-for="level in severityLevels" :key="level" :value="level">{{ level }}</option>
+                    </select>
                     <input type="text" class="edit-input" id="radius-input" @input="isEventDirty = true" v-model="localEvent.radius" />
                 </div>
 
@@ -213,7 +217,7 @@ const deleteEvent = async () => {
     }
 
     .double-label-container {
-        gap: 9rem;
+        gap: 7.5rem;
     }
 
     .double-input-container {
@@ -246,5 +250,26 @@ const deleteEvent = async () => {
 
     #save:disabled {
         opacity: 0.5;
+    }
+
+    .cancel-button {
+        position: absolute;
+        top: 25rem;
+        right: -5rem;
+        color: var(--bad-red);
+        background-color: transparent;
+    }
+
+    .dropdown-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 200px;
+    }
+      
+    .dropdown-select {
+        padding: 0.5rem;
+        border-radius: 4px;
+        border: 1px solid #ccc;
     }
 </style>

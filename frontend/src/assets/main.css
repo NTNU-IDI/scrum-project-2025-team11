@@ -258,6 +258,19 @@ select {
   background-color: var(--grey);
 }
 
+.modal-overlay {
+  position: fixed;
+  top: -5rem;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
 @media (max-width: 768px) {
   .title-map {
     font-size: var(--font-size-medium);

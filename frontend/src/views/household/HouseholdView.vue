@@ -105,28 +105,6 @@ const toggleNewMemberBox = () => {
         margin-top: 4.75rem;
     }
 
-	.modal-overlay {
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background-color: rgba(0, 0, 0, 0.5);
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		z-index: 1000;
-	}
-	  
-	.modal-content {
-		background-color: #fff;
-		padding: 2rem;
-		border-radius: 10px;
-		max-width: 600px;
-		width: 90%;
-		box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-	}
-
   @media(max-width: 480px) {
     .page-container {
       display: block
