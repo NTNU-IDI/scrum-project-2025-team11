@@ -117,20 +117,20 @@ const toggleEditMode = () => {
  * @param {number} itemId - The ID of the item to delete
  * @returns {Promise<void>}
  */
-const deleteItem =  (itemId: number) => {
-    list.value.forEach(async item => {
-        if (!householdStore.id) {
-            console.error('Household ID is not available');
-            responseMessage.value = 'Kunne ikke finne husstand';
-            return;
-        }
-        if (item.id === itemId) {
-            if(confirm(`Er du sikker på at du vil slette ${item.name} fra lageret?`)) {
-                await inventoryStore.deleteItem(itemId, item.acquiredDate);
-                responseMessage.value = `${item.name} er slettet fra lageret`;
-            }
-        }
-    });
+const deleteItem =  async (itemId: number) => {
+    const matchingItems = inventoryStore.inventory.filter(item => item.itemId === itemId);
+
+    if (matchingItems.length === 0) return;
+
+    const confirmed = confirm(`Er du sikker på at du vil slette alle ${matchingItems[0].itemName || ''}-enheter fra lageret?`);
+    if (!confirmed) return;
+
+    for (const item of matchingItems) {
+        await inventoryStore.deleteItem(itemId, item.acquiredDate);
+    }
+
+    responseMessage.value = `${matchingItems[0].itemName || 'Vare'} er slettet fra lageret`;
+    await loadInventory(); 
 }
 </script>
 <template>
@@ -154,6 +154,10 @@ const deleteItem =  (itemId: number) => {
     <p class="user-response">{{ responseMessage }}</p>
 </template>
 <style scoped>
+    .grey-container {
+        width: 500px;
+    }
+
     .quantity {
         display: flex;
         align-items: center;
@@ -179,5 +183,15 @@ const deleteItem =  (itemId: number) => {
     .article-card.active .quantity, .article-card:hover .quantity, .article-card.active .edit-input, .article-card:hover .edit-input {
         color: white;
         background-color: transparent;
+    }
+
+    @media (max-width: 480px) {
+        .grey-container {
+            width: 100%;
+        }
+        .dark-button {
+            width: 5;
+            height: 3rem;
+        }
     }
 </style>

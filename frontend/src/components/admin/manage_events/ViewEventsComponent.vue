@@ -69,7 +69,7 @@ const chooseEvent = (eventId: any) => {
     }
 
     .grey-container {
-        min-height: 42rem;
+        height: auto;
     }
 
     .article-card {

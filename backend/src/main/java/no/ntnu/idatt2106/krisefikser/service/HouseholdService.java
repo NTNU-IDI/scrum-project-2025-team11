@@ -7,13 +7,11 @@ import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdResponseDTO;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdUpdateDTO;
-import no.ntnu.idatt2106.krisefikser.model.Address;
 import no.ntnu.idatt2106.krisefikser.model.Household;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Service class for managing households.
