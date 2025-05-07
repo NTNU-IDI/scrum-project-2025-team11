@@ -15,10 +15,18 @@ const isMemberBoxVisible = ref(false);
 
 const toggleNewItemBox = () => {
 	isItemBoxVisible.value = !isItemBoxVisible.value;
+  if(isItemBoxVisible.value) {
+    isMemberBoxVisible.value = false;
+  }
+  responseMessage.value = '';
 }
 
 const toggleNewMemberBox = () => {
 	isMemberBoxVisible.value = !isMemberBoxVisible.value;
+  if(isMemberBoxVisible.value) {
+    isItemBoxVisible.value = false;
+  }
+  responseMessage.value = '';
 }
 </script>
 
@@ -44,7 +52,7 @@ const toggleNewMemberBox = () => {
 			<div class="items-column">
 			<ViewSingleItemComponent />
 			</div>
-			<button class="dark-button" id="add-button" @click="toggleNewItemBox">+</button>
+			<button class="dark-button" id="add-button" @click="toggleNewItemBox">+</button> 
 
 			<div class="modal-overlay" v-if="isItemBoxVisible" @click.self="isItemBoxVisible = false">
 				<NewItemComponent  

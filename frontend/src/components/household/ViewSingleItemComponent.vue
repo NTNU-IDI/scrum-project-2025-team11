@@ -131,7 +131,7 @@ const updateItems = async () => {
                 expirationDate: item.expirationDate || '',
                 acquiredDate: item.acquiredDate,
             };
-            await inventoryStore.updateItem(item.householdId, updatedItem)
+            await inventoryStore.updateItem(updatedItem)
             responseMessage.value = `${item.itemName} er oppdatert`;
             item.dirty = false;
         }

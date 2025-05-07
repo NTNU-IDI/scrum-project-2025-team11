@@ -45,5 +45,5 @@ export const useInventoryStore = defineStore('inventory', {
             await this.fetchInventory();
         },
     },
-    persist: true
+    persist: true,
 });

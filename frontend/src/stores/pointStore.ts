@@ -1,107 +1,104 @@
+import type { PointOfInterest } from "@/types/PointOfInterest";
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import type { PointOfInterest } from "@/types/PointOfInterest";
+import { PointService } from "@/api/PointService";
+import { useToast } from "vue-toast-notification";
 
 export const usePointStore = defineStore("pointStore", () => {
-  const allPoints = ref<PointOfInterest[]>([]);
-  const shelters = ref<PointOfInterest[]>([]);
+  const pointsDisplaying = ref<PointOfInterest[]>([]);
+  const selectedIcons = ref<string[]>([]);
+  let pollingInterval: ReturnType<typeof setInterval> | null = null;
 
-  const fetchAllPoints = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/api/interest");
-      if (!response.ok) throw new Error("Failed fetching all points");
-      allPoints.value = await response.json();
-    } catch (error) {
-      console.error("Error fetching all points:", error);
-      allPoints.value = [];
+  const startPolling = () => {
+    if (pollingInterval) return;
+    pollingInterval = setInterval(() => {
+      fetchPointsByIconTypes(selectedIcons.value);
+    }, 5000); // 5 seconds
+  };
+
+  const stopPolling = () => {
+    if (pollingInterval) {
+      clearInterval(pollingInterval);
+      pollingInterval = null;
     }
   };
 
-  const fetchShelters = async () => {
-    try {
-      const response = await fetch(
-        "http://localhost:8080/api/interest/iconType?iconType=shelter"
-      );
-      if (!response.ok) throw new Error("Failed fetching shelters");
-      shelters.value = await response.json();
-    } catch (error) {
-      console.error("Error fetching shelters:", error);
-      shelters.value = [];
-    }
+  const initializePolling = async () => {
+    await fetchPointsByIconTypes(selectedIcons.value);
+    startPolling();
+  };
+
+  const updateSelectedIcons = (newIcons: string[]) => {
+    selectedIcons.value = newIcons;
+    stopPolling();
+    fetchPointsByIconTypes(newIcons);
+    startPolling();
+  };
+
+  const fetchPointsByIconTypes = async (iconTypes: string[]) => {
+    const points = await PointService.getByIconTypes(iconTypes);
+    pointsDisplaying.value = points;
+  };
+
+  const fetchNearestShelters = async (latitude: number, longitude: number) => {
+    return await PointService.getNearestShelters(latitude, longitude);
   };
 
   const createPoint = async (point: PointOfInterest) => {
+    const $toast = useToast();
     try {
-      const response = await fetch("http://localhost:8080/api/interest", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: point.name,
-          iconType: point.iconType,
-          description: point.description,
-          latitude: point.latitude,
-          longitude: point.longitude,
-        }),
+      const newPoint = await PointService.save(point);
+      fetchPointsByIconTypes(selectedIcons.value);
+      $toast.success("Punktet ble laget!", {
+        duration: 5000,
       });
-
-      if (!response.ok) throw new Error("Failed to create point");
-
-      const newPoint = await response.json();
-      allPoints.value.push(newPoint);
       return newPoint;
     } catch (error) {
-      console.error("Error creating point:", error);
+      $toast.warning("Punktet kunne ikke bli lagd", { duration: 5000 });
       throw error;
     }
   };
 
   const updatePointById = async (point: PointOfInterest) => {
+    const $toast = useToast();
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/interest/${point.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(point),
-        }
-      );
-
-      if (!response.ok) throw new Error("Failed to update point");
-
-      const updated = await response.json();
-      await fetchAllPoints();
+      const updated = await PointService.update(point.id, point);
+      fetchPointsByIconTypes(selectedIcons.value);
+      $toast.success("Punktet ble oppdatert!", {
+        duration: 5000,
+      });
       return updated;
     } catch (error) {
-      console.error("Error updating point:", error);
+      $toast.warning("Punktet kunne ikke bli oppdatert", { duration: 5000 });
       throw error;
     }
   };
 
   const deletePointById = async (id: number) => {
+    const $toast = useToast();
     try {
-      const response = await fetch(`http://localhost:8080/api/interest/${id}`, {
-        method: "DELETE",
+      await PointService.remove(id);
+      fetchPointsByIconTypes(selectedIcons.value);
+      $toast.success("Punktet ble slettet!", {
+        duration: 5000,
       });
-
-      if (!response.ok) throw new Error("Failed to delete point");
-      allPoints.value = allPoints.value.filter((point) => point.id !== id);
     } catch (error) {
-      console.error("Error deleting point:", error);
+      $toast.warning("Punktet kunne ikke bli slettet", { duration: 5000 });
       throw error;
     }
   };
 
   return {
-    allPoints,
-    shelters,
-    fetchAllPoints,
-    fetchShelters,
+    pointsDisplaying,
+    selectedIcons,
+    startPolling,
+    stopPolling,
+    initializePolling,
+    fetchPointsByIconTypes,
+    fetchNearestShelters,
     createPoint,
     updatePointById,
     deletePointById,
+    updateSelectedIcons,
   };
 });
