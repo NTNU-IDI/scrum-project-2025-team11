@@ -6,7 +6,7 @@ import { useAdminUserStore } from '@/stores/adminUserStore';
 const adminUserStore = useAdminUserStore();
 
 // Props
-const adminUsers = ref<{ id: number; username: string; email: string }[]>([]);
+const adminUsers = ref<{ id: number; firstName: string; lastName: string; username: string; email: string }[]>([]);
 
 const loadUsers = async () => {
     await adminUserStore.fetchUsers();
@@ -19,6 +19,8 @@ onMounted( async () => {
 watch(() => adminUserStore.adminUsers, async (newUsers) => {
     adminUsers.value = newUsers.map(user => ({
         id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
         username: user.username,
         email: user.email
     }));
@@ -35,12 +37,14 @@ const deleteUser = (id: number) => {
         <div class="grey-container">
             <div class="header-cards">
                 <div class="article-card" id="id-header">ID</div>
+                <div class="article-card" id="name-header">Fullt navn</div>
                 <div class="article-card" id="username-header">Brukernavn</div>
                 <div class="article-card" id="email-header">Epost</div>
                 <div class="article-card" id="delete-header">Slett</div>
             </div>
             <div v-for="(user, index) in adminUsers" :key="index" class="user-card">
                 <p class="article-card" id="id">{{ user.id }}</p>
+                <p class="article-card" id="name">{{ user.firstName + ' ' + user.lastName}}</p>
                 <h2 class="article-card" id="username">{{ user.username }}</h2>
                 <p class="article-card" id="email">{{ user.email }}</p>
                 <button class="delete-button" @click="deleteUser(user.id)">X</button>
@@ -55,7 +59,7 @@ const deleteUser = (id: number) => {
 }
 
 .grey-container {
-    width: 45rem;
+    width: 60rem;
     height: auto;
 }
 
@@ -74,7 +78,7 @@ const deleteUser = (id: number) => {
     font-size: var(--font-size-medium); 
 }
 
-#id-header, #username-header, #email-header {
+#id-header, #name-header, #username-header, #email-header {
     background-color: var(--light-blue);
     color: white;
 }
@@ -98,7 +102,7 @@ const deleteUser = (id: number) => {
     justify-content: center; 
     align-items: center;
 }
-#username-header, #username {
+#username-header, #username, #name-header, #name {
     width: 15rem;
 }
 
