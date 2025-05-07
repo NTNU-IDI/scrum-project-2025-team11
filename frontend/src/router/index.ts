@@ -6,7 +6,7 @@ import HouseholdView from "@/views/household/HouseholdView.vue";
 import PrivacyPolicyView from "@/views/PrivacyPolicyView.vue";
 import AuthView from "@/views/AuthView.vue";
 import UserHomeView from "@/views/HomeInloggedView.vue";
-import AdminView from "@/views/HomeAdminView.vue";
+import AdminView from "@/views/admin/AdminView.vue";
 import SuperAdminView from "@/views/admin/SuperAdminView.vue";
 import HomeAdminView from "@/views/HomeAdminView.vue";
 import AboutView from "@/views/AboutView.vue";
