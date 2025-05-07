@@ -54,7 +54,7 @@
         <div class="point-detail-container">
           <!-- Name -->
           <label class="point-label">Navn*</label>
-          <input v-model="pointData.name" type="text" placeholder="Navn" class="point-input" />
+          <input v-model="pointData.name" type="text" class="point-input" />
 
           <!-- Icon type -->
           <label class="point-label">Type punkt*</label>
@@ -67,7 +67,7 @@
 
           <!-- Description -->
           <label class="point-label">Beskrivelse*</label>
-          <input class="point-input" v-model="pointData.description" placeholder="Beskrivelse" />
+          <input class="point-input" v-model="pointData.description" placeholder="F.eks. Plass til 5." />
 
           <!-- Choose coordinates or address -->
           <label class="point-label">Inndata for lokasjon*</label>
@@ -80,15 +80,15 @@
           <!-- Coordinates -->
           <div v-if="inputMethod === 'coordinates'" class="coordinates-input">
             <label class="point-label">Breddegrad</label>
-            <input class="point-input" v-model="pointData.latitude" type="number" placeholder="Breddegrad" />
+            <input class="point-input" v-model="pointData.latitude" type="number" placeholder="F.eks. 63,41" />
             <label class="point-label">Lengdegrad</label>
-            <input class="point-input" v-model="pointData.longitude" type="number" placeholder="Lengdegrad" />
+            <input class="point-input" v-model="pointData.longitude" type="number" placeholder="F.eks. 10,40" />
           </div>
 
           <!-- Address -->
           <div v-if="inputMethod === 'address'">
             <label class="point-label">Adresse</label>
-            <input class="point-input" v-model="address" type="text" placeholder="Adresse" @blur="resolveAddress" />
+            <input class="point-input" v-model="address" type="text" @blur="resolveAddress" />
             <p v-if="addressError" class="error-message">{{ addressError }}</p>
           </div>
 
@@ -322,8 +322,7 @@ const deletePoint = async () => {
 
 .point-label {
   display: block;
-  font-size: var(--font-size-small);
-  color: #333;
+  font-size: var(--font-size-xsmall);
 }
 
 
