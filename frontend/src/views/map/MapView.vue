@@ -272,9 +272,15 @@ function handleNavigation(coords: { latitude: number, longitude: number }) {
     window.routingControl = L.Routing.control({
       waypoints: [L.latLng(userLat, userLon), L.latLng(coords.latitude, coords.longitude)],
       routeWhileDragging: false,
-      createMarker: function() {
-        return L.marker([userLat, userLon], { icon: userIcon });
-      }
+      createMarker: () => L.marker([userLat, userLon], { icon: userIcon }),
+      lineOptions: {
+        styles: [
+          {
+            color: 'var(--navigation)',
+            weight: 6  
+          }
+        ]
+      } as L.Routing.LineOptions
     } as L.Routing.RoutingControlOptions).addTo(map);
 
     isNavigating.value = true;
