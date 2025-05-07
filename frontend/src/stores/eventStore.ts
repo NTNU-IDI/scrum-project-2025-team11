@@ -1,6 +1,9 @@
 import { defineStore } from "pinia";
 import type { EventRequestDTO, EventResponseDTO } from "@/types/Event";
 import { EventService } from "@/api/EventService";
+import { PollingService } from "@/services/PollingService";
+
+const pollingService = new PollingService();
 
 export const useEventStore = defineStore("events", {
   state: () => ({
@@ -10,6 +13,12 @@ export const useEventStore = defineStore("events", {
   }),
 
   actions: {
+    startPollingActiveEvents() {
+      pollingService.start(() => this.fetchActiveEvents());
+    },
+    stopPollingActiveEvents() {
+      pollingService.stop();
+    },
     async fetchEvents() {
       try {
         await EventService.findAll().then((data) => {
@@ -52,40 +61,40 @@ export const useEventStore = defineStore("events", {
         console.error("Error choosing event:", error);
       }
     },
-    async update(id: number, event: EventRequestDTO){
-          try {
-              await EventService.update(id, event).then((data) => {
-                  this.chosenEvent = data;
-                  this.fetchEvents();
-              });
-          } catch (error) {
-              console.error('Error updating event:', error);
-          }
-      },
-      async save(event: EventRequestDTO) {
-          try {
-              await EventService.save(event).then((data) => {
-                  this.chosenEvent = data;
-                  this.fetchEvents();
-              });
-          } catch (error) {
-              console.error('Error saving event:', error);
-          }
-      },
-      async delete(id: number) {
-          try {
-              await EventService.delete(id).then(() => {
-                  this.chosenEvent = {} as EventResponseDTO;
-                  this.fetchEvents();
-                  console.log(this.chosenEvent.id);
-              });
-          } catch (error) {
-              console.error('Error deleting event:', error);
-          }
-      },
-      clearEvents() {
-        this.events = [];
-        this.activeEvents = [];
-      },
+    async update(id: number, event: EventRequestDTO) {
+      try {
+        await EventService.update(id, event).then((data) => {
+          this.chosenEvent = data;
+          this.fetchEvents();
+        });
+      } catch (error) {
+        console.error("Error updating event:", error);
+      }
     },
+    async save(event: EventRequestDTO) {
+      try {
+        await EventService.save(event).then((data) => {
+          this.chosenEvent = data;
+          this.fetchEvents();
+        });
+      } catch (error) {
+        console.error("Error saving event:", error);
+      }
+    },
+    async delete(id: number) {
+      try {
+        await EventService.delete(id).then(() => {
+          this.chosenEvent = {} as EventResponseDTO;
+          this.fetchEvents();
+          console.log(this.chosenEvent.id);
+        });
+      } catch (error) {
+        console.error("Error deleting event:", error);
+      }
+    },
+    clearEvents() {
+      this.events = [];
+      this.activeEvents = [];
+    },
+  },
 });

@@ -18,11 +18,6 @@ export const usePointStore = defineStore("pointStore", () => {
     polling.stop();
   };
 
-  const initializePolling = async () => {
-    await fetchPointsByIconTypes(selectedIcons.value);
-    startPolling();
-  };
-
   const updateSelectedIcons = (newIcons: string[]) => {
     selectedIcons.value = newIcons;
     stopPolling();
@@ -88,7 +83,6 @@ export const usePointStore = defineStore("pointStore", () => {
     selectedIcons,
     startPolling,
     stopPolling,
-    initializePolling,
     fetchPointsByIconTypes,
     fetchNearestShelters,
     createPoint,

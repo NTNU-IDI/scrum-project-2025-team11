@@ -48,7 +48,7 @@ import { useUserStore } from "@/stores/userStore.ts";
 import type { PointOfInterest } from "@/types/PointOfInterest";
 import { calculateDistance, getEventColor } from '@/utils/geoService';
 import { storeToRefs } from "pinia";
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { onUnmounted, onMounted, ref, watch } from 'vue';
 import { useEventStore } from '@/stores/eventStore'; 
 import { useToast } from 'vue-toast-notification';
 
@@ -100,8 +100,8 @@ onMounted(async () => {
   L.control.zoom({ position: 'topright' }).addTo(map);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-  await pointStore.initializePolling();
-  // TODO: Should also poll active enevts here
+  pointStore.startPolling();
+  eventStore.startPollingActiveEvents();
 
   // POI and events
   addMarkersToMap();
@@ -138,8 +138,9 @@ onMounted(async () => {
   }
 });
 
-onBeforeUnmount(() => {
+onUnmounted(() => {
   pointStore.stopPolling();
+  eventStore.stopPollingActiveEvents();
   $toast.clear();
 });
 
