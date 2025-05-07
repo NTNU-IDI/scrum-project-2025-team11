@@ -192,17 +192,17 @@ button:disabled:hover {
 }
 
 .map-icon.shelter {
-  background: url("/yellow-star-fill-border.svg") no-repeat center center /
+  background: url("../assets/ikon/shelter.svg") no-repeat center center /
     contain;
 }
 
 .map-icon.assembly_point {
-  background: url("/lightest-blue-triangle-fill-border.svg") no-repeat center
-    center / contain;
+  background: url("../assets/ikon/assembly-point.svg") no-repeat center center /
+    contain;
 }
 
 .map-icon.medical {
-  background: url("/bad-red-medical-fill-border.svg") no-repeat center center /
+  background: url("../assets/ikon/medical.svg") no-repeat center center /
     contain;
 }
 

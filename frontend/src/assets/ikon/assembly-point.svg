@@ -1,0 +1,16 @@
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer Circle -->
+  <circle cx="50" cy="50" r="48" stroke="#000" stroke-width="4" fill="white"></circle>
+
+  <!-- Person 1 (Top Center) -->
+  <circle cx="50" cy="25" r="9" fill="#000"></circle>
+  <path d="M40 37c0-6 20-6 20 0v10H40z" fill="#000"></path>
+
+  <!-- Person 2 (Bottom Left) -->
+  <circle cx="36" cy="56" r="9" fill="#000"></circle>
+  <path d="M26 68c0-6 20-6 20 0v10H26z" fill="#000"></path>
+
+  <!-- Person 3 (Bottom Right) -->
+  <circle cx="64" cy="56" r="9" fill="#000"></circle>
+  <path d="M54 68c0-6 20-6 20 0v10H54z" fill="#000"></path>
+</svg>

@@ -44,7 +44,7 @@ export const usePointStore = defineStore("pointStore", () => {
       });
       return newPoint;
     } catch (error) {
-      $toast.warning("Punktet kunne ikke bli lagd", { duration: 5000 });
+      $toast.error("Punktet kunne ikke bli lagd", { duration: 5000 });
       throw error;
     }
   };
@@ -59,7 +59,7 @@ export const usePointStore = defineStore("pointStore", () => {
       });
       return updated;
     } catch (error) {
-      $toast.warning("Punktet kunne ikke bli oppdatert", { duration: 5000 });
+      $toast.error("Punktet kunne ikke bli oppdatert", { duration: 5000 });
       throw error;
     }
   };
@@ -73,7 +73,7 @@ export const usePointStore = defineStore("pointStore", () => {
         duration: 5000,
       });
     } catch (error) {
-      $toast.warning("Punktet kunne ikke bli slettet", { duration: 5000 });
+      $toast.error("Punktet kunne ikke bli slettet", { duration: 5000 });
       throw error;
     }
   };
