@@ -8,6 +8,7 @@ const showNewUserBox = ref(false);
 const $toast = useToast();
 
 const displaySuccess = () => {
+    showNewUserBox.value = false
     $toast.success('Bruker opprettet!', {
         duration: 3000,
         position: 'top-right'
@@ -29,7 +30,7 @@ const displaySuccess = () => {
             <AddUserComponent
             @close="showNewUserBox = false"
             @hide-new-user-box="showNewUserBox = false"
-            @new-user-success="showNewUserBox = false && displaySuccess()"
+            @new-user-success="displaySuccess"
             />
         </div>
     </div>

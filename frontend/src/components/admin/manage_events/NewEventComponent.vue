@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { eventIcons } from '@/utils/icons';
 import { validateLatitude, validateLongitude, validatePointDescription, validatePointName, validateRadius, validateSeverity } from '@/utils/validationService';
 import { useEventStore } from '@/stores/eventStore';
@@ -14,42 +14,44 @@ const description = ref('');
 const startTime = ref();
 const endTime = ref();
 const selectedIcon = ref('none');
-const emit = defineEmits(['hide-new-event-box']);
+const emit = defineEmits(['hide-new-event-box', 'new-event-success']);
 const icons = eventIcons;
 const eventStore = useEventStore();
 const severityLevels = [0, 1, 2, 3, 4, 5];
+const errorMsg = ref('');
 
 const validateEvent = () => {
+    errorMsg.value = '';
     if (!validatePointName(name.value)) {
-        alert('Hendelsesnavn må fylles ut');
+        errorMsg.value = ('Hendelsesnavn må fylles ut');
         return false;
     }
     if (!validateSeverity(severity.value)) {
-        alert('Krisenivå må fylles ut');
+        errorMsg.value = ('Krisenivå må fylles ut');
         return false;
     }
     if (!validateRadius(radius.value)) {
-        alert('Radius må fylles ut');
+        errorMsg.value = ('Radius må fylles ut');
         return false;
     }
     if (!validateLatitude(latitude.value)) {
-        alert('Lengdegrad må fylles ut');
+        errorMsg.value = ('Lengdegrad må fylles ut');
         return false;
     }
     if (!validateLongitude(longitude.value)) {
-        alert('Breddegrad må fylles ut');
+        errorMsg.value = ('Breddegrad må fylles ut');
         return false;
     }
     if (!validatePointDescription(description.value)) {
-        alert('Beskrivelse må fylles ut');
+        errorMsg.value = ('Beskrivelse må fylles ut');
         return false;
     }
     if (!startTime.value) {
-        alert('Startdato må fylles ut');
+        errorMsg.value = ('Startdato må fylles ut');
         return false;
     }
     if (endTime.value && new Date(startTime.value) > new Date(endTime.value)) {
-        alert('Sluttdato kan ikke være før startdato');
+        errorMsg.value = ('Sluttdato kan ikke være før startdato');
         return false;
     }
     return true;
@@ -57,34 +59,37 @@ const validateEvent = () => {
 
 // Add event 
 const addEvent = () => {
-    if (validateEvent()) {
-        if (endTime.value) {
-            eventStore.save({
-                name: name.value,
-                description: description.value,
-                iconType: selectedIcon.value,
-                startTime: startTime.value + ':00',
-                endTime: endTime.value + ':00',
-                latitude: latitude.value,
-                longitude: longitude.value,
-                severity: severity.value,
-                radius: radius.value,
-            });
-        } else {
-            eventStore.save({
-                name: name.value,
-                description: description.value,
-                iconType: selectedIcon.value,
-                startTime: startTime.value + ':00',
-                latitude: latitude.value,
-                longitude: longitude.value,
-                severity: severity.value,
-                radius: radius.value,
-            });
-        }
-        emit('hide-new-event-box');
+    if (!validateEvent()) {
+        return;
     }
+    if (endTime.value) {
+        eventStore.save({
+            name: name.value,
+            description: description.value,
+            iconType: selectedIcon.value,
+            startTime: startTime.value + ':00',
+            endTime: endTime.value + ':00',
+            latitude: latitude.value,
+            longitude: longitude.value,
+            severity: severity.value,
+            radius: radius.value,
+        });
+    } else {
+        eventStore.save({
+            name: name.value,
+            description: description.value,
+            iconType: selectedIcon.value,
+            startTime: startTime.value + ':00',
+            latitude: latitude.value,
+            longitude: longitude.value,
+            severity: severity.value,
+            radius: radius.value,
+        });
+    }
+    emit('new-event-success');
+    
 }
+
 </script>
 <template>
     <div class="grey-container">
@@ -100,13 +105,13 @@ const addEvent = () => {
             <!-- Severity and radius -->
             <div class="double-label-container">
                 <label for="severity-input">*Krisenivå</label>
-                <label for="radius-input">*Radius</label>
+                <label for="radius-input" id="radius-label">*Radius (meter)</label>
             </div>
             <div class="double-input-container">     
                 <select v-model="severity" id="severity-input" class="dropdown-select">
                     <option class="edit-input" v-for="level in severityLevels" :key="level" :value="level">{{ level }}</option>
                 </select>           
-                <input type="text" class="edit-input"  v-model="radius" />
+                <input type="text" class="edit-input" v-model="radius" />
             </div>
 
             <!-- Coordinates -->
@@ -115,12 +120,13 @@ const addEvent = () => {
                 <label for="coordinate-input">*Breddegrad</label>
             </div>
             <div class="double-input-container">
-                <input type="text" class="edit-input" id="coordinate-input" v-model="latitude" />
-                <input type="text" class="edit-input" id="coordinate-input" v-model="longitude" />
+                <input type="text" class="edit-input" id="coordinate-input" placeholder="f.eks 62.1008" v-model="latitude" />
+                <input type="text" class="edit-input" id="coordinate-input" placeholder="f.eks 10.1199" v-model="longitude" />
             </div>
 
             <!-- Description and dates -->
-            <textarea class="edit-input" placeholder="*Beskrivelse" v-model="description"></textarea>
+            <label for="description">*Beskrivelse</label>
+            <textarea class="edit-input" id="description" placeholder="Minst 5 tegn" v-model="description"></textarea>
             <label for="start-input">*Startdato</label>
             <input type="datetime-local" class="edit-input" id="start-input" v-model="startTime" />   
             <label for="end-input">Eventuell Sluttdato</label>
@@ -139,11 +145,12 @@ const addEvent = () => {
         <div class="button-container">
             <button class="dark-button" @click="addEvent">Legg til</button>
         </div>
+        <p class="error-message">{{ errorMsg }}</p>
     </div>
 </template>
 <style scoped>
 .grey-container {
-   height:40rem;
+   height:41rem;
    margin-top: 4.75rem;
 }
 
@@ -158,16 +165,21 @@ const addEvent = () => {
 }
 
 .double-label-container {
-    gap: 7rem;
+    gap: 6rem;
+}
+
+#radius-label {
+    margin-left: 1rem;
 }
 
 .double-input-container {
     justify-content: space-between;
     gap: 1rem;
+    width: 22.85rem;
 }
 
 .medium-header {
-    margin: 0.5rem 0 1rem 0;
+    margin: 0;
 }
 
 .edit-input {
@@ -178,6 +190,7 @@ const addEvent = () => {
 
 textarea {
     width: 100%;
+    height: 2.5rem;
     padding: 0.5rem;
     margin-bottom: 1rem;
     border: none;
@@ -190,12 +203,13 @@ textarea {
 .button-container {
     display: flex;
     justify-content: space-between;
+    margin: 0;
 }
 
 .dark-button {
     width: 10rem; 
     height: 3rem; 
-    background-color: var(--orange);
+    background-color: var(--good-green);
 }
 
 .cancel-button {
@@ -217,6 +231,13 @@ textarea {
     padding: 0.5rem;
     border-radius: 4px;
     background-color: white;
-    width: 24rem;
+    width: 22rem;
+    margin-right: 1rem;
+}
+
+p {
+    font-size: var(--font-size-medium);
+    color: var(--bad-red);
+    margin-top: 0.5rem;
 }
 </style>

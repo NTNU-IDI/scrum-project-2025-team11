@@ -4,9 +4,12 @@ import { onMounted, ref, watch } from 'vue';
 import { eventIcons } from '@/utils/icons';
 import { formatDate, formatDateForInput } from '@/utils/formatDate';
 import { validateIconType, validateLatitude, validateLongitude, validatePointDescription, validateRadius, validateSeverity } from '@/utils/validationService';
+import { useToast } from 'vue-toast-notification';
 
 // Store imports
 const eventStore = useEventStore();
+
+const $toast = useToast();
 
 // Props
 const localEvent = ref({
@@ -25,6 +28,7 @@ const isEventDirty = ref(false);
 const selectedIcon = ref('none');
 const icons = eventIcons;
 const severityLevels = [0, 1, 2, 3, 4, 5];
+const errorMsg = ref('');
 
 // Load events from store
 const loadChosenEvent = async () => {
@@ -61,35 +65,35 @@ watch(() => eventStore.chosenEvent, async (newEvent) => {
 // Validate new event data
 const validateEvent = () => {
     if (!validatePointDescription(localEvent.value.description)) {
-        alert('Fyll inn en gyldig beskrivelse');
+        errorMsg.value = ('Fyll inn en gyldig beskrivelse');
         return false;
     }
     if (!localEvent.value.startTime) {
-        alert('Startdato må fylles ut');
+        errorMsg.value = ('Startdato må fylles ut');
         return false;
     }
     if (!validateLatitude(localEvent.value.latitude)) {
-        alert('Fyll inn en gyldig breddegrad');
+        errorMsg.value = ('Fyll inn en gyldig breddegrad');
         return false;
     }
     if (!validateLongitude(localEvent.value.longitude)) {
-        alert('Fyll inn en gyldig lengdegrad');
+        errorMsg.value = ('Fyll inn en gyldig lengdegrad');
         return false;
     }
     if (!validateRadius(localEvent.value.radius)) {
-        alert('Fyll inn en gyldig radius');
+        errorMsg.value = ('Fyll inn en gyldig radius');
         return false;
     }
     if (!validateSeverity(localEvent.value.severity)) {
-        alert('Fyll inn et gyldig krisenivå');
+        errorMsg.value = ('Fyll inn et gyldig krisenivå');
         return false;
     }
     if (!validateIconType(localEvent.value.iconType)) {
-        alert('Velg et ikon');
+        errorMsg.value = ('Velg et ikon');
         return false;
     }
     if (localEvent.value.endTime && new Date(localEvent.value.startTime) > new Date(localEvent.value.endTime)) {
-        alert('Sluttdato kan ikke være før startdato');
+        errorMsg.value = ('Sluttdato kan ikke være før startdato');
         return false;
     }
     return true;
@@ -130,6 +134,11 @@ const updateEvent = async () => {
     }
     
     isEventDirty.value = false;
+    $toast.success(`${localEvent.value.name} er oppdatert!`, {
+                duration: 3000,
+                position: 'top-right'
+            });
+    errorMsg.value = '';
 }
 
 // Delete event
@@ -138,6 +147,18 @@ const deleteEvent = async () => {
         return;
     }
     await eventStore.delete(localEvent.value.id);
+    await eventStore.fetchEvents();
+    if(eventStore.events.map(event => event.id).includes(localEvent.value.id)) {
+        $toast.error('Kunne ikke slette hendelse', {
+            duration: 3000,
+            position: 'top-right'
+        });
+    } else {
+        $toast.success('Hendelse slettet', {
+            duration: 3000,
+            position: 'top-right'
+        });
+    }
 }
 </script>
 <template>
@@ -154,8 +175,8 @@ const deleteEvent = async () => {
                     <label for="radius-input">Radius</label>
                 </div>
                 <div class="double-input-container">     
-                    <select v-model="localEvent.severity" id="severity-input" class="dropdown-select">
-                        <option v-for="level in severityLevels" :key="level" :value="level">{{ level }}</option>
+                    <select v-model="localEvent.severity" id="severity-input" class="dropdown-select" @change="isEventDirty = true">
+                        <option v-for="level in severityLevels" :key="level" :value="level" >{{ level }}</option>
                     </select>
                     <input type="text" class="edit-input" id="radius-input" @input="isEventDirty = true" v-model="localEvent.radius" />
                 </div>
@@ -187,6 +208,7 @@ const deleteEvent = async () => {
                 <button class="dark-button" id="delete" @click="deleteEvent()">Slett hendelse</button>
                 <button class="dark-button" id="save" @click="updateEvent()" :disabled="!isEventDirty">Lagre endringer</button>
             </div>
+            <p class="error-message">{{ errorMsg }}</p>
         </div>
     </div>
 </div>
@@ -194,13 +216,17 @@ const deleteEvent = async () => {
 <style scoped>
     .grey-container {
         background-color: var(--light-blue);
-        max-height: 42rem;
+        height: auto;
     }
 
     .page-container {
         margin: 1rem;
         display: flex;
         flex-direction: column;
+    }
+
+    h1 {
+        text-align: left;
     }
 
     .small-header {
@@ -240,11 +266,12 @@ const deleteEvent = async () => {
         width: 10rem;
     }
 
-    #delete:hover {
+
+    #delete {
         background-color: var(--bad-red);
     }
 
-    #save:hover {
+    #save {
         background-color: var(--good-green);
     }
 
@@ -256,8 +283,9 @@ const deleteEvent = async () => {
         position: absolute;
         top: 25rem;
         right: -5rem;
-        color: var(--bad-red);
+        color: white;
         background-color: transparent;
+        font-weight: bold;
     }
 
     .dropdown-container {
@@ -271,5 +299,12 @@ const deleteEvent = async () => {
         padding: 0.5rem;
         border-radius: 4px;
         border: 1px solid #ccc;
+    }
+
+    .error-message {
+        font-size: var(--font-size-medium);
+        color: white;
+        margin: 0;
+        padding: 0;
     }
 </style>

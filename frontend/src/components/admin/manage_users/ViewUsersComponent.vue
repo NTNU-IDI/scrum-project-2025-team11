@@ -1,12 +1,14 @@
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue';
 import { useAdminUserStore } from '@/stores/adminUserStore';
+import { useToast } from 'vue-toast-notification';
 
 // Store imports
 const adminUserStore = useAdminUserStore();
 
 // Props
 const adminUsers = ref<{ id: number; firstName: string; lastName: string; username: string; email: string }[]>([]);
+const $toast = useToast();
 
 const loadUsers = async () => {
     await adminUserStore.fetchUsers();
@@ -28,6 +30,17 @@ watch(() => adminUserStore.adminUsers, async (newUsers) => {
 
 const deleteUser = (id: number) => {
    adminUserStore.deleteUser(id);
+   if(adminUserStore.adminUsers.map(user => user.id).includes(id)) {
+    $toast.error('Kunne ikke slette bruker', {
+        duration: 3000,
+        position: 'top-right'
+    });
+   } else {
+    $toast.success('Bruker slettet', {
+        duration: 3000,
+        position: 'top-right'
+    });
+   }
 };
 </script>
 <template>
