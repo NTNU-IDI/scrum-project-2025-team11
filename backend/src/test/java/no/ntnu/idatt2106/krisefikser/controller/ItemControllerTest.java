@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ntnu.idatt2106.krisefikser.config.TestSecurityConfig;
 import no.ntnu.idatt2106.krisefikser.dto.ItemRequest;
 import no.ntnu.idatt2106.krisefikser.dto.ItemResponse;
+import no.ntnu.idatt2106.krisefikser.exceptionhandler.ResourceNotFoundException;
 import no.ntnu.idatt2106.krisefikser.mapper.ItemMapper;
 import no.ntnu.idatt2106.krisefikser.model.Item;
 import no.ntnu.idatt2106.krisefikser.security.JwtAuthFilter;
@@ -155,5 +156,17 @@ class ItemControllerTest {
            .andExpect(status().isNoContent());
 
         verify(service).delete(5);
+    }
+
+    @Test
+    @DisplayName("DELETE /api/items/{id} returns 404 when not found")
+    void deleteItemNotFound() throws Exception {
+        doThrow(new ResourceNotFoundException("Item", "id", 99))
+            .when(service).delete(99);
+
+        mvc.perform(delete("/api/items/99"))
+           .andExpect(status().isNotFound());
+
+        verify(service).delete(99);
     }
 }
