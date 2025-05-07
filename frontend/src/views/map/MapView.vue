@@ -137,9 +137,9 @@ onMounted(async () => {
   }
 });
 
-// Stop polling when component is unmounted
 onBeforeUnmount(() => {
   pointStore.stopPolling();
+  $toast.clear();
 });
 
 function addMarkersToMap() {
