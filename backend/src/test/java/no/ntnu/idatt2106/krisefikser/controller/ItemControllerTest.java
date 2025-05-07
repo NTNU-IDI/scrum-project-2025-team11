@@ -169,4 +169,73 @@ class ItemControllerTest {
 
         verify(service).delete(99);
     }
+
+    @Test
+    @DisplayName("GET /api/items/{id} returns 200 when item exists")
+    void getItemById_whenExists_returns200() throws Exception {
+        Item entity = new Item(10, "X", "x");
+        ItemResponse resp = new ItemResponse(10, "X", "x");
+
+        when(service.findById(10)).thenReturn(Optional.of(entity));
+        when(itemMapper.toResponse(entity)).thenReturn(resp);
+
+        mvc.perform(get("/api/items/10"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(10))
+            .andExpect(jsonPath("$.name").value("X"));
+
+    verify(service).findById(10);
+    }
+    
+    @Test
+    @DisplayName("GET /api/items/{id} returns 404 when not found")
+    void getItemById_whenNotFound_returns404() throws Exception {
+        when(service.findById(42)).thenReturn(Optional.empty());
+
+        mvc.perform(get("/api/items/42"))
+           .andExpect(status().isNotFound());
+
+        verify(service).findById(42);
+    }
+
+    @Test
+    @DisplayName("PUT /api/items/{id} returns 404 when updating non-existent item")
+    void updateItem_whenNotFound_returns404() throws Exception {
+        ItemRequest req = new ItemRequest();
+        req.setName("Name");
+        req.setDescription("Desc");
+
+        when(service.findById(7)).thenReturn(Optional.empty());
+
+        mvc.perform(put("/api/items/7")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(mapper.writeValueAsString(req)))
+            .andExpect(status().isNotFound());
+
+        verify(service).findById(7);
+        verify(service, never()).update(anyInt(), any());
+    }
+
+    @Test
+    @DisplayName("POST /api/items returns 400 on validation failure")
+    void createItem_whenInvalid_returns400() throws Exception {
+        ItemRequest req = new ItemRequest();
+        req.setName("");               // invalid: blank
+        req.setDescription("desc");
+
+        mvc.perform(post("/api/items")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(mapper.writeValueAsString(req)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.status").value(400))
+            .andExpect(jsonPath("$.message").value("Validation failed"))
+            .andExpect(jsonPath("$.fieldErrors.name").exists());
+    
+        // No need to verify service; it should never be called:
+        verify(service, never()).create(any());
+    }
+
+
+
+
 }
