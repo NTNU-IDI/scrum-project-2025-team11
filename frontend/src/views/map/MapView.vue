@@ -52,13 +52,12 @@ import EventView from '../../components/map/EventView.vue';
 import L from 'leaflet';
 import 'leaflet-routing-machine';
 import 'leaflet/dist/leaflet.css';
-import userMarkerIcon from '@/assets/ikon/user-maker.svg';
 import { usePointStore } from '@/stores/pointStore';
 import { useUserStore } from "@/stores/userStore.ts";
 import type { PointOfInterest } from "@/types/PointOfInterest";
 import type { EventResponseDTO } from "@/types/Event";
 import { isUserInCrisisArea } from '@/utils/geoService';
-import { addMarkersToMap, addEventsToMap, clearEventLayers } from '@/services/MapService'; 
+import { addMarkersToMap, addEventsToMap, clearEventLayers, createRoutingControl, clearRoutingControl, userIcon } from '@/services/MapService'; 
 import { storeToRefs } from "pinia";
 import { onUnmounted, onMounted, ref, watch } from 'vue';
 import { useEventStore } from '@/stores/eventStore'; 
@@ -88,7 +87,6 @@ const showNearestShelterButton = ref(true);
 const showEventView = ref(false);
 const selectedEvent = ref<EventResponseDTO>({ id: 0, name: '', description: '', iconType: '', startTime: '', endTime: '', latitude: 0, longitude: 0, radius: 0, severity: 0,});
 const selectedPoint = ref<PointOfInterest>({ id: 0, name: '',description: '', iconType: '', latitude: 0, longitude: 0 });
-const userIcon = L.icon({ iconUrl: userMarkerIcon, iconSize: [35, 35], iconAnchor: [20, 40], popupAnchor: [0, -40],});
 
 let map: L.Map;
 let temporaryMarker: L.Marker | null = null;
@@ -261,6 +259,9 @@ if (userLat !== null && userLon !== null) {
 }
 
 function handleEventClick(event: EventResponseDTO) {
+  console
+  clearRouting();
+  showNearestShelterButton.value = true;
   selectedEvent.value = event;
   showPointForm.value = false;
   showEventView.value = true;
@@ -273,30 +274,15 @@ function closeEventView() {
 function handleNavigation(coords: { latitude: number, longitude: number }) {
   getUserPosition((userLat, userLon) => {
     clearRouting();
-
-    window.routingControl = L.Routing.control({
-      waypoints: [L.latLng(userLat, userLon), L.latLng(coords.latitude, coords.longitude)],
-      routeWhileDragging: false,
-      createMarker: () => L.marker([userLat, userLon], { icon: userIcon }),
-      lineOptions: {
-        styles: [
-          {
-            color: 'var(--navigation)',
-            weight: 6  
-          }
-        ]
-      } as L.Routing.LineOptions
-    } as L.Routing.RoutingControlOptions).addTo(map);
-
+    window.routingControl = createRoutingControl(map, userLat, userLon, coords.latitude, coords.longitude);
     isNavigating.value = true;
   }, true);
 }
 
 function clearRouting() {
-  if (window.routingControl) {
-    map.removeControl(window.routingControl);
-    window.routingControl = null;
-  }
+  clearRoutingControl(map, window.routingControl);
+  removeTempMarker();
+  window.routingControl = null;
   isNavigating.value = false;
 }
 

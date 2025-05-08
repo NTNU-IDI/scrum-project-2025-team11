@@ -1,7 +1,16 @@
 import L from "leaflet";
+import userMarkerIcon from "@/assets/ikon/user-maker.svg";
+import "leaflet-routing-machine";
 import type { PointOfInterest } from "@/types/PointOfInterest";
 import type { EventResponseDTO } from "@/types/Event";
 import { getEventColor } from "@/utils/geoService";
+
+export const userIcon = L.icon({
+  iconUrl: userMarkerIcon,
+  iconSize: [35, 35],
+  iconAnchor: [20, 40],
+  popupAnchor: [0, -40],
+});
 
 export function addMarkersToMap(
   map: L.Map,
@@ -67,4 +76,33 @@ export function addEventsToMap(
 export function clearEventLayers(eventLayers: L.Circle[], map: L.Map) {
   eventLayers.forEach((layer) => map.removeLayer(layer));
   eventLayers.length = 0;
+}
+
+export function createRoutingControl(
+  map: L.Map,
+  startLat: number,
+  startLon: number,
+  endLat: number,
+  endLon: number
+) {
+  const routingControl = L.Routing.control({
+    waypoints: [L.latLng(startLat, startLon), L.latLng(endLat, endLon)],
+    routeWhileDragging: false,
+    lineOptions: {
+      styles: [{ color: "var(--navigation)", weight: 6 }],
+      extendToWaypoints: false,
+      missingRouteTolerance: 0,
+    },
+  } as any).addTo(map);
+
+  const startMarker = L.marker([startLat, startLon], { icon: userIcon });
+  startMarker.addTo(map);
+
+  return routingControl;
+}
+
+export function clearRoutingControl(map: L.Map, routingControl: any) {
+  if (routingControl) {
+    map.removeControl(routingControl);
+  }
 }
