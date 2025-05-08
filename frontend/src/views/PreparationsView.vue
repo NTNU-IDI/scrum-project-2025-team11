@@ -26,42 +26,64 @@
 
 <template>
     <HeaderBase />
-    <div class="prev_and_next">
-      <div id="previous">
-        <router-link
-          v-if="prevStage"
-         :to="`/beredskap/${prevStage}`"
-        >
-          <button class="box">
-            <i class="fa fa-arrow-left" aria-hidden="true"></i> {{ formatStage(prevStage) }}
-          </button>
-        </router-link>
-      </div>
+    <!--<div class="prev_and_next">
+        <div id="previous">
+            <router-link
+                v-if="prevStage"
+                :to="`/beredskap/${prevStage}`"
+            >
+                <button class="box">
+                    <i class="fa fa-arrow-left" aria-hidden="true"></i> {{ formatStage(prevStage) }}
+                </button>
+            </router-link>
+        </div>
 
-      <div id="next">
-        <router-link
-          v-if="nextStage"
-          :to="`/beredskap/${nextStage}`"
-        >
-          <button class="box">
-            {{ formatStage(nextStage) }} <i class="fa fa-arrow-right" aria-hidden="true"></i>
-          </button>
-        </router-link>
-      </div>
-    </div>
+        <div id="next">
+            <router-link
+                v-if="nextStage"
+                :to="`/beredskap/${nextStage}`"
+            >
+                <button class="box">
+                    {{ formatStage(nextStage) }} <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                </button>
+            </router-link>
+        </div>
+    </div>-->
     <div id="preparationsContainer">
+        <div id="previous">
+            <router-link
+                v-if="prevStage"
+                :to="`/beredskap/${prevStage}`"
+            >
+                <button class="box">
+                    <i class="fa fa-arrow-left" aria-hidden="true"></i> {{ formatStage(prevStage) }}
+                </button>
+            </router-link>
+        </div>
         <PreparationsComponent :stage="stage" />
+        <div id="next">
+            <router-link
+                v-if="nextStage"
+                :to="`/beredskap/${nextStage}`"
+            >
+                <button class="box">
+                    {{ formatStage(nextStage) }} <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                </button>
+            </router-link>
+        </div>
     </div>
     <Footer />
 </template>
 
 <style scoped>
     #preparationsContainer {
-        width: 100%;
+        height: 100%;
         display: flex;
+        flex-direction: row;
         align-items: center;
         justify-content: center;
         padding: 20px 0;
+        
     }
 
     .prev_and_next {
@@ -73,15 +95,20 @@
 
     #previous {
         align-self: flex-start;
-        padding: 20px 0 0 30px;
+        padding: 10px 30px 0 0;
+        width: 140px;
+        display: flex;
+        justify-content: flex-end;
+        
     }
     #next {
-        align-self: flex-end;
-        padding: 20px 30px 0 0;
+        align-self: flex-start;
+        padding: 10px 0 0 30px;
+        width: 140px;
     }
-
+    
     .box {
-        width: 120px; /* Or whatever consistent width you prefer */
+        width: 120px;
         text-align: center;
     }
 </style>
