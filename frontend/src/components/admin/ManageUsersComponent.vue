@@ -20,7 +20,7 @@ const displaySuccess = () => {
 <div class="container">
     <div class="header-box"> 
         <h1>Administrere adminbrukere</h1>
-        <p>Her kan du administrere adminbrukere. Husk at du igjennom dette grensesnittet har tilgang til krtiske opplysninger -  vennligst ta ansvaret som følger med det.</p>
+        <p>Her kan du administrere adminbrukere. Husk at du igjennom dette grensesnittet har tilgang til kritiske opplysninger -  vennligst ta ansvaret som følger med det.</p>
     </div>   
     <div class="page-container">
         <ViewUsersComponent />

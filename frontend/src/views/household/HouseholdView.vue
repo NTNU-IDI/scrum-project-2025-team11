@@ -4,8 +4,8 @@ import NewMemberComponent from '@/components/household/NewMemberComponent.vue';
 import ViewMembersComponent from '@/components/household/ViewMembersComponent.vue';
 import ViewSingleItemComponent from '@/components/household/ViewSingleItemComponent.vue';
 import ViewSuppliesComponent from '@/components/household/ViewSuppliesComponent.vue';
-import Header from '@/components/Header.vue';
-import Footer from '@/components/Footer.vue';
+import HeaderBase from '@/components/HeaderBase.vue'
+import Footer from '@/components/Footer.vue'
 import { ref } from 'vue';
 import { useToast } from 'vue-toast-notification';
 
@@ -44,7 +44,7 @@ const newItemSuccess = () => {
 </script>
 
 <template>
-	<Header />
+	<HeaderBase />
   	<div class="page-container">
 		<h1>Min husstand</h1>
 		<div class="members-container">

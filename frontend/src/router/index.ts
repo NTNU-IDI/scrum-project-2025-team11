@@ -13,6 +13,8 @@ import AboutView from "@/views/AboutView.vue";
 import ForgotPassword from "@/views/ForgotPasswordView.vue";
 import ResetPassword from "@/views/ResetPasswordView.vue";
 
+import Header from "@/components/Header.vue";
+
 import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
 import {useUserStore} from "@/stores/userStore.ts";
@@ -57,6 +59,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/userhome",
     name: "UserHomeView",
     component: UserHomeView,
+    meta: { requiresNormalUser: true }
   },
   {
     path: "/superadmin",
@@ -79,6 +82,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/adminhome',
     name: 'HomeAdminView',
     component: HomeAdminView,
+    meta: { requiresAdmin: true }
   },
   { path: '/about',
     name: 'AboutView',
@@ -94,6 +98,13 @@ const routes: Array<RouteRecordRaw> = [
     name: "ResetPassword",
     component: ResetPassword,
   },
+
+
+  {
+    path: "/headers",
+    name: "Headers",
+    component: Headers,
+  },
   {
     path: "/beredskap/:stage",
     name: "Beredskap",
@@ -105,6 +116,8 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
 });
+
+// Accesse 
 
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
@@ -121,6 +134,8 @@ router.beforeEach((to, from, next) => {
   } else {
     next()
   }
+  
 })
+  
 
 export default router;
