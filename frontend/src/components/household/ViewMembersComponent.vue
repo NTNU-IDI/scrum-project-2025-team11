@@ -25,7 +25,7 @@ onMounted( async () => {
             </div>
 
             <div class="address-container">
-                <h1 class="medium-header">Addresse</h1>
+                <h1 class="medium-header">Adresse</h1>
                 <div class="article-card">
                     <p id="address">{{ householdStore.address }}</p>
                 </div>
