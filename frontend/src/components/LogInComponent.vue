@@ -4,6 +4,8 @@ import {ref} from "vue";
 
 const username = ref('')
 const password = ref('')
+const passwordInputType = ref('password')
+const showPassword = ref(false)
 const errorMessage = ref('');
 
 function attemptLogin() {
@@ -24,18 +26,28 @@ function simpleValidation() {
   return true
 }
 
+function changePasswordVisibility() {
+  if(showPassword.value === false) {
+    passwordInputType.value = 'password'
+  } else {
+    passwordInputType.value = 'type'
+  }
+}
+
 </script>
 
 <template>
   <div class="register-login-container">
     <h1>Logg inn</h1>
     <form v-on:submit.prevent>
-      <input type="text" v-model="username" placeholder="Brukernavn"/>
-      <input type="password" v-model="password" placeholder="Passord"/>
+      <label>Brukernavn <span class="importantStar">*</span><input type="text" v-model="username"/></label>
+      <label>Passord <span class="importantStar">*</span><input :type="passwordInputType" v-model="password" /></label>
+      <label><input type="checkbox" id="cbPassword" v-model="showPassword" @change="changePasswordVisibility"> Vis passord</label>
+      <br> <br>
       <button class="good-button" type="submit" @click="attemptLogin">Logg inn</button>
-      <p id="error" class="error-message">{{errorMessage}}</p>
-
     </form>
+    <p id="error" class="error-message">{{errorMessage}}</p>
+
     <p class="register-login-text">
       Har du ikke en bruker?
       <router-link to="/register" class="link">Registrer deg her</router-link>
