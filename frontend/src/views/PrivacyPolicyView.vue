@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import HeaderBase from "@/components/HeaderBase.vue";
+import Footer from "@/components/Footer.vue";
 </script>
 
 <template>
+  <HeaderBase />
   <div id="wrapper">
     <div id="divPrivacyPolicy">
       <h1>Personvernerklæring</h1>
@@ -46,6 +49,7 @@
       <p><i>Denne personvernerklæringen er basert på en mal for personvernerklæring fra gdprcontrol.no</i></p>
     </div>
   </div>
+  <Footer />
 </template>
 
 <style scoped>

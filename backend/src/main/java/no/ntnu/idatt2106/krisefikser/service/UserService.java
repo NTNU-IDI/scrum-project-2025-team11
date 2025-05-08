@@ -73,10 +73,11 @@ public class UserService {
 
     /**
      * Saves a user to the database.
-     * @param user
+     * @param user user information that will be saved into the db
+     * @param role decides which role the user should have
      * @return User object that was saved
      */
-    public UserResponseDTO saveUser(UserRequestDTO user) {
+    public UserResponseDTO saveUser(UserRequestDTO user, Role role) {
       User newUser = new User();
       newUser.setEmail(user.getEmail());
       newUser.setUsername(user.getUsername());
@@ -87,7 +88,7 @@ public class UserService {
       
       newUser.setPassword(passwordEncoder.encode(user.getPassword())); // Hash the password before saving
 
-      newUser.setRole(Role.normal);
+      newUser.setRole(role);
       return UserMapper.toResponseDTO(userRepository.save(newUser)); // mapper → DTO
 
     }

@@ -8,6 +8,8 @@ import no.ntnu.idatt2106.krisefikser.dto.HouseholdUpdateDTO;
 import no.ntnu.idatt2106.krisefikser.model.Address;
 import no.ntnu.idatt2106.krisefikser.model.Household;
 import no.ntnu.idatt2106.krisefikser.repository.HouseholdRepository;
+import no.ntnu.idatt2106.krisefikser.repository.UserRepository;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,6 +32,9 @@ class HouseholdServiceTest {
 
     @Mock
     private AddressService addressService;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private HouseholdService householdService;
@@ -60,19 +65,16 @@ class HouseholdServiceTest {
         Household household = new Household();
         household.setId(1);
         household.setName("Old Name");
-        household.setMemberCount(2);
 
         when(householdRepository.findById(1)).thenReturn(Optional.of(household));
         when(householdRepository.save(ArgumentMatchers.any(Household.class))).thenAnswer(i -> i.getArgument(0));
 
         HouseholdUpdateDTO updateDTO = new HouseholdUpdateDTO();
         updateDTO.setName("New Name");
-        updateDTO.setMemberCount(3);
 
         HouseholdResponseDTO updated = householdService.updateHousehold(1, updateDTO);
 
         assertThat(updated.getName()).isEqualTo("New Name");
-        assertThat(updated.getMemberCount()).isEqualTo(3);
     }
 
     @Test
@@ -84,6 +86,7 @@ class HouseholdServiceTest {
         Address address = new Address();
         address.setId(1);
         address.setCity("Trondheim");
+        address.setStreet("Street 1");
 
         when(addressService.save(ArgumentMatchers.any(AddressRequestDTO.class))).thenReturn(addressResponseDTO);
         when(addressService.findById(1)).thenReturn(Optional.of(address));
@@ -96,7 +99,6 @@ class HouseholdServiceTest {
 
         HouseholdRequestDTO householdRequestDTO = new HouseholdRequestDTO();
         householdRequestDTO.setName("New Household");
-        householdRequestDTO.setMemberCount(5);
         AddressRequestDTO addressRequestDTO = new AddressRequestDTO();
         addressRequestDTO.setCity("Trondheim");
         addressRequestDTO.setStreet("Street 1");
@@ -108,7 +110,8 @@ class HouseholdServiceTest {
         HouseholdResponseDTO saved = householdService.save(householdRequestDTO);
 
         assertThat(saved.getName()).isEqualTo("New Household");
-        assertThat(saved.getMemberCount()).isEqualTo(5);
+        assertThat(saved.getAddress().getCity()).isEqualTo("Trondheim");
+        assertThat(saved.getAddress().getStreet()).isEqualTo("Street 1");
     }
 
     @Test
@@ -116,7 +119,6 @@ class HouseholdServiceTest {
     void testSaveHouseholdMissingFields() {
         HouseholdRequestDTO badRequest = new HouseholdRequestDTO();
         badRequest.setName(null); // Name missing
-        badRequest.setMemberCount(0); // MemberCount missing
 
         assertThatThrownBy(() -> householdService.save(badRequest))
                 .isInstanceOf(IllegalArgumentException.class)

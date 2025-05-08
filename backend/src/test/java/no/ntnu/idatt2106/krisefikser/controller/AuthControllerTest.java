@@ -10,6 +10,8 @@ import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
 import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.security.JwtAuthFilter;
 import no.ntnu.idatt2106.krisefikser.security.JwtUtil;
+import no.ntnu.idatt2106.krisefikser.service.AddressService;
+import no.ntnu.idatt2106.krisefikser.service.HouseholdService;
 import no.ntnu.idatt2106.krisefikser.service.RefreshTokenService;
 import no.ntnu.idatt2106.krisefikser.service.TwoFactorCodeService;
 import no.ntnu.idatt2106.krisefikser.service.UserService;
@@ -68,6 +70,12 @@ class AuthControllerTest {
 
     @MockitoBean
     private PasswordEncoder passwordEncoder;
+
+    @MockitoBean
+    private AddressService addressService;
+
+    @MockitoBean
+    private HouseholdService householdService;
     
     @Autowired
     private ObjectMapper objectMapper;
@@ -132,7 +140,7 @@ class AuthControllerTest {
         mockMvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -170,7 +178,7 @@ class AuthControllerTest {
     @Test
     void refreshJwtToken_WithoutToken_ShouldReturnUnauthorized() throws Exception {
         mockMvc.perform(post("/auth/refresh"))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().is(498));
     }
 
 

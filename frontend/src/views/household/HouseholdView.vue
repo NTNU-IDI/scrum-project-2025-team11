@@ -4,21 +4,27 @@ import NewMemberComponent from '@/components/household/NewMemberComponent.vue';
 import ViewMembersComponent from '@/components/household/ViewMembersComponent.vue';
 import ViewSingleItemComponent from '@/components/household/ViewSingleItemComponent.vue';
 import ViewSuppliesComponent from '@/components/household/ViewSuppliesComponent.vue';
-import Header from '@/components/Header.vue';
-import Footer from '@/components/Footer.vue';
+import HeaderBase from '@/components/HeaderBase.vue'
+import Footer from '@/components/Footer.vue'
 import { ref } from 'vue';
+import { useToast } from 'vue-toast-notification';
 
 // Toggle new item component visibility
 const isItemBoxVisible = ref(false);
 // Toggle new member component visibility
 const isMemberBoxVisible = ref(false);
 
+/**
+ * Toast instance
+ * @property {import('vue-toast-notification').Toast}
+ */
+ const $toast = useToast();
+
 const toggleNewItemBox = () => {
 	isItemBoxVisible.value = !isItemBoxVisible.value;
   if(isItemBoxVisible.value) {
     isMemberBoxVisible.value = false;
   }
-  responseMessage.value = '';
 }
 
 const toggleNewMemberBox = () => {
@@ -26,12 +32,27 @@ const toggleNewMemberBox = () => {
   if(isMemberBoxVisible.value) {
     isItemBoxVisible.value = false;
   }
-  responseMessage.value = '';
+}
+
+const newItemSuccess = () => {
+	isItemBoxVisible.value = false;
+    $toast.success(`Vare er lagt til i lageret`, {
+        duration: 3000,
+        position: 'top-right'
+    });
+}
+
+const inviteSuccess = () => {
+	isMemberBoxVisible.value = false;
+	$toast.success(`Invitasjonslink sendt!`, {
+		duration: 3000,
+		position: 'top-right'
+    });
 }
 </script>
 
 <template>
-	<Header />
+	<HeaderBase />
   	<div class="page-container">
 		<h1>Min husstand</h1>
 		<div class="members-container">
@@ -41,6 +62,7 @@ const toggleNewMemberBox = () => {
 				<NewMemberComponent
 				@close="isMemberBoxVisible = false"
 				@hide-new-member-box="isMemberBoxVisible = false"
+				@invite-success="inviteSuccess"
 				/>
 			</div>
 		</div>
@@ -52,12 +74,13 @@ const toggleNewMemberBox = () => {
 			<div class="items-column">
 			<ViewSingleItemComponent />
 			</div>
-			<button class="dark-button" id="add-button" @click="toggleNewItemBox">+</button> 
+			<button class="dark-button" id="add-button" @click="toggleNewItemBox">+ Ny vare</button> 
 
 			<div class="modal-overlay" v-if="isItemBoxVisible" @click.self="isItemBoxVisible = false">
 				<NewItemComponent  
 				@close="isItemBoxVisible = false"
 				@hide-new-item-box="isItemBoxVisible = false" 
+				@new-item-success="newItemSuccess"
 				/>
 			</div>
 		</div>
@@ -86,6 +109,7 @@ const toggleNewMemberBox = () => {
 	.items-container{
 		display: flex;
 		flex-direction: row;
+		min-height: 50vh;
 		gap: 2rem;
 		padding: 1rem;
 	
@@ -103,12 +127,12 @@ const toggleNewMemberBox = () => {
 	}
 	
 	#add-button {
+		background-color: var(--orange);
         display: flex;
         align-items: center; 
         justify-content: center; 
-        width: 3rem; 
-        height: 3rem; 
-        font-size: var(--font-size-xlarge);
+        width: 6.5rem; 
+        height: 3.5rem; 
         margin-left: 0px;
         margin-top: 4.75rem;
     }

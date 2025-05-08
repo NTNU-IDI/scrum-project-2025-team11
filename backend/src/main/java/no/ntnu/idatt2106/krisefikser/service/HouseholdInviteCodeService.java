@@ -3,6 +3,7 @@ package no.ntnu.idatt2106.krisefikser.service;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,9 +11,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import no.ntnu.idatt2106.krisefikser.dto.EmailRequest;
+import no.ntnu.idatt2106.krisefikser.dto.HouseholdResponseDTO;
+import no.ntnu.idatt2106.krisefikser.mapper.HouseholdMapper;
 import no.ntnu.idatt2106.krisefikser.model.Household;
 import no.ntnu.idatt2106.krisefikser.model.HouseholdInviteCode;
+import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.repository.HouseholdInviteCodeRepository;
+import no.ntnu.idatt2106.krisefikser.repository.UserRepository;
 
 @Service
 @Transactional
@@ -22,6 +27,7 @@ public class HouseholdInviteCodeService {
     private final HouseholdInviteCodeRepository houseCodeRepo;
     private final HouseholdService householdService;
     private final EmailService emailService;
+    private final UserRepository userRepository;
 
     @Value("${app.frontend.url}")
     private String frontendUrl;
@@ -29,10 +35,11 @@ public class HouseholdInviteCodeService {
     @Autowired
     public HouseholdInviteCodeService(HouseholdInviteCodeRepository houseCodeRepo,
                                      HouseholdService householdService,
-                                     EmailService emailService) {
+                                     EmailService emailService, UserRepository userRepository) {
         this.houseCodeRepo = houseCodeRepo;
         this.householdService = householdService;
         this.emailService = emailService;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -94,7 +101,7 @@ public class HouseholdInviteCodeService {
     }
 
 
-    public Household consumeInviteCode(String code) {
+    public HouseholdResponseDTO consumeInviteCode(String code) {
         HouseholdInviteCode row = houseCodeRepo.findByCode(code)
             .orElseThrow(() -> new IllegalArgumentException("Invalid code"));
     
@@ -105,6 +112,7 @@ public class HouseholdInviteCodeService {
     
         Household household = row.getHousehold();
         houseCodeRepo.delete(row);          // one-time use
-        return household;
+        List<User> members = userRepository.findByHousehold_Id(household.getId());
+        return HouseholdMapper.toResponseDTO(household, members);
     }
 }

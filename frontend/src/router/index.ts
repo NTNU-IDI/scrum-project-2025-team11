@@ -16,7 +16,9 @@ import ResetPassword from "@/views/ResetPasswordView.vue";
 import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
 import {useUserStore} from "@/stores/userStore.ts";
+import {useToast} from "vue-toast-notification";
 
+const $toast = useToast()
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -54,6 +56,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/userhome",
     name: "UserHomeView",
     component: UserHomeView,
+    meta: { requiresNormalUser: true }
   },
   {
     path: "/superadmin",
@@ -76,6 +79,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/adminhome',
     name: 'HomeAdminView',
     component: HomeAdminView,
+    meta: { requiresAdmin: true }
   },
   { path: '/about',
     name: 'AboutView',
@@ -91,6 +95,13 @@ const routes: Array<RouteRecordRaw> = [
     name: "ResetPassword",
     component: ResetPassword,
   },
+
+
+  {
+    path: "/headers",
+    name: "Headers",
+    component: Headers,
+  },
 ];
 
 const router = createRouter({
@@ -98,21 +109,25 @@ const router = createRouter({
   routes,
 });
 
+// Accesse 
+
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
 
   if(to.meta.requiresNormalUser && userStore.role !== 'normal') {
-    alert("Du har ikke adgangsnivå til denne siden.")
     next("/")
+    let instance = $toast.error("Du har ikke adgangsnivå til denne siden.")
   } else if (to.meta.requiresAdmin && userStore.role !== 'admin') {
-    alert("Du har ikke adgangsnivå til denne siden.")
     next("/")
+    let instance = $toast.error("Du har ikke adgangsnivå til denne siden.")
   } else if (to.meta.requiresSuperAdmin && userStore.role !== 'super_admin') {
-    alert("Du har ikke adgangsnivå til denne siden.")
     next("/")
+    let instance = $toast.error("Du har ikke adgangsnivå til denne siden.")
   } else {
     next()
   }
+  
 })
+  
 
 export default router;

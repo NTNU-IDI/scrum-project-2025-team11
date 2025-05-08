@@ -41,11 +41,11 @@ function changePasswordVisibility() {
         <h1>Tilbakestille passord?</h1>
         <form id="formResetPassword" v-on:submit.prevent>
           <p>
-              Du skal ha blitt tilsendt en e-post med en bekreftelseskode. Vennligst skriv inn koden og passord.
+              Du skal ha blitt tilsendt en e-post med en bekreftelseskode. Vennligst skriv inn koden og det nye passordet.
           </p>
-          <label>Bekreftelseskode <input type="text" v-model="code" placeholder="Bekreftelseskode" />  </label>
-          <label>Passord <br> <input :type="passwordInputType" v-model="password" placeholder="Nytt passord" /> </label>
-          <label>Gjenta passord: <br><input :type="passwordInputType" v-model="repeatedPassword" placeholder="Gjenta nytt passord" /> </label>
+          <label>Bekreftelseskode <span class="importantStar">*</span><input type="text" v-model="code"/>  </label>
+          <label>Nytt passord <span class="importantStar">*</span><br> <input :type="passwordInputType" v-model="password" /> </label>
+          <label>Gjenta nytt passord <span class="importantStar">*</span><br><input :type="passwordInputType" v-model="repeatedPassword" /> </label>
           <label><input type="checkbox" id="cbPassword" v-model="showPassword" @change="changePasswordVisibility"> Vis passord</label>
           <br>
           <p id="error" class="error-message">{{errorMessage}}</p>
