@@ -3,7 +3,7 @@
     import Footer from "@/components/Footer.vue";
     import PreparationsComponent from "@/components/PreparationsComponent.vue";
     import { useRoute } from "vue-router";
-    import { computed, ref } from "vue";
+    import { computed } from "vue";
 
     const route = useRoute()
     const stage = computed(() => Array.isArray(route.params.stage) ? route.params.stage[0] : route.params.stage);
@@ -20,7 +20,7 @@
     currentIndex.value < stages.length - 1 ? stages[currentIndex.value + 1] : null
     )
 
-    const formatStage = (s) =>
+    const formatStage = (s: string) =>
     s.charAt(0).toUpperCase() + s.slice(1)
 </script>
 
@@ -83,7 +83,6 @@
         align-items: center;
         justify-content: center;
         padding: 20px 0;
-        
     }
 
     .prev_and_next {
@@ -106,9 +105,38 @@
         padding: 10px 0 0 30px;
         width: 140px;
     }
-    
+
     .box {
         width: 120px;
         text-align: center;
+    }
+
+    @media(max-width: 480px) {
+        #preparationsContainer {
+            flex-direction: column; /* Stack elements vertically */
+            align-items: center; /* Center align items */
+        }
+
+        #previous, #next {
+            width: 100%; /* Make buttons take full width */
+            display: inline-block;
+            justify-content: center; /* Center align buttons */
+            margin-bottom: 10px;
+            padding: 0;
+            align-items: center;
+            margin-left: 10%;
+        }
+        #previous {
+            order: -2;
+        }
+
+        #next {
+            order: -1;
+        }
+
+        .box {
+            width:80%; /* Reduce button width for smaller screens */
+
+        }
     }
 </style>
