@@ -121,7 +121,7 @@
             width: 100%; /* Make buttons take full width */
             display: inline-block;
             justify-content: center; /* Center align buttons */
-            margin-bottom: 10px;
+            margin-bottom: 20px;
             padding: 0;
             align-items: center;
             margin-left: 10%;
