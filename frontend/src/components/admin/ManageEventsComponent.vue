@@ -4,6 +4,7 @@ import EditEventComponent from './manage_events/EditEventComponent.vue';
 import ViewEventsComponent from './manage_events/ViewEventsComponent.vue';
 import NewEventComponent from './manage_events/NewEventComponent.vue';
 import { useEventStore } from '@/stores/eventStore';
+import { useToast } from 'vue-toast-notification';
 
 const showNewEventBox = ref(false);
 const toggleNewEventBox = () => {
@@ -12,12 +13,23 @@ const toggleNewEventBox = () => {
 
 const showSingleEventBox = ref(false);
 const eventStore = useEventStore();
+
 const chooseEventId = (eventId: number) => {
     eventStore.chooseEvent(eventId);
     eventStore.fetchChosenEvent();
     showSingleEventBox.value = true;
 };
 
+const $toast = useToast();
+
+const newEvent = () => {
+    showNewEventBox.value = false;
+    $toast.success('Ny hendelse opprettet!', {
+        duration: 3000,
+        position: 'top-right'
+    });
+
+}
 watch(() => eventStore.chosenEvent, (newEvent) => {
     if (newEvent && newEvent.id !==  undefined) {
         showSingleEventBox.value = true;
@@ -27,31 +39,42 @@ watch(() => eventStore.chosenEvent, (newEvent) => {
 });
 </script>
 <template>
-<div class="header-container"> 
-    <h1>Administrere Krisehendelser</h1>
+<div class="container">
+    <div class="header-box"> 
+        <h1>Administrere Krisehendelser</h1>
+        <div class="page-container">
+            <p>Her kan du slette, endre og legge til nye krisehendelser.</p>
+            <button class="dark-button" @click="toggleNewEventBox">+ Opprett ny hendelse</button>
+        </div>  
+    </div>   
     <div class="page-container">
-        <p>Her kan du administrere krisehendelser.</p>
-        <button class="dark-button" @click="toggleNewEventBox">+ Opprett ny hendelse</button>
-    </div>  
-</div>   
-<div class="page-container">
-    <ViewEventsComponent @event-selected="chooseEventId"/>
-    <EditEventComponent v-if="showSingleEventBox" @hide-edit-box="showSingleEventBox = false"/>
+        <ViewEventsComponent @event-selected="chooseEventId"/>
+        <EditEventComponent v-if="showSingleEventBox" @hide-edit-box="showSingleEventBox = false"/>
 
-    <div class="modal-overlay" v-if="showNewEventBox" @click.self="showNewEventBox = false">
-        <NewEventComponent
-        @close="showNewEventBox = false"
-        @hide-new-event-box="showNewEventBox = false"
-        />
+        <div class="modal-overlay" v-if="showNewEventBox" @click.self="showNewEventBox = false">
+            <NewEventComponent
+            @close="showNewEventBox = false"
+            @hide-new-event-box="showNewEventBox = false"
+            @new-event-success="newEvent"
+            />
+        </div>
     </div>
 </div>
 </template>
 <style scoped>
-.header-container {
+.header-box {
     margin-left: 2rem;
     margin-top: 4rem;
 }
 
+h1 {
+    text-align: left;
+    margin-bottom: 0.5rem;
+}
+p {
+    margin-left: -1rem;
+    text-align: left;
+}
 .page-container {
     display: flex;
     flex-direction: row;

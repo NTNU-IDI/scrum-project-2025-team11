@@ -68,6 +68,9 @@ const chooseEvent = (eventId: any) => {
         flex-direction: column;
     }
 
+    h1 {
+        text-align: left;
+    }
     .grey-container {
         height: auto;
     }
