@@ -2,6 +2,9 @@
   <div class="layout-map-page">
     <Header />
     <div class="map-page">
+      <div v-if="showCrisisAlert" class="crisis-alert">
+        <p><strong>Viktig melding:</strong> Du er i et kriseområde!</p>
+      </div>
       <div class="corner-container">
         <IconsOverview ref="iconsOverviewRef"/>
         <EventsOverview />
@@ -27,10 +30,6 @@
       </div>
 
       <div id="map" class="map"></div>
-
-      <div v-if="showCrisisAlert" class="crisis-alert">
-        <p><strong>Viktig melding:</strong> Du er i et kriseområde!</p>
-      </div>
     </div>
     <Footer />
   </div>
@@ -378,7 +377,7 @@ function toggleEditMode() {
 <style>
 .corner-container {
   position: absolute;
-  top: 10px;
+  top: 45px;
   left: 10px;
   z-index: 2;
   display: flex;
@@ -410,19 +409,18 @@ function toggleEditMode() {
 
 .crisis-alert {
   position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
+  width: 100%;
   background-color: var(--bad-red);
   color: var(--white);
-  padding: 0 20px;
-  border-radius: 5px;
-  font-size: var(--font-size-medium);
+  font-size: var(--font-size-small);
   font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2;
+  text-align: center;
+  z-index: 9999; 
+}
+
+.crisis-alert p {
+  padding: 10px 10px;
+  margin: 0;
 }
 
 .leaflet-touch .leaflet-control-attribution, .leaflet-touch .leaflet-control-layers, .leaflet-touch .leaflet-bar {
@@ -455,7 +453,11 @@ function toggleEditMode() {
 
 @media (max-width: 768px) {
   .crisis-alert {
-    font-size: var(--font-size-small);
+    font-size: var(--font-size-xsmall);
   }
+
+  .corner-container {
+    top: 42px;
+}
 }
 </style>
