@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -154,15 +153,25 @@ public class PointOfInterestService {
      * @return A list of the three closest shelters
      */
     public List<PointOfInterestResponseDTO> findThreeClosestShelters(double latitude, double longitude) {
-        List<PointOfInterest> allPoints = pointOfInterestRepository.findByIconType(Enums.IconEnum.shelter);
-        List<PointOfInterest> closestShelters = allPoints.stream()
-            .sorted(Comparator.comparingDouble(
-                shelter -> Math.pow(shelter.getLatitude() - latitude, 2) + Math.pow(shelter.getLongitude() - longitude, 2)))
-            .limit(3)
-            .collect(Collectors.toList());
+        List<PointOfInterest> shelters = pointOfInterestRepository.findByIconType(Enums.IconEnum.shelter);
+        return shelters.stream()
+        .sorted(Comparator.comparingDouble(
+            p -> haversineKm(p.getLatitude(), p.getLongitude(), latitude, longitude)))
+        .limit(3)
+        .map(PointOfInterestMapper::toResponseDTO)
+        .toList();
+    }
 
-        return closestShelters.stream()
-            .map(PointOfInterestMapper::toResponseDTO)
-            .toList();
+    private static double haversineKm(double lat1, double lon1,
+                                  double lat2, double lon2) {
+        final double R = 6371.0;                // Earth radius km
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(lat1)) *
+                Math.cos(Math.toRadians(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
     }
 }
