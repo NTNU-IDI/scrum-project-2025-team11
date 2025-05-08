@@ -3,10 +3,6 @@ import {ref, watch, onMounted} from 'vue'
 import axios from 'axios'
 import {validateFirstName, validateLastName, validateEmail, validateUsername, validateHouseholdName, validatePassword} from "@/utils/validationService.ts";
 import {registerNormalUser, login} from "@/api/AuthService.ts";
-import type {HouseholdRequestDTO} from "@/types/Household.ts";
-import {HouseholdService} from "@/api/HouseholdService.ts";
-
-const REGISTRATION_FAILURE_WAIT_MESSAGE = "Noe gikk galt under registreringen. Vennligst prøv igjen senere."
 
 //Input-fields
 const firstName = ref('')
@@ -103,11 +99,7 @@ async function attemptRegistration() {
         await registerHouseholdAndCreateUser(latitude, longitude, city)
       }
     } else if(householdChoice.value === "existing") {
-      //TODO: Implement how creation of new user joining existing household works when backend is ready
-      //Will probably have to firstly use the code in the input-field to retrieve the hhid from backend, and then
-      //use the hhid when creating the new user.
-      //getHousholdAndCreateUser()
-      //createNewUser(householdCode.value)
+      await getHhIdFromInviteCodeAndRegister();
     }
   }
 }
@@ -138,9 +130,28 @@ async function registerHouseholdAndCreateUser(latitude: number, longitude: numbe
         if (error.response.status === 400) {
           errorMessage.value = "Ugyldig husstands-informasjon. Vennligst kontroller og prøv igjen."
         } else {
-          alert(REGISTRATION_FAILURE_WAIT_MESSAGE)
+          errorMessage.value = "Noe gikk galt under registreringen. Vennligst prøv igjen senere."
         }
       });
+}
+
+async function getHhIdFromInviteCodeAndRegister() {
+  const inviteCode = householdCode.value;
+  await axios.get("http://localhost:8080/api/household/inviteCode", {
+    params: {
+      inviteCode: inviteCode
+    }
+  })
+      .then((response) => {
+        createNewUser(response.data.id)
+  })
+      .catch((error) => {
+        if (error.response.status === 400) {
+          errorMessage.value = "Kunne ikke finne en husstand med den gitte koden."
+        } else {
+          errorMessage.value = "Noe uforventet oppsto. Vennligst vent og prøv igjen senere."
+        }
+      })
 }
 
 async function createNewUser(hhID: number) {
