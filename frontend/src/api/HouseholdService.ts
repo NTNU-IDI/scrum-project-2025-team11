@@ -29,7 +29,7 @@ export class HouseholdService {
     }
 
     static async inviteToHousehold(email: string): Promise<void> {
-        await axios.post(`${HOUSEHOLS_API_URL}/invite`, email, { withCredentials: true });
+        await axios.post(`${HOUSEHOLS_API_URL}/invite`, null, {params: {email: email}, withCredentials: true });
     }
 
     
