@@ -291,6 +291,63 @@ button:disabled:hover {
   font-size: var(--font-size-xsmall);
 }
 
+.layout-map-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.map-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.map {
+  flex: 1;
+  width: 100%;
+  z-index: 0;
+}
+
+.crisis-alert p {
+  padding: 10px 10px;
+  margin: 0;
+}
+
+.corner-container {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  bottom: 10px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: calc(100% - 20px);
+  overflow: hidden;
+}
+
+.corner-container.crisis-mode {
+  top: 45px;
+}
+
+.leaflet-touch .leaflet-control-attribution,
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+  display: none;
+}
+
+.leaflet-marker-icon.leaflet-interactive,
+.leaflet-image-layer.leaflet-interactive,
+.leaflet-pane > svg path.leaflet-interactive,
+svg.leaflet-image-layer.leaflet-interactive path {
+  display: block;
+  visibility: visible;
+  pointer-events: auto;
+}
+
 .error-message {
   font-size: var(--font-size-xsmall);
   color: var(--bad-red);
@@ -324,6 +381,9 @@ button:disabled:hover {
 @media (max-width: 768px) {
   .title-map {
     font-size: var(--font-size-medium);
+  }
+  .crisis-alert {
+    font-size: var(--font-size-xsmall);
   }
 }
 /* ---Styling for hjemmesidene! Ikke rør altså!!--- */

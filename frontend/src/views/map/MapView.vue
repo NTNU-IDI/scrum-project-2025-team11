@@ -33,13 +33,8 @@
           @close-point-view="closePointForm"
           :show-next-button="viewingNearest && nearestShelters.length > 1"        
         />
-        <EventView 
-          v-if="showEventView" 
-          :event="selectedEvent" 
-          @close="closeEventView" 
-        />
+        <EventView v-if="showEventView" :event="selectedEvent" @close="closeEventView"/>
       </div>
-
       <div id="map" class="map"></div>
     </div>
     <Footer />
@@ -62,7 +57,7 @@ import { usePointStore } from '@/stores/pointStore';
 import { useUserStore } from "@/stores/userStore.ts";
 import type { PointOfInterest } from "@/types/PointOfInterest";
 import type { EventResponseDTO } from "@/types/Event";
-import { calculateDistance, getEventColor } from '@/utils/geoService';
+import { calculateDistance, getEventColor, isUserInCrisisArea } from '@/utils/geoService';
 import { storeToRefs } from "pinia";
 import { onUnmounted, onMounted, ref, watch } from 'vue';
 import { useEventStore } from '@/stores/eventStore'; 
@@ -90,32 +85,9 @@ const userLocationFetched = ref(false);
 const showSelectType = ref(false);
 const showNearestShelterButton = ref(true);
 const showEventView = ref(false);
-const selectedEvent = ref<EventResponseDTO>({
-  id: 0,
-  name: '',
-  description: '',
-  iconType: '',
-  startTime: '',
-  endTime: '',
-  latitude: 0,
-  longitude: 0,
-  radius: 0,
-  severity: 0,
-});
-const selectedPoint = ref<PointOfInterest>({
-  id: 0,
-  name: '',
-  description: '',
-  iconType: '',
-  latitude: 0,
-  longitude: 0,
-});
-const userIcon = L.icon({
-  iconUrl: userMarkerIcon,
-  iconSize: [35, 35],   
-  iconAnchor: [20, 40],
-  popupAnchor: [0, -40],
-});
+const selectedEvent = ref<EventResponseDTO>({ id: 0, name: '', description: '', iconType: '', startTime: '', endTime: '', latitude: 0, longitude: 0, radius: 0, severity: 0,});
+const selectedPoint = ref<PointOfInterest>({ id: 0, name: '',description: '', iconType: '', latitude: 0, longitude: 0 });
+const userIcon = L.icon({ iconUrl: userMarkerIcon, iconSize: [35, 35], iconAnchor: [20, 40], popupAnchor: [0, -40],});
 
 let map: L.Map;
 let temporaryMarker: L.Marker | null = null;
@@ -149,12 +121,12 @@ onMounted(async () => {
   });
   watch(activeEvents, () => {
     addEvents(map);
-    updateCrisisAlertVisibility();
+    checkIfInCrisisArea();
   });
 
   // Get user location and set marker
   getUserPosition((lat, lon) => {
-    checkIfInCrisisArea(lat, lon);
+    checkIfInCrisisArea();
   });
 });
 
@@ -209,7 +181,7 @@ function handleAddEvent() {
 }
 
 watch(isEditMode, (newValue) => {
-  updateCrisisAlertVisibility();
+  checkIfInCrisisArea();
   if (role.value === 'admin') {
     if (newValue) {
       map.on('click', mapClickHandler);
@@ -303,27 +275,12 @@ function getUserPosition(callback: (lat: number, lon: number) => void, force: bo
   );
 }
 
-function isInCrisisArea(lat: number, lon: number): boolean {
-  return activeEvents.value.some(event => 
-    calculateDistance(lat, lon, event.latitude, event.longitude) <= event.radius
-  );
-}
-
-function updateCrisisAlertVisibility() {
-  if (userLat !== null && userLon !== null) {
-    showCrisisAlert.value = isInCrisisArea(userLat, userLon) && !isEditMode.value;
-  }
-}
-
-function checkIfInCrisisArea(userLatitude: number, userLongitude: number) {
-  showCrisisAlert.value = false;
-  activeEvents.value.forEach(event => {
-    const distance = calculateDistance(userLatitude, userLongitude, event.latitude, event.longitude);
-    
-    if (distance <= event.radius) {
-      showCrisisAlert.value = true;
-    }
-  });
+function checkIfInCrisisArea() {
+if (userLat !== null && userLon !== null) {
+  if (!isEditMode.value) {
+      showCrisisAlert.value = isUserInCrisisArea(userLat, userLon, activeEvents.value);
+    }  
+  } 
 }
 
 function addEvents(map: L.Map) {
@@ -429,6 +386,7 @@ function toggleEditMode() {
 
   if (isEditMode.value) {
     $toast.info('Redigeringsmodus aktivert. Klikk på et sted for å opprette et punkt, eller klikk på et eksisterende punkt for å redigere det.', { duration: 7000 });
+    showCrisisAlert.value = false;
     clearEventLayers();
     eventStore.stopPollingActiveEvents();
     
@@ -442,43 +400,6 @@ function toggleEditMode() {
 </script>
 
 <style>
-.corner-container {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  bottom: 10px;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-height: calc(100% - 20px); 
-  overflow: hidden; 
-}
-
-.corner-container.crisis-mode {
-  top: 45px;
-}
-
-.layout-map-page {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
-.map-page {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow: hidden;
-}
-
-.map {
-  flex: 1;
-  width: 100%;
-  z-index: 0;
-}
-
 .crisis-alert {
   position: absolute;
   width: 100%;
@@ -488,21 +409,6 @@ function toggleEditMode() {
   font-weight: bold;
   text-align: center;
   z-index: 9999; 
-}
-
-.crisis-alert p {
-  padding: 10px 10px;
-  margin: 0;
-}
-
-.leaflet-touch .leaflet-control-attribution, .leaflet-touch .leaflet-control-layers, .leaflet-touch .leaflet-bar {
-    display: none;
-}
-
-.leaflet-marker-icon.leaflet-interactive, .leaflet-image-layer.leaflet-interactive, .leaflet-pane > svg path.leaflet-interactive, svg.leaflet-image-layer.leaflet-interactive path {
-    display: block;
-    visibility: visible;
-    pointer-events: auto;
 }
 
 .delete-button {
@@ -517,11 +423,5 @@ function toggleEditMode() {
 
 .delete-button:hover {
   background-color: var(--white); 
-}
-
-@media (max-width: 768px) {
-  .crisis-alert {
-    font-size: var(--font-size-xsmall);
-  }
 }
 </style>

@@ -1,3 +1,5 @@
+import type { EventResponseDTO } from "@/types/Event";
+
 export function calculateDistance(
   lat1: number,
   lon1: number,
@@ -32,6 +34,19 @@ export function getEventColor(severity: number) {
     : severity === 0
     ? "var(--yellow)"
     : "var(--bad-red)";
+}
+
+// Tar inn lat long til bruker og alle events
+export function isUserInCrisisArea(
+  lat: number,
+  lon: number,
+  activeEvents: EventResponseDTO[]
+): boolean {
+  return activeEvents.some(
+    (event) =>
+      calculateDistance(lat, lon, event.latitude, event.longitude) <=
+      event.radius
+  );
 }
 
 export async function resolveAddressFromText(
