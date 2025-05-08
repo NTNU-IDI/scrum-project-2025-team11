@@ -1,5 +1,7 @@
 import L from "leaflet";
 import type { PointOfInterest } from "@/types/PointOfInterest";
+import type { EventResponseDTO } from "@/types/Event";
+import { getEventColor } from "@/utils/geoService";
 
 export function addMarkersToMap(
   map: L.Map,
@@ -33,4 +35,36 @@ export function addMarkersToMap(
       }
     });
   });
+}
+
+export function addEventsToMap(
+  map: L.Map,
+  activeEvents: EventResponseDTO[],
+  eventLayers: L.Circle[],
+  handleEventClick: (event: EventResponseDTO) => void
+) {
+  clearEventLayers(eventLayers, map);
+
+  activeEvents.forEach((event) => {
+    const color = getEventColor(event.severity);
+    const circle = L.circle([event.latitude, event.longitude], {
+      color,
+      fillColor: color,
+      weight: 1,
+      radius: event.radius,
+      fillOpacity: 0.3,
+      interactive: true,
+    }).addTo(map);
+
+    circle.on("click", () => {
+      handleEventClick(event);
+    });
+
+    eventLayers.push(circle);
+  });
+}
+
+export function clearEventLayers(eventLayers: L.Circle[], map: L.Map) {
+  eventLayers.forEach((layer) => map.removeLayer(layer));
+  eventLayers.length = 0;
 }

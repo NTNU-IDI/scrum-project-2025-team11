@@ -57,8 +57,8 @@ import { usePointStore } from '@/stores/pointStore';
 import { useUserStore } from "@/stores/userStore.ts";
 import type { PointOfInterest } from "@/types/PointOfInterest";
 import type { EventResponseDTO } from "@/types/Event";
-import { getEventColor, isUserInCrisisArea } from '@/utils/geoService';
-import { addMarkersToMap } from '@/services/MapService'; 
+import { isUserInCrisisArea } from '@/utils/geoService';
+import { addMarkersToMap, addEventsToMap, clearEventLayers } from '@/services/MapService'; 
 import { storeToRefs } from "pinia";
 import { onUnmounted, onMounted, ref, watch } from 'vue';
 import { useEventStore } from '@/stores/eventStore'; 
@@ -121,9 +121,9 @@ onMounted(async () => {
   });
 
   // Events
-  addEvents(map);
+  addEventsToMap(map, activeEvents.value, eventLayers, handleEventClick);
   watch(activeEvents, () => {
-    addEvents(map);
+    addEventsToMap(map, activeEvents.value, eventLayers, handleEventClick);  
     checkIfInCrisisArea();
   });
 
@@ -260,26 +260,6 @@ if (userLat !== null && userLon !== null) {
   } 
 }
 
-function addEvents(map: L.Map) {
-  clearEventLayers();
-  activeEvents.value.forEach(event => {
-    const color = getEventColor(event.severity);
-    const circle = L.circle([event.latitude, event.longitude], {
-      color,
-      fillColor: color,
-      weight: 1,
-      radius: event.radius,
-      fillOpacity: 0.3,
-      interactive: true
-    }).addTo(map);
-
-    circle.on('click', () => {
-      handleEventClick(event);
-    });
-    eventLayers.push(circle);
-  });
-}
-
 function handleEventClick(event: EventResponseDTO) {
   selectedEvent.value = event;
   showPointForm.value = false;
@@ -288,11 +268,6 @@ function handleEventClick(event: EventResponseDTO) {
 
 function closeEventView() {
   showEventView.value = false;
-}
-
-function clearEventLayers() {
-  eventLayers.forEach(layer => map.removeLayer(layer));
-  eventLayers = [];
 }
 
 function handleNavigation(coords: { latitude: number, longitude: number }) {
@@ -364,14 +339,15 @@ function toggleEditMode() {
   if (isEditMode.value) {
     $toast.info('Redigeringsmodus aktivert. Klikk på et sted for å opprette et punkt, eller klikk på et eksisterende punkt for å redigere det.', { duration: 7000 });
     showCrisisAlert.value = false;
-    clearEventLayers();
+    clearEventLayers(eventLayers, map);
+    showEventView.value = false;
     eventStore.stopPollingActiveEvents();
     
   } else {
     $toast.info('Redigeringsmodus deaktivert. Du er nå i visningsmodus.', { duration: 5000 });
     eventStore.startPollingActiveEvents();
     removeTempMarker();
-    addEvents(map);
+    addEventsToMap(map, activeEvents.value, eventLayers, handleEventClick);
   }
 }
 </script>
