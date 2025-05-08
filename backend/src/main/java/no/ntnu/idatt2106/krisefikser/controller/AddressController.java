@@ -26,6 +26,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
+import no.ntnu.idatt2106.krisefikser.mapper.AddressMapper;
 import no.ntnu.idatt2106.krisefikser.model.Address;
 import no.ntnu.idatt2106.krisefikser.model.Household;
 import no.ntnu.idatt2106.krisefikser.model.User;
@@ -47,6 +48,7 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
 public class AddressController {
   private final AddressService addressService;
   private final UserService userService;
+  private final AddressMapper addressMapper;
 
   /**
    * Endpoint to retrieve all addresses in the system.
@@ -83,14 +85,15 @@ public class AddressController {
     @ApiResponse(responseCode = "404", description = "Address not found")
   })
   @GetMapping("/me")
-  public ResponseEntity<Address> getMyAddress() {
+  public ResponseEntity<AddressResponseDTO> getMyAddress() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     String username = authentication.getName();
     User user = userService.getUserByUsername(username).orElse(null);
     Household household = user.getHousehold();
     Address address = household.getAddress();
-    if (address != null) {
-      return ResponseEntity.ok(address);
+    AddressResponseDTO addressResponseDTO = addressMapper.toResponseDTO(address);
+    if (addressResponseDTO != null) {
+      return ResponseEntity.ok(addressResponseDTO);
     } else {
       return ResponseEntity.notFound().build();
     }
