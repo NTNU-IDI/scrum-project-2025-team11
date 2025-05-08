@@ -93,11 +93,14 @@ export function createRoutingControl(
       extendToWaypoints: false,
       missingRouteTolerance: 0,
     },
+    createMarker: function (i: number, waypoint: any) {
+      if (i === 0) {
+        return L.marker(waypoint.latLng, { icon: userIcon });
+      }
+      return L.marker(waypoint.latLng);
+    },
+    draggableWaypoints: false,
   } as any).addTo(map);
-
-  const startMarker = L.marker([startLat, startLon], { icon: userIcon });
-  startMarker.addTo(map);
-
   return routingControl;
 }
 
