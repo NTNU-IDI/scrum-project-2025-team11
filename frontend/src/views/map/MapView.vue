@@ -1,6 +1,6 @@
 <template>
   <div class="layout-map-page">
-    <Header />
+    <HeaderBase />
     <div class="map-page">
       <div class="corner-container">
         <IconsOverview ref="iconsOverviewRef"/>
@@ -51,6 +51,8 @@ import { storeToRefs } from "pinia";
 import { onUnmounted, onMounted, ref, watch } from 'vue';
 import { useEventStore } from '@/stores/eventStore'; 
 import { useToast } from 'vue-toast-notification';
+
+import HeaderBase from '@/components/HeaderBase.vue';
 
 const $toast = useToast();
 const eventStore = useEventStore(); 
