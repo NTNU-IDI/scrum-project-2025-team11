@@ -42,17 +42,9 @@ public class AddressService {
     if (addressDTO.getStreet() == null || addressDTO.getPostalCode() == null || addressDTO.getCity() == null) {
       throw new IllegalArgumentException("Street, postal code, and/or city cannot be null");
     }
+    Address address = addressMapper.toEntity(addressDTO);
 
-    Address address = new Address();
-    address.setStreet(addressDTO.getStreet());
-    address.setPostalCode(addressDTO.getPostalCode());
-    address.setCity(addressDTO.getCity());
-    address.setLatitude(addressDTO.getLatitude());
-    address.setLongitude(addressDTO.getLongitude());
-
-    Address savedAddress = addressRepository.save(address);
-    return addressMapper.toResponseDTO(savedAddress);
-    
+    return addressMapper.toResponseDTO(addressRepository.save(address));
   }
 
   /**
