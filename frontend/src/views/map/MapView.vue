@@ -57,7 +57,8 @@ import { usePointStore } from '@/stores/pointStore';
 import { useUserStore } from "@/stores/userStore.ts";
 import type { PointOfInterest } from "@/types/PointOfInterest";
 import type { EventResponseDTO } from "@/types/Event";
-import { calculateDistance, getEventColor, isUserInCrisisArea } from '@/utils/geoService';
+import { getEventColor, isUserInCrisisArea } from '@/utils/geoService';
+import { addMarkersToMap } from '@/services/MapService'; 
 import { storeToRefs } from "pinia";
 import { onUnmounted, onMounted, ref, watch } from 'vue';
 import { useEventStore } from '@/stores/eventStore'; 
@@ -113,12 +114,14 @@ onMounted(async () => {
   pointStore.startPolling();
   eventStore.startPollingActiveEvents();
 
-  // POI and events
-  addMarkersToMap();
-  addEvents(map);
+  // POIs
+  addMarkersToMap(map, pointsDisplaying.value, markers, role.value, isEditMode.value, showPointView);
   watch(pointsDisplaying, () => {
-    addMarkersToMap();
+    addMarkersToMap(map, pointsDisplaying.value, markers, role.value, isEditMode.value, showPointView);
   });
+
+  // Events
+  addEvents(map);
   watch(activeEvents, () => {
     addEvents(map);
     checkIfInCrisisArea();
@@ -137,9 +140,10 @@ onUnmounted(() => {
   $toast.clear();
 });
 
-function showPointView(mode: 'view' | 'edit' | 'create', point: PointOfInterest, showMarker: boolean) {
+function showPointView(mode: 'view' | 'edit' | 'create', point: PointOfInterest, showMarker: boolean, isViewingNearest: boolean) {
   clearRouting();
   removeTempMarker();
+  viewingNearest.value = isViewingNearest;
   showEventView.value = false;
   selectedPoint.value = { ...point };
   formMode.value = mode;
@@ -170,7 +174,7 @@ const mapClickHandler = (e: L.LeafletMouseEvent) => {
 
 function handleAddPoint() {
   showSelectType.value = false;
-  showPointView('create', selectedPoint.value, true);
+  showPointView('create', selectedPoint.value, true, false);
 }
 
 function handleAddEvent() {
@@ -192,33 +196,6 @@ watch(isEditMode, (newValue) => {
     }
   }
 });
-
-function addMarkersToMap() {
-  markers.forEach(marker => map.removeLayer(marker));
-  markers = [];
-  pointsDisplaying.value.forEach(point => {
-    const customIcon = L.divIcon({
-      html: `<div class="map-icon ${point.iconType}" style="margin: 0;"></div>`,
-      className: '',
-      iconSize: [20, 20],
-      iconAnchor: [10, 10],
-    });
-
-    const marker = L.marker([point.latitude, point.longitude], { icon: customIcon }).addTo(map);
-    markers.push(marker);
-
-    // Marker click behavior for admin and non-admin users
-    marker.on('click', () => {
-      viewingNearest.value = false;
-
-      if (role.value === 'admin' && isEditMode.value) {
-        showPointView('edit', point, true);
-      } else {
-        showPointView('view', point, true);
-      }
-    });
-  });
-}
 
 function closePointForm() {
   removeTempMarker();
@@ -368,7 +345,7 @@ async function findNearestShelter() {
   }
   currentShelterIndex.value = 0;
   viewingNearest.value = true;
-  showPointView('view', nearestShelters.value[currentShelterIndex.value], true);
+  showPointView('view', nearestShelters.value[currentShelterIndex.value], true, true);
 }
 
 function handleNextShelter() {
@@ -376,7 +353,7 @@ function handleNextShelter() {
   
   currentShelterIndex.value = 
     (currentShelterIndex.value + 1) % nearestShelters.value.length;
-  showPointView('view', nearestShelters.value[currentShelterIndex.value], true);
+  showPointView('view', nearestShelters.value[currentShelterIndex.value], true, true);
 }
 
 function toggleEditMode() {
