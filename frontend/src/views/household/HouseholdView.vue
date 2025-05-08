@@ -41,6 +41,14 @@ const newItemSuccess = () => {
         position: 'top-right'
     });
 }
+
+const inviteSuccess = () => {
+	isMemberBoxVisible.value = false;
+	$toast.success(`Invitasjonslink sendt!`, {
+		duration: 3000,
+		position: 'top-right'
+    });
+}
 </script>
 
 <template>
@@ -54,6 +62,7 @@ const newItemSuccess = () => {
 				<NewMemberComponent
 				@close="isMemberBoxVisible = false"
 				@hide-new-member-box="isMemberBoxVisible = false"
+				@invite-success="inviteSuccess"
 				/>
 			</div>
 		</div>
@@ -100,6 +109,7 @@ const newItemSuccess = () => {
 	.items-container{
 		display: flex;
 		flex-direction: row;
+		min-height: 50vh;
 		gap: 2rem;
 		padding: 1rem;
 	
