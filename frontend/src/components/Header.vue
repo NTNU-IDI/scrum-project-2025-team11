@@ -10,7 +10,7 @@
       </div>
 
       <nav class="header-right">
-        <a href="/login" class="button login"><i class="fa fa-sign-in"></i> Logg inn</a> 
+        <a href="/login" class="button login"><i class="fa fa-sign-in"></i> Logg inn / <i class="fa fa-user-plus"></i> Registrer deg</a>
       </nav>
     </div>
   </header>

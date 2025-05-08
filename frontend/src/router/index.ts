@@ -110,7 +110,7 @@ const router = createRouter({
 });
 
 // Accesse 
-/*
+
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
 
@@ -128,6 +128,6 @@ router.beforeEach((to, from, next) => {
   }
   
 })
-  */
+  
 
 export default router;
