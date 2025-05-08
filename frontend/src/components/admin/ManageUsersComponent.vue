@@ -70,4 +70,15 @@ h1 {
     margin-left: auto;
     margin-top: 4.7rem;
 }
+
+@media (max-width: 480px) {
+    .page-container {
+        flex-direction: column;
+    }
+   
+    .modal-overlay {
+        overflow-x: hidden;
+        top: 0;
+    }
+}
 </style>
