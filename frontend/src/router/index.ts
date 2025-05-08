@@ -16,6 +16,7 @@ import ResetPassword from "@/views/ResetPasswordView.vue";
 import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
 import {useUserStore} from "@/stores/userStore.ts";
+import PreparationsView from "@/views/PreparationsView.vue";
 
 
 const routes: Array<RouteRecordRaw> = [
@@ -91,6 +92,11 @@ const routes: Array<RouteRecordRaw> = [
     name: "ResetPassword",
     component: ResetPassword,
   },
+  {
+    path: "/beredskap",
+    name: "Beredskap",
+    component: PreparationsView
+  }
 ];
 
 const router = createRouter({
