@@ -6,6 +6,7 @@ import no.ntnu.idatt2106.krisefikser.model.Household;
 import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.security.JwtAuthFilter;
 import no.ntnu.idatt2106.krisefikser.security.JwtUtil;
+import no.ntnu.idatt2106.krisefikser.service.HouseholdInviteCodeService;
 import no.ntnu.idatt2106.krisefikser.service.HouseholdService;
 import no.ntnu.idatt2106.krisefikser.service.UserService;
 import no.ntnu.idatt2106.krisefikser.config.TestSecurityConfig;
@@ -53,6 +54,9 @@ class HouseholdControllerTest {
 
     @MockitoBean
     private HouseholdService householdService;
+
+    @MockitoBean
+    private HouseholdInviteCodeService householdInviteCodeService;
 
     @InjectMocks
     private HouseholdController householdController;

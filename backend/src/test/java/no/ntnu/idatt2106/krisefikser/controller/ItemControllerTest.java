@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ntnu.idatt2106.krisefikser.config.TestSecurityConfig;
 import no.ntnu.idatt2106.krisefikser.dto.ItemRequest;
 import no.ntnu.idatt2106.krisefikser.dto.ItemResponse;
+import no.ntnu.idatt2106.krisefikser.exceptionhandler.ResourceNotFoundException;
 import no.ntnu.idatt2106.krisefikser.mapper.ItemMapper;
 import no.ntnu.idatt2106.krisefikser.model.Item;
 import no.ntnu.idatt2106.krisefikser.security.JwtAuthFilter;
@@ -30,43 +31,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-/**
- * Unit tests for the {@link ItemController} class.
- * This test class uses Spring's {@link WebMvcTest} to test the controller layer in isolation.
- * Mock dependencies are used to simulate the behavior of the service and mapper layers.
- * 
- * Test Cases:
- * 
- * 1. {@code listItems()}:
- *    - Tests the GET endpoint `/api/items`.
- *    - Verifies that the endpoint returns a list of item DTOs in JSON format with HTTP 200 status.
- *    - Mocks the service to return a list of items and the mapper to convert entities to DTOs.
- *    - Validates the response structure and content using JSON path assertions.
- * 
- * 2. {@code createItem()}:
- *    - Tests the POST endpoint `/api/items`.
- *    - Verifies that the endpoint creates a new item and returns the created DTO with HTTP 201 status.
- *    - Mocks the mapper to convert the request to an entity, the service to save the entity, and the mapper to convert the saved entity to a DTO.
- *    - Validates the response structure, content, and the `Location` header.
- * 
- * 3. {@code updateItem()}:
- *    - Tests the PUT endpoint `/api/items/{id}`.
- *    - Verifies that the endpoint updates an existing item and returns the updated DTO with HTTP 200 status.
- *    - Mocks the service to find the existing item, the mapper to convert the request to an entity, and the service to update the entity.
- *    - Validates the response structure and content using JSON path assertions.
- * 
- * 4. {@code deleteItem()}:
- *    - Tests the DELETE endpoint `/api/items/{id}`.
- *    - Verifies that the endpoint deletes an item and returns HTTP 204 status.
- *    - Mocks the service to delete the item by ID.
- *    - Validates the response status.
- * 
- * Dependencies:
- * - {@link MockMvc}: Used to perform HTTP requests and validate responses.
- * - {@link ObjectMapper}: Used to serialize and deserialize JSON content.
- * - {@link ItemService}: Mocked service layer for item operations.
- * - {@link ItemMapper}: Mocked mapper for converting between entities and DTOs.
- */
 @WebMvcTest(controllers = ItemController.class)
 @AutoConfigureMockMvc(addFilters = false) 
 @ActiveProfiles("test")
@@ -156,4 +120,85 @@ class ItemControllerTest {
 
         verify(service).delete(5);
     }
+
+    @Test
+    @DisplayName("DELETE /api/items/{id} returns 404 when not found")
+    void deleteItemNotFound() throws Exception {
+        doThrow(new ResourceNotFoundException("Item", "id", 99))
+            .when(service).delete(99);
+
+        mvc.perform(delete("/api/items/99"))
+           .andExpect(status().isNotFound());
+
+        verify(service).delete(99);
+    }
+
+    @Test
+    @DisplayName("GET /api/items/{id} returns 200 when item exists")
+    void getItemById_whenExists_returns200() throws Exception {
+        Item entity = new Item(10, "X", "x");
+        ItemResponse resp = new ItemResponse(10, "X", "x");
+
+        when(service.findById(10)).thenReturn(Optional.of(entity));
+        when(itemMapper.toResponse(entity)).thenReturn(resp);
+
+        mvc.perform(get("/api/items/10"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(10))
+            .andExpect(jsonPath("$.name").value("X"));
+
+    verify(service).findById(10);
+    }
+    
+    @Test
+    @DisplayName("GET /api/items/{id} returns 404 when not found")
+    void getItemById_whenNotFound_returns404() throws Exception {
+        when(service.findById(42)).thenReturn(Optional.empty());
+
+        mvc.perform(get("/api/items/42"))
+           .andExpect(status().isNotFound());
+
+        verify(service).findById(42);
+    }
+
+    @Test
+    @DisplayName("PUT /api/items/{id} returns 404 when updating non-existent item")
+    void updateItem_whenNotFound_returns404() throws Exception {
+        ItemRequest req = new ItemRequest();
+        req.setName("Name");
+        req.setDescription("Desc");
+
+        when(service.findById(7)).thenReturn(Optional.empty());
+
+        mvc.perform(put("/api/items/7")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(mapper.writeValueAsString(req)))
+            .andExpect(status().isNotFound());
+
+        verify(service).findById(7);
+        verify(service, never()).update(anyInt(), any());
+    }
+
+    @Test
+    @DisplayName("POST /api/items returns 400 on validation failure")
+    void createItem_whenInvalid_returns400() throws Exception {
+        ItemRequest req = new ItemRequest();
+        req.setName("");               // invalid: blank
+        req.setDescription("desc");
+
+        mvc.perform(post("/api/items")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(mapper.writeValueAsString(req)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.status").value(400))
+            .andExpect(jsonPath("$.message").value("Validation failed"))
+            .andExpect(jsonPath("$.fieldErrors.name").exists());
+    
+        // No need to verify service; it should never be called:
+        verify(service, never()).create(any());
+    }
+
+
+
+
 }
