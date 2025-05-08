@@ -380,7 +380,7 @@ button:disabled:hover {
   color: white;
   transform: scale(1);
   cursor: default;
-  pointer-events: none;
+  pointer: none;
 }
 
 /* Boks som ikke skal kunne trykkes på */
@@ -538,4 +538,9 @@ button:disabled:hover {
     width: 5rem;
     height: 3rem;
   }
+}
+
+.importantStar {
+  color: var(--orange);
+  font-weight: bolder;
 }

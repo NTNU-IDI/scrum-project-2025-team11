@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 
 import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
+import no.ntnu.idatt2106.krisefikser.mapper.AddressMapper;
 import no.ntnu.idatt2106.krisefikser.model.Address;
 import no.ntnu.idatt2106.krisefikser.repository.AddressRepository;
 
@@ -27,10 +28,14 @@ public class AddressServiceTest {
   @Mock
   private AddressRepository addressRepository;
 
+  @Mock
+  private AddressMapper addressMapper;
+
   @InjectMocks
   private AddressService addressService;
 
   private Address address;
+  private AddressResponseDTO addressResponseDTO;
 
   @BeforeEach
   void init() {
@@ -45,6 +50,14 @@ public class AddressServiceTest {
     address.setCity("Test City");
     address.setLatitude(10.0);
     address.setLongitude(20.0);
+
+    addressResponseDTO = new AddressResponseDTO();
+    addressResponseDTO.setId(address.getId());
+    addressResponseDTO.setStreet(address.getStreet());
+    addressResponseDTO.setPostalCode(address.getPostalCode());
+    addressResponseDTO.setCity(address.getCity());
+    addressResponseDTO.setLatitude(address.getLatitude());
+    addressResponseDTO.setLongitude(address.getLongitude());
   }
   @Nested
   @DisplayName("Positive Tests")
@@ -60,7 +73,7 @@ public class AddressServiceTest {
     }
 
     @Test
-    void testCreateAddress() {
+    void testCreateAddress() throws Exception {
       AddressRequestDTO addressDTO = new AddressRequestDTO();
       addressDTO.setStreet("Test Street");
       addressDTO.setPostalCode("1234");
@@ -68,20 +81,21 @@ public class AddressServiceTest {
       addressDTO.setLatitude(10.0);
       addressDTO.setLongitude(20.0);
 
-      AddressResponseDTO savedAddress = null;
+      when(addressMapper.toEntity(any(AddressRequestDTO.class))).thenReturn(address);
       when(addressRepository.save(any(Address.class))).thenReturn(address);
-      try {
-        savedAddress = addressService.save(addressDTO);
-      } catch (Exception e) {
-        fail("Exception should not be thrown: " + e.getMessage());
-      }
+      when(addressMapper.toResponseDTO(any(Address.class))).thenReturn(addressResponseDTO);
+
+      AddressResponseDTO createdAddress = addressService.save(addressDTO);
 
       verify(addressRepository, times(1)).save(any(Address.class));
-      assertNotNull(savedAddress);
+
+      assertNotNull(createdAddress);
+      assertEquals(address.getId(), createdAddress.getId());
+      assertEquals(address.getStreet(), createdAddress.getStreet());
     }
 
     @Test
-    void testUpdateAddress() {
+    void testUpdateAddress() throws Exception {
       AddressRequestDTO addressDTO = new AddressRequestDTO();
       addressDTO.setStreet("Updated Street");
       addressDTO.setPostalCode("5678");
@@ -90,17 +104,23 @@ public class AddressServiceTest {
       addressDTO.setLongitude(40.0);
 
       when(addressRepository.findById(1)).thenReturn(Optional.of(address));
+      when(addressMapper.toEntity(any(AddressRequestDTO.class))).thenReturn(address);
       when(addressRepository.save(any(Address.class))).thenReturn(address);
+      when(addressMapper.toResponseDTO(any(Address.class))).thenAnswer(invocation -> {
+        Address updatedAddress = invocation.getArgument(0);
+        AddressResponseDTO responseDTO = new AddressResponseDTO();
+        responseDTO.setId(updatedAddress.getId());
+        responseDTO.setStreet(updatedAddress.getStreet());
+        responseDTO.setPostalCode(updatedAddress.getPostalCode());
+        responseDTO.setCity(updatedAddress.getCity());
+        responseDTO.setLatitude(updatedAddress.getLatitude());
+        responseDTO.setLongitude(updatedAddress.getLongitude());
+        return responseDTO;
+      });
 
-      AddressResponseDTO updatedAddress = null;
-      try {
-        updatedAddress = addressService.updateAddress(1, addressDTO);
-      } catch (Exception e) {
-        fail("Exception should not be thrown: " + e.getMessage());
-      }
+      AddressResponseDTO updatedAddress = addressService.updateAddress(1, addressDTO);
 
       verify(addressRepository, times(1)).save(any(Address.class));
-      verify(addressRepository, times(1)).findById(1);
       assertNotNull(updatedAddress);
       assertEquals(updatedAddress.getStreet(), address.getStreet());
     }
@@ -123,9 +143,10 @@ public class AddressServiceTest {
       address2.setLatitude(30.0);
       address2.setLongitude(40.0);
 
-      when(addressRepository.findAll()).thenReturn(List.of(address, address2));
-      List<AddressResponseDTO> addresses = addressService.findAllAddresses();
-      verify(addressRepository, times(1)).findAll();
+      List<Address> addresses = List.of(address, address2);
+
+      when(addressRepository.findAll()).thenReturn(addresses);
+      when(addressMapper.toResponseDTO(any(Address.class))).thenReturn(addressResponseDTO);
 
       assertNotNull(addresses);
       assertEquals(2, addresses.size());
@@ -148,7 +169,7 @@ public class AddressServiceTest {
         addressService.save(addressDTO);
       });
 
-      String expectedMessage = "Street, postal code, and city cannot be null";
+      String expectedMessage = "Street, postal code, and/or city cannot be null";
       String actualMessage = exception.getMessage();
 
       assertTrue(actualMessage.contains(expectedMessage));

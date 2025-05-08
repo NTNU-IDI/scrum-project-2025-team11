@@ -13,8 +13,6 @@ import AboutView from "@/views/AboutView.vue";
 import ForgotPassword from "@/views/ForgotPasswordView.vue";
 import ResetPassword from "@/views/ResetPasswordView.vue";
 
-import Header from "@/components/Header.vue";
-
 import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
 import {useUserStore} from "@/stores/userStore.ts";

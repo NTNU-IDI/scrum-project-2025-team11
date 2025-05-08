@@ -108,24 +108,6 @@ public class HouseholdController {
         return ResponseEntity.ok(household);
     }
 
-    /* TODO add maybe on delete cascade so that it is possible to delete entries
-    @Operation(
-            summary = "Delete household",
-            description = "Delete a entry in the household table based on the id"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Household successfully deleted"),
-            @ApiResponse(responseCode = "400", description = "Household could not be found, make sure that the id is correct")
-    })
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteHousehold(@PathVariable int id) {
-        if (!householdService.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        householdService.deleteById(id);
-        return ResponseEntity.noContent().build();
-    }*/
-
     @Operation(
             summary = "List all households",
             description = "List all the households that is in the household table"

@@ -2,12 +2,16 @@
 import {ref} from "vue";
 import {validateEmail} from "@/utils/validationService.ts";
 import {sendEmailForReset} from "@/api/PasswordService.ts";
+import {useToast} from "vue-toast-notification";
 
 const email = ref('')
+const $toast = useToast()
 
 function sendEmail() {
   if (validateEmail(email.value)) {
     sendEmailForReset(email.value)
+  } else {
+    let instance = $toast.info("Kunne ikke sende bekreftelseskode grunnet ugyldig email.")
   }
 }
 

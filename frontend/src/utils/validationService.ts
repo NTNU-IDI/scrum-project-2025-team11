@@ -1,10 +1,10 @@
 // Regexes for validating items
-const itemNameRegex = /^[a-zA-Z0-9_ ]+$/;
+const itemNameRegex = /^[æøåÆØÅa-zA-Z0-9_ ]+$/;
 const itemQuantityRegex = /^[0-9]+$/;
-const itemUnitRegex = /^[a-zA-Z]+$/;
+const itemUnitRegex = /^[æøåÆØÅa-zA-Z]+$/;
 const itemExpirationDateRegex = /^\d{4}-\d{2}-\d{2}$/; // YYYY-MM-DD format
-const firstNameRegex = /^[a-zA-Z\s\-]+$/;
-const lastNameRegex = /^[a-zA-Z\s\-]+$/;
+const firstNameRegex = /^[æøåÆØÅa-zA-Z\s\-]+$/;
+const lastNameRegex = /^[æøåÆØÅa-zA-Z\s\-]+$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 //Passwordregex ensures at least 8 characters, one uppercase letter, one lowercase letter, one number and one
 //special character. Gotten from: https://stackoverflow.com/questions/19605150/regex-for-password-must-contain-at-least-eight-characters-at-least-one-number-a
@@ -13,7 +13,7 @@ const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$
 // Regexes for user
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const usernameRegex = /^[a-zA-Z0-9]+$/;
-const householdNameRegex = /^[a-zA-Z\s\-]+$/;
+const householdNameRegex = /^[æøåÆØÅa-zA-Z\s\-]+$/;
 
 // Regexes for validating icons (interest points)
 const pointNameRegex = /^[a-zA-Z0-9\s\-_,.æøåÆØÅ]{2,}$/; // Punctuation, letters, numbers
