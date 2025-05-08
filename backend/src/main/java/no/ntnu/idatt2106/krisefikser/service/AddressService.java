@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
+import no.ntnu.idatt2106.krisefikser.mapper.AddressMapper;
 import no.ntnu.idatt2106.krisefikser.model.Address;
 import no.ntnu.idatt2106.krisefikser.repository.AddressRepository;
 
@@ -20,20 +21,13 @@ import no.ntnu.idatt2106.krisefikser.repository.AddressRepository;
 @RequiredArgsConstructor
 public class AddressService {
   private final AddressRepository addressRepository;
+  private final AddressMapper addressMapper;
 
-  private AddressResponseDTO mapToResponseDTO(Address address) {
-    AddressResponseDTO dto = new AddressResponseDTO();
-    dto.setId(address.getId());
-    dto.setStreet(address.getStreet());
-    dto.setPostalCode(address.getPostalCode());
-    dto.setCity(address.getCity());
-    dto.setLatitude(address.getLatitude());
-    dto.setLongitude(address.getLongitude());
-    return dto;
-  }
-
-  // Add methods for creating, updating, deleting, and retrieving addresses here.
-
+  /**
+   * Retrieves an address by its ID.
+   * @param id the ID of the address to retrieve.
+   * @return an Optional containing the address if found, or an empty Optional if not found.
+   */
   public Optional<Address> findById(int id) {
     return addressRepository.findById(id);
   }
@@ -46,19 +40,11 @@ public class AddressService {
    */
   public AddressResponseDTO save(AddressRequestDTO addressDTO) throws Exception {
     if (addressDTO.getStreet() == null || addressDTO.getPostalCode() == null || addressDTO.getCity() == null) {
-      throw new IllegalArgumentException("Street, postal code, and city cannot be null");
+      throw new IllegalArgumentException("Street, postal code, and/or city cannot be null");
     }
+    Address address = addressMapper.toEntity(addressDTO);
 
-    Address address = new Address();
-    address.setStreet(addressDTO.getStreet());
-    address.setPostalCode(addressDTO.getPostalCode());
-    address.setCity(addressDTO.getCity());
-    address.setLatitude(addressDTO.getLatitude());
-    address.setLongitude(addressDTO.getLongitude());
-
-    Address savedAddress = addressRepository.save(address);
-    return mapToResponseDTO(savedAddress);
-    
+    return addressMapper.toResponseDTO(addressRepository.save(address));
   }
 
   /**
@@ -82,7 +68,7 @@ public class AddressService {
     existingAddress.setLongitude(addressDTO.getLongitude());
 
     Address updatedAddress = addressRepository.save(existingAddress);
-    return mapToResponseDTO(updatedAddress);
+    return addressMapper.toResponseDTO(updatedAddress);
   }
 
   /**
@@ -104,9 +90,7 @@ public class AddressService {
   public List<AddressResponseDTO> findAllAddresses() {
     List<Address> addresses = addressRepository.findAll();
     return addresses.stream()
-        .map(this::mapToResponseDTO)
+        .map(addressMapper::toResponseDTO)
         .toList();
-  }
-
-  
+  }  
 }
