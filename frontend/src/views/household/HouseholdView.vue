@@ -7,18 +7,24 @@ import ViewSuppliesComponent from '@/components/household/ViewSuppliesComponent.
 import HeaderBase from '@/components/HeaderBase.vue'
 import Footer from '@/components/Footer.vue'
 import { ref } from 'vue';
+import { useToast } from 'vue-toast-notification';
 
 // Toggle new item component visibility
 const isItemBoxVisible = ref(false);
 // Toggle new member component visibility
 const isMemberBoxVisible = ref(false);
 
+/**
+ * Toast instance
+ * @property {import('vue-toast-notification').Toast}
+ */
+ const $toast = useToast();
+
 const toggleNewItemBox = () => {
 	isItemBoxVisible.value = !isItemBoxVisible.value;
   if(isItemBoxVisible.value) {
     isMemberBoxVisible.value = false;
   }
-  responseMessage.value = '';
 }
 
 const toggleNewMemberBox = () => {
@@ -26,7 +32,14 @@ const toggleNewMemberBox = () => {
   if(isMemberBoxVisible.value) {
     isItemBoxVisible.value = false;
   }
-  responseMessage.value = '';
+}
+
+const newItemSuccess = () => {
+	isItemBoxVisible.value = false;
+    $toast.success(`Vare er lagt til i lageret`, {
+        duration: 3000,
+        position: 'top-right'
+    });
 }
 </script>
 
@@ -52,12 +65,13 @@ const toggleNewMemberBox = () => {
 			<div class="items-column">
 			<ViewSingleItemComponent />
 			</div>
-			<button class="dark-button" id="add-button" @click="toggleNewItemBox">+</button> 
+			<button class="dark-button" id="add-button" @click="toggleNewItemBox">+ Ny vare</button> 
 
 			<div class="modal-overlay" v-if="isItemBoxVisible" @click.self="isItemBoxVisible = false">
 				<NewItemComponent  
 				@close="isItemBoxVisible = false"
 				@hide-new-item-box="isItemBoxVisible = false" 
+				@new-item-success="newItemSuccess"
 				/>
 			</div>
 		</div>
@@ -103,12 +117,12 @@ const toggleNewMemberBox = () => {
 	}
 	
 	#add-button {
+		background-color: var(--orange);
         display: flex;
         align-items: center; 
         justify-content: center; 
-        width: 3rem; 
-        height: 3rem; 
-        font-size: var(--font-size-xlarge);
+        width: 6.5rem; 
+        height: 3.5rem; 
         margin-left: 0px;
         margin-top: 4.75rem;
     }

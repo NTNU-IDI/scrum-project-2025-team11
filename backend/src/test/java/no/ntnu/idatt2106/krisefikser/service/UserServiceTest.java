@@ -65,7 +65,7 @@ import no.ntnu.idatt2106.krisefikser.repository.UserRepository;
         req.setHouseholdId(123);
 
         // Act
-        UserResponseDTO resp = userService.saveUser(req);
+        UserResponseDTO resp = userService.saveUser(req, Role.normal);
 
         // Assert
         assertThat(resp.getId()).isEqualTo(1);

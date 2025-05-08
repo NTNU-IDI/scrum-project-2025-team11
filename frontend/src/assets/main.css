@@ -188,6 +188,12 @@ button:disabled:hover {
   cursor: pointer;
 }
 
+.cancel-button {
+  color: var(--bad-red);
+  background-color: transparent;
+  font-weight: bold;
+}
+
 .map-icon {
   display: inline-block;
   width: 20px;

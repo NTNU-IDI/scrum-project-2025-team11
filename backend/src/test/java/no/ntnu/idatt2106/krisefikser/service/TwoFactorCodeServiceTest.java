@@ -13,7 +13,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import java.util.Optional;
@@ -89,5 +96,47 @@ class TwoFactorCodeServiceTest {
         service.completeAuthentication("abc123", loginRequest);
 
         verify(codeRepo).delete(code);
+    }
+
+    @Test
+    void registerAdmin_ShouldSendEmailWithCredentials() {
+        // Arrange
+        String name = "John Doe";
+        String username = "johndoe_admin";
+        String password = "tempPassword123";
+        String email = "john.doe@example.com";
+
+        // Act
+        service.registerAdmin(name, username, password, email);
+
+        // Assert: Verify email is sent with correct details
+        verify(emailService, times(1)).sendEmail(argThat(req ->
+            req.getTo().equals(email) &&
+            req.getSubject().equals("New account") &&
+            req.getBody().contains(name) &&
+            req.getBody().contains(username) &&
+            req.getBody().contains(password) &&
+            req.isHtml()
+        ));
+    }
+
+    @Test
+    void registerAdmin_ShouldThrowExceptionWhenEmailFails() {
+        // Arrange
+        String name = "John Doe";
+        String username = "johndoe_admin";
+        String password = "tempPassword123";
+        String email = "john.doe@example.com";
+        
+        doThrow(new RuntimeException("SMTP error"))
+            .when(emailService).sendEmail(any());
+
+        // Act & Assert
+        Exception exception = assertThrows(RuntimeException.class, () -> 
+            service.registerAdmin(name, username, password, email));
+        
+        assertEquals("Unable to send new account information", exception.getMessage());
+        assertInstanceOf(RuntimeException.class, exception.getCause());
+        assertEquals("SMTP error", exception.getCause().getMessage());
     }
 }
