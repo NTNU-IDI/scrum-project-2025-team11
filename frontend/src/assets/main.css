@@ -1,35 +1,546 @@
-@import './base.css';
+@import "./base.css";
+@import url('@/assets/icons/font-awesome-4.7.0/css/font-awesome.min.css');
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
+body {
+  font-family: "Inter", sans-serif;
+  font-weight: normal;
+  margin: 0;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+.medium-header {
+  font-size: var(--font-size-xlarge);
+  font-weight: normal;
+  color: var(--darkest-blue);
+}
+
+.grey-container {
+  background-color: var(--grey);
+  color: var(--darkest-blue);
+  padding: 1rem;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 350px;
+  height: 100%;
+  font-weight: normal;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.dark-button {
+  background-color: var(--dark-blue);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: var(--font-size-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dark-button:hover {
+  background-color: var(--light-blue);
+  color: white;
+}
+
+.register-login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
   padding: 2rem;
+  background-color: var(--dark-blue);
+}
+
+.register-login-container {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  width: 300px;
+  text-align: left;
+}
+
+@media (min-width: 480px) {
+  .register-login-container {
+    width: 400px;
+  }
+}
+
+
+h1 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: var(--darkest-blue);
+  text-align: center;
+}
+
+input {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--grey);
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--grey);
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+button {
+  width: 100%;
+  padding: 0.5rem;
+  color: var(--white);
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+button:hover {
+  transform: scale(1.03);
+}
+
+button:disabled {
+  background-color: var(--grey);
+  cursor: not-allowed;
+}
+
+button:disabled:hover {
+  background-color: var(--grey);
+}
+
+.small-button {
+  font-size: var(--font-size-small);
+}
+
+.good-button {
+  background-color: var(--good-green);
+}
+
+.grey-button {
+  background-color: var(--grey);
+  color: var(--darkest-blue);
+}
+
+.register-login-text {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: var(--darkest-blue);
+}
+
+.link {
+  color: var(--orange);
+  text-decoration: none;
+}
+
+.article-card {
+  display: flex;
+  align-items: center;
+  border: 2px solid var(--light-blue);
+  border-radius: 8px;
+  background-color: white;
+  padding: 0.5rem 1.1rem;
+  transition: all 0.2s ease;
+  justify-content: space-between;
+  width: 100%;
+  height: 40px;
+}
+
+.article-card .quantity {
+  font-size: var(--font-size-medium);
+  padding: 0.25rem 0.25rem;
+  text-align: left;
   font-weight: normal;
 }
 
-a,
-.green {
+.article-card .info h2 {
+  margin: 0;
+  font-size: var(--font-size-medium);
+  margin-left: 1rem;
+  text-align: right;
+  font-weight: normal;
+}
+
+.item-card {
+  display: flex;
+  align-items: center;
+  border-radius: 0.5rem;
+}
+
+.delete-button {
+  color: var(--bad-red);
+  padding: 0.5rem;
+  margin-right: 1rem;
+  cursor: pointer;
+}
+
+.cancel-button {
+  color: var(--bad-red);
+  background-color: transparent;
+  font-weight: bold;
+}
+
+.map-icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 0.5rem;
+}
+
+.map-icon.shelter {
+  background: url("../assets/ikon/shelter.svg") no-repeat center center /
+    contain;
+}
+
+.map-icon.assembly_point {
+  background: url("../assets/ikon/assembly-point.svg") no-repeat center center /
+    contain;
+}
+
+.map-icon.medical {
+  background: url("../assets/ikon/medical.svg") no-repeat center center /
+    contain;
+}
+
+.title-map {
+  font-size: var(--font-size-medium);
+  margin: 0;
+  text-align: left;
+}
+
+.map-overview-box {
+  background: var(--white);
+  padding: 1rem 1.5rem 1rem 1rem;
+  border-radius: 10px;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.map-overview-box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  gap: 20px;
+  margin: 0;
+}
+
+.map-overview-details {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  margin-top: 7px;
+}
+
+.map-li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: var(--font-size-xsmall);
+}
+
+.error-message {
+  font-size: var(--font-size-xsmall);
+  color: var(--bad-red);
+  margin: 0;
+  padding-bottom: 10px;
+  padding-top: 10px;
+}
+
+.button:disabled {
+  background-color: var(--grey);
+  cursor: not-allowed;
+}
+
+.button:disabled:hover {
+  background-color: var(--grey);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: -5rem;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+@media (max-width: 768px) {
+  .title-map {
+    font-size: var(--font-size-medium);
+  }
+}
+/* ---Styling for hjemmesidene! Ikke rør altså!!--- */
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: white;
+}
+
+.main-content {
+  flex: 1;
+  padding: 48px 32px;
+  background-color: white;
+}
+
+/* Info-seksjon */
+.info-header {
+  background-color: #ffffff;
+  color: var(--darkest-blue);
+  padding: 2px;
+  margin: 40px 125px 20px 125px;
+  text-align: center;
+}
+
+.info-header h1 {
+  margin: 0 0 16px 0;
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.info-header p {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+/* Grid med tjenestebokser */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  padding: 40px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  margin: 20px 100px;
+}
+
+/* Boks med en tjeneste */
+.box {
+  background-color: var(--light-blue);
+  border: 2px solid var(--light-blue);
+  color: white;
+  padding: 24px;
+  border-radius: 8px;
+  transition: background-color 0.4s ease, transform 0.4s ease;
+  box-shadow: 0 4px 6px rgba(0.5, 0, 0, 0.5);
+  text-align: center;
   text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
+.box h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.box p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.box:hover {
+  background-color: rgb(169, 184, 203);
+  color: var(--darkest-blue);
+  transform: scale(1.02);
+  cursor: pointer;
+}
+
+.box.info {
+  background-color: var(--light-blue);
+  border: 2px solid var(--light-blue);
+  color: white;
+}
+.box.info h3 {
+  text-transform: uppercase;
+}
+.box.info:hover { 
+  background-color: var(--light-blue);
+  border: 2px solid var(--light-blue);
+  color: white;
+  transform: scale(1);
+  cursor: default;
+  pointer: none;
+}
+
+/* Boks som ikke skal kunne trykkes på */
+.box.unavailable {
+  background-color: var(--lightest-blue);
+  border: 2px solid var(--lightest-blue);
+  color: white;
+  position: relative;
+}
+
+.box.unavailable:hover {
+  background-color: var(--lightest-blue);
+  color: white;
+  transform: scale(1);
+  cursor: not-allowed;
+}
+
+.box.unavailable::after {
+  content: attr(data-tooltip);
+  position: center;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--bad-red);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+
+.box.unavailable:hover::after {
+  opacity: 1;
+}
+
+/* Boks som kun gjelder for innloggede bruker */
+.box.registered {
+  background-color: var(--good-green);
+  border: 2px solid var(--good-green);
+}
+
+.box.registered:hover {
+  background-color: var(--good-green);
+  color: white;
+  transform: scale(1.02);
+  cursor: pointer;
+}
+
+/* ---Stylingen til headerene, så helst ikke rør denne heller!--- */
+.header {
+  background-color: var(--dark-blue);
+  color: white;
+  padding: 1px;
+  box-shadow: inset 0 4px 10px rgba(1, 0, 0, 1.5);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
+}
+
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* For dele opp headeren i venstre og høyre del */
+.header-left,
+.header-right,
+.header-icons,
+.nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+/* Logoene og ikonene */
+.logo {
+  height: 100px;
+  width: auto;
+  cursor: pointer;
+}
+
+.icon {
+  height: 55px;
+  width: 55px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.icon:hover {
+  transform: scale(1.1);
+}
+
+/* De andre knappene (altså innlogging og sånn i header) */
+.button {
+  display: inline-block;
+  padding: 15px 25px;
+  font-size: 20px;
+  border-radius: 4px;
+  border: 2px solid transparent;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  text-decoration: none;
+  font-weight: 500;
+  margin: 10px 10px;
+  background-color: var(--light-blue);
+  color: #ffffff;
+}
+
+.button.login {
+  background-color: var(--good-green);
+  border-color: var(--good-green);
+}
+
+.button.logout {
+  background-color: var(--bad-red);
+  border-color: var(--bad-red);
+}
+
+.button.login:hover {
+  background-color: #ffffff;
+  color: var(--good-green);
+  border-color: var(--good-green);
+}
+
+.button.logout:hover {
+  background-color: #ffffff;
+  color: var(--bad-red);
+  border-color: var(--bad-red);
+}
+
+.button.other {
+  background-color: var(--light-blue);
+  border-color: var(--light-blue);
+  color: #ffffff;
+}
+
+.button.other:hover {
+  background-color: #ffffff;
+  border-color: var(--light-blue);
+  color: var(--darkest-blue);
+}
+
+@media (max-width: 480px) {
+  .grey-container {
+    width: 300px !important;
+  }
+
+  .dark-button {
+    width: 5rem;
+    height: 3rem;
   }
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+.importantStar {
+  color: var(--orange);
+  font-weight: bolder;
 }

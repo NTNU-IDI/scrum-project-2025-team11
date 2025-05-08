@@ -1,0 +1,213 @@
+package no.ntnu.idatt2106.krisefikser.controller;
+
+import java.util.List;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import no.ntnu.idatt2106.krisefikser.dto.PasswordChangeDTO;
+import no.ntnu.idatt2106.krisefikser.dto.UserResponseDTO;
+import no.ntnu.idatt2106.krisefikser.dto.UserUpdateDTO;
+import no.ntnu.idatt2106.krisefikser.mapper.UserMapper;
+import no.ntnu.idatt2106.krisefikser.model.User;
+import no.ntnu.idatt2106.krisefikser.service.UserService;
+
+@RestController
+@RequestMapping("/api/users")
+@CrossOrigin(origins = "*")
+@RequiredArgsConstructor
+@SecurityRequirement(name = "jwtCookieAuth")
+@PreAuthorize("isAuthenticated()")
+@Tag(name = "User", description = "Operations related to user management")
+public class UserController {
+  private final UserService userService;
+  private final PasswordEncoder passwordEncoder;
+
+
+  /**
+   * Retrieves a user by their unique identifier.
+   *
+   * @param id the unique identifier of the user
+   * @return {@code ResponseEntity} containing the user if found, otherwise
+   *         returns a 404 Not Found response
+   */
+  @Operation(
+      summary     = "Get logged in user",
+      description = "Retrieves the user details by login")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "User found",
+          content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = UserResponseDTO.class))),
+      @ApiResponse(responseCode = "404", description = "User not found",
+          content = @Content)
+  })
+  @GetMapping("/me")
+  public ResponseEntity<UserResponseDTO> getUserInfo() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String username = authentication.getName();
+    User user = userService.getUserByUsername(username).orElse(null);
+    if (user == null) {
+      return ResponseEntity.notFound().build();
+    }
+
+    return ResponseEntity.ok(UserMapper.toResponseDTO(user));
+  }
+
+
+  /**
+   * Endpoint to retrieve all users in the system.
+   * 
+   * @return a list of all users
+   */
+  @Operation(
+      summary     = "List users",
+      description = "Returns every user in the system.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Users returned"),
+      @ApiResponse(responseCode = "204", description = "No users found",
+          content = @Content)
+  })
+  @GetMapping("/all")
+  public ResponseEntity<List<UserResponseDTO>> list() {
+    List<UserResponseDTO> users = userService.findAll();
+    if (users == null) {
+      return ResponseEntity.notFound().build();
+    }
+    return users.isEmpty()
+         ? ResponseEntity.noContent().build()
+         : ResponseEntity.ok(users);
+  }
+
+
+  /**
+   * Changes the password of a logged in user.
+   *
+   * @param id the unique identifier of the user
+   * @param dto the password change request
+   * @return {@code ResponseEntity} indicating the result of the operation
+   */
+  @Operation(
+      summary     = "Change password",
+      description = "Changes the user’s password after verifying current password.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "204", description = "Password changed"),
+      @ApiResponse(responseCode = "400", description = "Current password wrong",
+          content = @Content)
+  })
+  @PostMapping("/password")
+  public ResponseEntity<Void> changePassword(
+      @Parameter(description = "Password change payload", required = true)
+      @RequestBody PasswordChangeDTO dto) {
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String username = authentication.getName();
+    User user = userService.getUserByUsername(username).orElse(null);
+    if (user == null) {
+      return ResponseEntity.notFound().build();
+    }
+    if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
+      return ResponseEntity
+          .status(HttpStatus.BAD_REQUEST) 
+          .body(null);
+    }
+    if (dto.getNewPassword() == null || dto.getNewPassword().isEmpty()) {
+      return ResponseEntity
+          .status(HttpStatus.BAD_REQUEST) 
+          .body(null);
+    }
+
+    int id = user.getId();
+    userService.changePassword(id, dto);
+    return ResponseEntity.noContent().build();   
+  }
+
+  /**
+   * Deletes a user by their unique identifier.
+   *
+   * @param id the unique identifier of the user
+   * @return {@code ResponseEntity} indicating the result of the operation
+   */
+  @Operation(
+      summary     = "Delete user",
+      description = "Deletes a user (admin only).")
+  @ApiResponses({
+      @ApiResponse(responseCode = "204", description = "User deleted",
+          content = @Content),
+      @ApiResponse(responseCode = "404", description = "User not found",
+          content = @Content)
+  })
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> delete(
+      @Parameter(description = "User ID", required = true)
+      @PathVariable int id) {
+    
+    User user = userService.getUserById(id).orElse(null);
+    if (user == null) {
+      return ResponseEntity.notFound().build();
+    }
+
+    userService.deleteById(id);
+    return ResponseEntity.noContent().build();
+  }
+
+
+  /**
+   * Updates an existing user entity.
+   *
+   * @param user the updated user entity
+   * @return {@code ResponseEntity} containing the updated user entity
+   */
+  @Operation(
+    summary = "Update user",
+    description = "Updates an existing user entity in the system."
+  )
+  @ApiResponses({
+      @ApiResponse(responseCode = "404", description = "User not found",
+          content = @Content),
+      @ApiResponse(responseCode = "409", description = "Email or username already taken",
+          content = @Content),
+      @ApiResponse(responseCode = "200", description = "User updated successfully",
+          content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = UserResponseDTO.class)))
+  })
+  @PutMapping
+  public ResponseEntity<UserResponseDTO> updateUser(
+    @Parameter(description = "Updated user object", required = true)
+    @RequestBody UserUpdateDTO user) {
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String username = authentication.getName();
+
+    User existingUser = userService.getUserByUsername(username).orElse(null);
+    if (existingUser == null) {
+      return ResponseEntity.notFound().build();
+    }
+    if (userService.emailExists(user.getEmail())) {
+      return ResponseEntity
+          .status(409) 
+          .body(null);
+    }
+    if (userService.usernameExists(user.getUsername())) {
+      return ResponseEntity
+          .status(409) 
+          .body(null);
+    }
+
+    UserResponseDTO updatedUser = userService.updateUser(existingUser.getId(), user);
+    return ResponseEntity.ok(updatedUser);
+  }  
+}
