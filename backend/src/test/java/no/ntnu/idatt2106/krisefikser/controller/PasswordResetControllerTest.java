@@ -3,10 +3,13 @@ package no.ntnu.idatt2106.krisefikser.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ntnu.idatt2106.krisefikser.dto.PasswordResetConfirm;
 import no.ntnu.idatt2106.krisefikser.dto.PasswordResetRequest;
+import no.ntnu.idatt2106.krisefikser.exceptionhandler.ResourceNotFoundException;
 import no.ntnu.idatt2106.krisefikser.security.JwtAuthFilter;
 import no.ntnu.idatt2106.krisefikser.security.JwtUtil;
 import no.ntnu.idatt2106.krisefikser.service.PasswordResetService;
 import no.ntnu.idatt2106.krisefikser.config.TestSecurityConfig;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -18,6 +21,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -26,63 +30,92 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(PasswordResetController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class PasswordResetControllerTest {
-
+    
     @Autowired
     private MockMvc mockMvc;
-
+    
     @MockitoBean
     private PasswordResetService passwordResetService;
-
+    
     @MockitoBean
     private JwtUtil jwtUtil;
-
+    
     @MockitoBean
     private JwtAuthFilter jwtAuthFilter;
-
+    
     @Autowired
     private ObjectMapper objectMapper;
-
+    
     @Test
     void requestPasswordReset_ShouldReturnOk() throws Exception {
         PasswordResetRequest request = new PasswordResetRequest("test@example.com");
-
+        
         doNothing().when(passwordResetService).initiateReset(request.getEmail());
-
+        
         mockMvc.perform(post("/api/auth/request-password-reset")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isOk());
     }
-
+    
     @Test
     void resetPassword_ShouldReturnOk() throws Exception {
         PasswordResetConfirm confirm = new PasswordResetConfirm("ABC123", "newPassword!");
-
+        
         doNothing().when(passwordResetService).completeReset(confirm.getToken(), confirm.getNewPassword());
-
+        
         mockMvc.perform(post("/api/auth/reset-password")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(confirm)))
-                .andExpect(status().isOk());
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(confirm)))
+        .andExpect(status().isOk());
     }
-
+    
     @Test
     void requestPasswordReset_InvalidEmail_ShouldReturnBadRequest() throws Exception {
         PasswordResetRequest request = new PasswordResetRequest(""); // invalid
-
+        
         mockMvc.perform(post("/api/auth/request-password-reset")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isBadRequest());
     }
-
+    
     @Test
     void resetPassword_MissingFields_ShouldReturnBadRequest() throws Exception {
         PasswordResetConfirm confirm = new PasswordResetConfirm("", ""); // invalid
-
+        
         mockMvc.perform(post("/api/auth/reset-password")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(confirm)))
-                .andExpect(status().isBadRequest());
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(confirm)))
+        .andExpect(status().isBadRequest());
     }
+    
+    @Test
+    @DisplayName("POST /api/auth/request-password-reset returns 404 when email not found")
+    void requestPasswordReset_whenServiceThrowsRNF_returns404() throws Exception {
+        PasswordResetRequest request = new PasswordResetRequest("missing@example.com");
+        
+        doThrow(new ResourceNotFoundException("User","email", request.getEmail()))
+        .when(passwordResetService).initiateReset(request.getEmail());
+        
+        mockMvc.perform(post("/api/auth/request-password-reset")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isNotFound());
+    }
+    
+    @Test
+    @DisplayName("POST /api/auth/reset-password returns 400 when token invalid")
+    void resetPassword_whenServiceThrowsIllegalArg_returns400() throws Exception {
+        PasswordResetConfirm confirm = new PasswordResetConfirm("BADTOKEN", "newPass!");
+        
+        doThrow(new IllegalArgumentException("Invalid token"))
+        .when(passwordResetService).completeReset(confirm.getToken(), confirm.getNewPassword());
+        
+        mockMvc.perform(post("/api/auth/reset-password")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(confirm)))
+        .andExpect(status().isBadRequest());
+    }
+    
 }
