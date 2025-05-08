@@ -5,10 +5,10 @@
       <div v-if="showCrisisAlert" class="crisis-alert">
         <p><strong>Viktig melding:</strong> Du er i et kriseområde!</p>
       </div>
-      <div class="corner-container">
+      <div class="corner-container" :class="{ 'crisis-mode': showCrisisAlert }">
         <IconsOverview ref="iconsOverviewRef"/>
         <EventsOverview />
-        <button v-if="!isEditMode" class="dark-button small-button" @click="findNearestShelter">
+        <button v-if="!isEditMode && showNearestShelterButton" class="dark-button small-button" @click="findNearestShelter">
           Finn 3 nærmeste tilflukstrom
         </button>  
         <button id="editToggle" @click="toggleEditMode" :class="{ 'delete-button small-button': isEditMode, 'dark-button small-button': !isEditMode }">
@@ -81,6 +81,7 @@ const iconsOverviewRef = ref();
 const isEditMode = ref(false);
 const userLocationFetched = ref(false);
 const showSelectType = ref(false);
+const showNearestShelterButton = ref(true);
 const selectedPoint = ref<PointOfInterest>({
   id: 0,
   name: '',
@@ -231,6 +232,7 @@ function addMarkersToMap() {
 function closePointForm() {
   removeTempMarker();
   showPointForm.value = false;
+  showNearestShelterButton.value = true;
 }
 
 function closeSelectType() {
@@ -345,6 +347,7 @@ function handleNavigation(coords: { latitude: number, longitude: number }) {
     } as L.Routing.RoutingControlOptions).addTo(map);
 
     isNavigating.value = true;
+    console.log('hei');
   });
 }
 
@@ -358,6 +361,7 @@ function clearRouting() {
 
 async function findNearestShelter() {
   isEditMode.value = false;
+  showNearestShelterButton.value = false;
   getUserPosition(() => {}, true);
   if (!pointStore.selectedIcons.includes('shelter')) {
     iconsOverviewRef.value?.forceIncludeShelter();
@@ -408,14 +412,19 @@ function toggleEditMode() {
 <style>
 .corner-container {
   position: absolute;
-  top: 45px;
+  top: 10px;
   left: 10px;
+  bottom: 10px;
   z-index: 2;
   display: flex;
   flex-direction: column;
   gap: 10px;
   max-height: calc(100% - 20px); 
   overflow: hidden; 
+}
+
+.corner-container.crisis-mode {
+  top: 45px;
 }
 
 .layout-map-page {
@@ -486,9 +495,5 @@ function toggleEditMode() {
   .crisis-alert {
     font-size: var(--font-size-xsmall);
   }
-
-  .corner-container {
-    top: 42px;
-}
 }
 </style>
