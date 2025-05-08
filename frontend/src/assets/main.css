@@ -62,6 +62,13 @@ body {
   text-align: left;
 }
 
+@media (min-width: 480px) {
+  .register-login-container {
+    width: 400px;
+  }
+}
+
+
 h1 {
   font-size: 1.8rem;
   margin-bottom: 1rem;
@@ -188,17 +195,17 @@ button:disabled:hover {
 }
 
 .map-icon.shelter {
-  background: url("/yellow-star-fill-border.svg") no-repeat center center /
+  background: url("../assets/ikon/shelter.svg") no-repeat center center /
     contain;
 }
 
 .map-icon.assembly_point {
-  background: url("/lightest-blue-triangle-fill-border.svg") no-repeat center
-    center / contain;
+  background: url("../assets/ikon/assembly-point.svg") no-repeat center center /
+    contain;
 }
 
 .map-icon.medical {
-  background: url("/bad-red-medical-fill-border.svg") no-repeat center center /
+  background: url("../assets/ikon/medical.svg") no-repeat center center /
     contain;
 }
 
@@ -274,7 +281,6 @@ button:disabled:hover {
   .title-map {
     font-size: var(--font-size-medium);
   }
-
 }
 /* ---Styling for hjemmesidene! Ikke rør altså!!--- */
 .page-wrapper {

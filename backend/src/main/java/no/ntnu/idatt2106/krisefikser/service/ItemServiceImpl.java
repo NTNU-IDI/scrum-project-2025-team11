@@ -1,5 +1,6 @@
 package no.ntnu.idatt2106.krisefikser.service;
 
+import no.ntnu.idatt2106.krisefikser.exceptionhandler.ResourceNotFoundException;
 import no.ntnu.idatt2106.krisefikser.model.Item;
 import no.ntnu.idatt2106.krisefikser.repository.ItemRepository;
 import org.springframework.stereotype.Service;
@@ -80,6 +81,10 @@ public class ItemServiceImpl implements ItemService {
      */
     @Override
     public void delete(Integer id) {
+        if (!repo.existsById(id)) {
+          throw new ResourceNotFoundException("Item", "id", id);
+        }
         repo.deleteById(id);
-    }
+      }
+      
 }

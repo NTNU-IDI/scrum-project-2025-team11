@@ -3,29 +3,19 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import { PointService } from "@/api/PointService";
 import { useToast } from "vue-toast-notification";
+import { PollingService } from "@/services/PollingService";
 
 export const usePointStore = defineStore("pointStore", () => {
   const pointsDisplaying = ref<PointOfInterest[]>([]);
   const selectedIcons = ref<string[]>([]);
-  let pollingInterval: ReturnType<typeof setInterval> | null = null;
+  const polling = new PollingService();
 
   const startPolling = () => {
-    if (pollingInterval) return;
-    pollingInterval = setInterval(() => {
-      fetchPointsByIconTypes(selectedIcons.value);
-    }, 5000); // 5 seconds
+    polling.start(() => fetchPointsByIconTypes(selectedIcons.value));
   };
 
   const stopPolling = () => {
-    if (pollingInterval) {
-      clearInterval(pollingInterval);
-      pollingInterval = null;
-    }
-  };
-
-  const initializePolling = async () => {
-    await fetchPointsByIconTypes(selectedIcons.value);
-    startPolling();
+    polling.stop();
   };
 
   const updateSelectedIcons = (newIcons: string[]) => {
@@ -54,7 +44,7 @@ export const usePointStore = defineStore("pointStore", () => {
       });
       return newPoint;
     } catch (error) {
-      $toast.warning("Punktet kunne ikke bli lagd", { duration: 5000 });
+      $toast.error("Punktet kunne ikke bli lagd", { duration: 5000 });
       throw error;
     }
   };
@@ -69,7 +59,7 @@ export const usePointStore = defineStore("pointStore", () => {
       });
       return updated;
     } catch (error) {
-      $toast.warning("Punktet kunne ikke bli oppdatert", { duration: 5000 });
+      $toast.error("Punktet kunne ikke bli oppdatert", { duration: 5000 });
       throw error;
     }
   };
@@ -83,7 +73,7 @@ export const usePointStore = defineStore("pointStore", () => {
         duration: 5000,
       });
     } catch (error) {
-      $toast.warning("Punktet kunne ikke bli slettet", { duration: 5000 });
+      $toast.error("Punktet kunne ikke bli slettet", { duration: 5000 });
       throw error;
     }
   };
@@ -93,7 +83,6 @@ export const usePointStore = defineStore("pointStore", () => {
     selectedIcons,
     startPolling,
     stopPolling,
-    initializePolling,
     fetchPointsByIconTypes,
     fetchNearestShelters,
     createPoint,

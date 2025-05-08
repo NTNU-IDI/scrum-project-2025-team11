@@ -1,0 +1,6 @@
+#FileLock
+#Wed May 07 11:47:02 CEST 2025
+hostName=dhcp-10-22-104-144.wlan.ntnu.no
+id=196aa2436f35bbbe368a9b8bd13150d786f1793ebf7
+method=file
+server=10.22.104.144\:52852

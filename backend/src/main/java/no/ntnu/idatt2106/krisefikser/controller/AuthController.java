@@ -5,7 +5,8 @@
 
   import lombok.RequiredArgsConstructor;
   import org.springframework.http.HttpStatus;
-  import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
   import org.springframework.security.crypto.password.PasswordEncoder;
   import org.springframework.web.bind.annotation.PostMapping;
   import org.springframework.web.bind.annotation.RequestBody;
@@ -22,13 +23,19 @@
   import jakarta.servlet.http.HttpServletRequest;
   import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.ConfirmAuthenticationRequest;
+import no.ntnu.idatt2106.krisefikser.dto.HouseholdRequestDTO;
+import no.ntnu.idatt2106.krisefikser.dto.HouseholdResponseDTO;
 import no.ntnu.idatt2106.krisefikser.dto.LoginRequest;
 import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
   import no.ntnu.idatt2106.krisefikser.dto.UserResponseDTO;
-  import no.ntnu.idatt2106.krisefikser.model.User;
-  import no.ntnu.idatt2106.krisefikser.security.JwtUtil;
-  import no.ntnu.idatt2106.krisefikser.service.RefreshTokenService;
+import no.ntnu.idatt2106.krisefikser.model.User;
+import no.ntnu.idatt2106.krisefikser.model.User.Role;
+import no.ntnu.idatt2106.krisefikser.security.JwtUtil;
+import no.ntnu.idatt2106.krisefikser.service.AddressService;
+import no.ntnu.idatt2106.krisefikser.service.HouseholdService;
+import no.ntnu.idatt2106.krisefikser.service.RefreshTokenService;
 import no.ntnu.idatt2106.krisefikser.service.TwoFactorCodeService;
 import no.ntnu.idatt2106.krisefikser.service.UserService;
 
@@ -42,19 +49,22 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
     private final RefreshTokenService refreshTokenService;
     private final PasswordEncoder passwordEncoder;
     private final TwoFactorCodeService twoFactorCodeService;
+    private final AddressService addressService;
+    private final HouseholdService householdService;
 
     @Operation(
       summary = "Refresh JWT token",
       description = "Refreshes the JWT token by generating a new one if old was a valid token")
     @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Token successfully refreshed"),
-      @ApiResponse(responseCode = "403", description = "Could not refresh the token, check credentials.")
+      @ApiResponse(responseCode = "403", description = "Could not refresh the token, check credentials."),
+      @ApiResponse(responseCode = "498", description = "Missing refresh token, please log in again")
     })
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshJwtToken(HttpServletRequest request, HttpServletResponse response) {
       Cookie[] cookies = request.getCookies();
       if (cookies == null) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing refresh token");
+        return ResponseEntity.status(498).body("Missing refresh token");
       }
 
       String refreshToken = Arrays.stream(cookies)
@@ -97,7 +107,7 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
       description = "Checks login credentials and sends a mail to the registered mail address")
     @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Login successful"),
-      @ApiResponse(responseCode = "401", description = "Invalid credentials")
+      @ApiResponse(responseCode = "400", description = "Invalid credentials")
     })
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
@@ -106,7 +116,7 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
 
       User user = userService.getUserByUsername(username).orElse(null);
       if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
-        return ResponseEntity.status(401).body("Invalid credentials");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid credentials");
       }
 
       twoFactorCodeService.initiateCode(username);
@@ -121,7 +131,7 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
 
       Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
       refreshCookie.setHttpOnly(true);
-      refreshCookie.setSecure(true); // important in production
+      refreshCookie.setSecure(false); // important in production
       refreshCookie.setPath("/auth/refresh");
       refreshCookie.setMaxAge((int) jwtUtil.getRefreshExpiration() / 1000);
       return refreshCookie;
@@ -131,7 +141,7 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
       String token = jwtUtil.generateToken(username, user.getRole().toString());
       Cookie jwtCookie = new Cookie("jwtToken", token);
       jwtCookie.setHttpOnly(true);
-      jwtCookie.setSecure(true);
+      jwtCookie.setSecure(false);
       jwtCookie.setPath("/");
       jwtCookie.setMaxAge((int) jwtUtil.getExpiration() / 1000);
       return jwtCookie;
@@ -169,7 +179,7 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
             .body(null);
       }
 
-      UserResponseDTO saved = userService.saveUser(body);
+      UserResponseDTO saved = userService.saveUser(body, Role.normal);
       User user = userService.getUserByUsername(saved.getUsername()).orElse(null);
 
       if (user == null) {
@@ -211,6 +221,55 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
 
         }
         return ResponseEntity.status(500).body("Failed to retrieve created user"); 
+    }
+
+    /**
+     * Endpoint to register a admin user as a super admin
+     * 
+     * @param body registration information such as name, username, password, email. Household id is not needed
+     * @return statuscode 200 if the admin user was successfully created
+     * @throws Exception
+     */
+    @Operation(
+            summary = "Registers an admin user when logged in as a super admin",
+            description = "A logged in superadmin can create another admin by sending registration information"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Admin user created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid registration information"),
+            @ApiResponse(responseCode = "409", description = "Either the email or username already exist")
+    })
+    @PostMapping("/register-admin")
+    public ResponseEntity<?> registerAdmin(@RequestBody UserRequestDTO body) throws Exception {
+      if (userService.emailExists(body.getEmail())) {
+        return ResponseEntity
+            .status(409) // Conflict
+            .body(null);
+      }
+      if (userService.usernameExists(body.getUsername())) {
+        return ResponseEntity
+            .status(409) // Conflict
+            .body(null);
+      }
+      AddressRequestDTO address = new AddressRequestDTO();
+      address.setCity("Trondheim");
+      address.setPostalCode("7035");
+      address.setLatitude(73.4305);
+      address.setLongitude(18.5555);
+      address.setStreet("Heiabakken 123");
+      addressService.save(address);
+
+      HouseholdRequestDTO household = new HouseholdRequestDTO();
+      household.setName("Admin hus");
+      household.setMemberCount(1);
+      household.setAddress(address);
+      HouseholdResponseDTO savedHousehold = householdService.save(household);
+
+      body.setHouseholdId(savedHousehold.getId());
+      userService.saveUser(body, Role.admin);
+
+      twoFactorCodeService.registerAdmin(body.getFirstName(), body.getUsername(), body.getPassword(), body.getEmail());
+      return ResponseEntity.ok().build();
     }
   }
 

@@ -53,9 +53,11 @@
 
         <div class="point-detail-container">
           <!-- Name -->
-          <input v-model="pointData.name" type="text" placeholder="Navn" class="point-input" />
+          <label class="point-label">Navn*</label>
+          <input v-model="pointData.name" type="text" class="point-input" />
 
           <!-- Icon type -->
+          <label class="point-label">Type punkt*</label>
           <select class="point-select" v-model="pointData.iconType">
             <option disabled value="">Velg type punkt</option>
             <option value="shelter">Tilfluktsrom</option>
@@ -64,9 +66,11 @@
           </select>
 
           <!-- Description -->
-          <input class="point-input" v-model="pointData.description" placeholder="Beskrivelse" />
+          <label class="point-label">Beskrivelse*</label>
+          <input class="point-input" v-model="pointData.description" placeholder="F.eks. Plass til 5." />
 
           <!-- Choose coordinates or address -->
+          <label class="point-label">Inndata for lokasjon*</label>
           <select class="point-select" v-model="inputMethod">
             <option disabled value="">Velg inndata for lokasjon</option>
             <option value="coordinates">Koordinater</option>
@@ -75,13 +79,16 @@
 
           <!-- Coordinates -->
           <div v-if="inputMethod === 'coordinates'" class="coordinates-input">
-            <input class="point-input" v-model="pointData.latitude" type="number" placeholder="Breddegrad" />
-            <input class="point-input" v-model="pointData.longitude" type="number" placeholder="Lengdegrad" />
+            <label class="point-label">Breddegrad</label>
+            <input class="point-input" v-model="pointData.latitude" type="number" placeholder="F.eks. 63,41" />
+            <label class="point-label">Lengdegrad</label>
+            <input class="point-input" v-model="pointData.longitude" type="number" placeholder="F.eks. 10,40" />
           </div>
 
           <!-- Address -->
           <div v-if="inputMethod === 'address'">
-            <input class="point-input" v-model="address" type="text" placeholder="Adresse" @blur="resolveAddress" />
+            <label class="point-label">Adresse</label>
+            <input class="point-input" v-model="address" type="text" @blur="resolveAddress" />
             <p v-if="addressError" class="error-message">{{ addressError }}</p>
           </div>
 
@@ -312,6 +319,12 @@ const deletePoint = async () => {
   scrollbar-width: thin;
   scrollbar-color: var(--light-gray) var(--white);
 }
+
+.point-label {
+  display: block;
+  font-size: var(--font-size-xsmall);
+}
+
 
 .point-buttons {
   display: flex;

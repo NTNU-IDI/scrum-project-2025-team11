@@ -40,7 +40,7 @@ watch(selectedFilters, (newIcons) => {
 
 onMounted(() => {
   pointStore.updateSelectedIcons(selectedFilters.value);
-  pointStore.initializePolling();
+  pointStore.startPolling();
 });
 
 const forceIncludeShelter = () => {
