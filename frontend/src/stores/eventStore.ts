@@ -10,6 +10,9 @@ export const useEventStore = defineStore("events", {
     events: [] as EventResponseDTO[],
     activeEvents: [] as EventResponseDTO[],
     chosenEvent: {} as EventResponseDTO,
+    lat: null as number | null,
+    lng: null as number | null,
+    openNewEvent: false,
   }),
 
   actions: {
@@ -19,6 +22,17 @@ export const useEventStore = defineStore("events", {
     },
     stopPollingActiveEvents() {
       pollingService.stop();
+    },
+    setCoordinates(lat: number, lng: number) {
+      this.lat = lat;
+      this.lng = lng;
+    },
+    // TODO: In admin view: watch for this trigger, and call clearTriggerNewItem
+    triggerNewEvent() {
+      this.openNewEvent = true;
+    },
+    clearTriggerNewEvent() {
+      this.openNewEvent = false;
     },
     async fetchEvents() {
       try {

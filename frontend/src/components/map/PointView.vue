@@ -299,51 +299,15 @@ const deletePoint = async () => {
 </script>
 
 <style scoped>
-.point-card {
-  position: relative;
-  background: var(--white);
-  border-radius: 10px;
-  width: 220px;
-  display: flex;
-  flex-direction: column;
-  max-height: 100%;
-  overflow: hidden;
-}
-
-.point-card-content {
-  padding: 1.2rem;
-  text-align: left;
-  flex: 1;
-  overflow: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-  scrollbar-color: var(--light-gray) var(--white);
-}
-
 .point-label {
   display: block;
   font-size: var(--font-size-xsmall);
 }
 
-
 .point-buttons {
   display: flex;
   flex-direction: column;
   gap: 5px;
-}
-
-.close-icon {
-  position: absolute;
-  top: 5px;
-  right: 15px;
-  font-size: 24px;
-  color: black;
-  cursor: pointer;
-  user-select: none;
-}
-
-.close-icon:hover {
-  color: var(--bad-red);
 }
 
 .point-detail-container {

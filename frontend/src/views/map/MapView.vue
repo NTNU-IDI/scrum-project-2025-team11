@@ -13,7 +13,13 @@
         </button>  
         <button id="editToggle" @click="toggleEditMode" :class="{ 'delete-button small-button': isEditMode, 'dark-button small-button': !isEditMode }">
           {{ isEditMode ? 'Avslutt redigering' : 'Redigeringsmodus' }}
-        </button>       
+        </button>   
+        <SelectType 
+          v-if="showSelectType"
+          @add-point="handleAddPoint"
+          @add-event="handleAddEvent"
+          @close="closeSelectType" 
+        />
         <PointView 
           v-if="showPointForm" 
           :selectedPoint="selectedPoint" 
@@ -41,6 +47,7 @@ import Header from '@/components/Header.vue';
 import EventsOverview from '../../components/map/EventsOverview.vue';
 import IconsOverview from '../../components/map/IconsOverview.vue';
 import PointView from '../../components/map/PointView.vue';
+import SelectType from '../../components/map/SelectType.vue';
 import L from 'leaflet';
 import 'leaflet-routing-machine';
 import 'leaflet/dist/leaflet.css';
@@ -53,7 +60,9 @@ import { storeToRefs } from "pinia";
 import { onUnmounted, onMounted, ref, watch } from 'vue';
 import { useEventStore } from '@/stores/eventStore'; 
 import { useToast } from 'vue-toast-notification';
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const $toast = useToast();
 const eventStore = useEventStore(); 
 const userStore = useUserStore()
@@ -71,6 +80,7 @@ const isNavigating = ref(false);
 const iconsOverviewRef = ref();
 const isEditMode = ref(false);
 const userLocationFetched = ref(false);
+const showSelectType = ref(false);
 const selectedPoint = ref<PointOfInterest>({
   id: 0,
   name: '',
@@ -140,6 +150,7 @@ function showPointView(mode: 'view' | 'edit' | 'create', point: PointOfInterest,
   removeTempMarker();
   selectedPoint.value = { ...point };
   formMode.value = mode;
+  showSelectType.value = false;
   showPointForm.value = true;
   createTempMarker(point.latitude, point.longitude);
   if (showMarker) {
@@ -148,6 +159,7 @@ function showPointView(mode: 'view' | 'edit' | 'create', point: PointOfInterest,
 }
 
 const mapClickHandler = (e: L.LeafletMouseEvent) => {
+  console.log(showPointForm.value);
   if (role.value === 'admin' && isEditMode.value) {
     const { lat, lng } = e.latlng;
     selectedPoint.value = {
@@ -158,9 +170,23 @@ const mapClickHandler = (e: L.LeafletMouseEvent) => {
       latitude: lat,
       longitude: lng
     };
-    showPointView('create', selectedPoint.value, false);
+    if (!showPointForm.value) {
+      showSelectType.value = true;
+    }
   }
 };
+
+function handleAddPoint() {
+  showSelectType.value = false;
+  showPointView('create', selectedPoint.value, true);
+}
+
+function handleAddEvent() {
+  showSelectType.value = false;
+  eventStore.setCoordinates(selectedPoint.value.latitude, selectedPoint.value.longitude);
+  router.push('/admin');
+  // TODO: Navigate to admin view and click on new event button and prefill lat and lng
+}
 
 watch(isEditMode, (newValue) => {
   updateCrisisAlertVisibility();
@@ -205,6 +231,11 @@ function addMarkersToMap() {
 function closePointForm() {
   removeTempMarker();
   showPointForm.value = false;
+}
+
+function closeSelectType() {
+  removeTempMarker();
+  showSelectType.value = false;
 }
 
 function removeTempMarker() {

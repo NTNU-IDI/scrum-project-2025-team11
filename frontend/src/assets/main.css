@@ -68,7 +68,6 @@ body {
   }
 }
 
-
 h1 {
   font-size: 1.8rem;
   margin-bottom: 1rem;
@@ -187,6 +186,41 @@ button:disabled:hover {
   cursor: pointer;
 }
 
+.point-card {
+  position: relative;
+  background: var(--white);
+  border-radius: 10px;
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.point-card-content {
+  padding: 1.2rem;
+  text-align: left;
+  flex: 1;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--light-gray) var(--white);
+}
+
+.close-icon {
+  position: absolute;
+  top: 5px;
+  right: 15px;
+  font-size: 24px;
+  color: black;
+  cursor: pointer;
+  user-select: none;
+}
+
+.close-icon:hover {
+  color: var(--bad-red);
+}
+
 .map-icon {
   display: inline-block;
   width: 20px;
@@ -213,6 +247,7 @@ button:disabled:hover {
   font-size: var(--font-size-medium);
   margin: 0;
   text-align: left;
+  font-weight: bold;
 }
 
 .map-overview-box {
