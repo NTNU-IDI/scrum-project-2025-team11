@@ -95,7 +95,7 @@ const routes: Array<RouteRecordRaw> = [
     component: ResetPassword,
   },
   {
-    path: "/beredskap",
+    path: "/beredskap/:stage",
     name: "Beredskap",
     component: PreparationsView
   }
