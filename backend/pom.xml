@@ -133,7 +133,6 @@
 						<exclude>no/ntnu/idatt2106/krisefikser/dto/**/*</exclude>
 						<exclude>no/ntnu/idatt2106/krisefikser/exceptionhandler/*</exclude>
 						<exclude>no/ntnu/idatt2106/krisefikser/exceptionhandler/**/*</exclude>
-						<exclude>no/ntnu/idatt2106/krisefikser/security/**</exclude>
 						<exclude>no/ntnu/idatt2106/krisefikser/config/*</exclude>
 						<exclude>no/ntnu/idatt2106/krisefikser/config/**/*</exclude>
 					</excludes>
