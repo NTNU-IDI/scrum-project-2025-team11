@@ -6,20 +6,27 @@
       </div>
 
       <div class="header-right">
-        <a href="/" class="button logout" @click.prevent="logOutUser"><i class="fa fa-sign-out"></i> Logg ut</a>
+        <a href="/" class="button logout" @click.prevent="logOutUser"><i class="fa fa-sign-out" aria-hidden="true"></i> Logg ut</a>
       </div>
+
+      <button class="hamburger" @click="toggleMobileMenu"><i class="fa fa-bars" aria-hidden="true"></i> Meny</button>
     </div>
+
+    <nav v-if="isMobileMenuOpen" class="mobile-nav">
+      <a href="/" class="button logout" @click.prevent="logOutUser"><i class="fa fa-sign-out" aria-hidden="true"></i> Logg ut</a>
+    </nav>
   </header>
 </template>
-  
-  <script lang="ts" setup>
-  import { useRouter } from 'vue-router'
-  const router = useRouter()
-  const goToHome = () => {
-    router.push('/')
-  }
-  
-  import {logOutUser} from '../api/AuthService';
-  </script>
-  
-  
+
+<script lang="ts" setup>
+import { logOutUser } from '../api/AuthService'
+import { useRouter } from 'vue-router'
+import { ref } from 'vue'
+
+const router = useRouter()
+const goToHome = () => router.push('/')
+const isMobileMenuOpen = ref(false)
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
+}
+</script>
