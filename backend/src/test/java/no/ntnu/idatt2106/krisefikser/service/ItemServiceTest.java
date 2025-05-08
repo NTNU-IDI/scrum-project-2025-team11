@@ -3,6 +3,7 @@ package no.ntnu.idatt2106.krisefikser.service;
 import no.ntnu.idatt2106.krisefikser.model.Item;
 import no.ntnu.idatt2106.krisefikser.repository.ItemRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 import java.util.List;
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,8 +51,15 @@ class ItemServiceTest {
     }
 
     @Test
-    void deleteById() {
+    @DisplayName("delete(5) on existing item invokes repository delete")
+    void deleteById_existing_deletes() {
+        // Arrange: tell the repo that ID 5 exists
+        when(repo.existsById(5)).thenReturn(true);
+
+        // Act
         service.delete(5);
+
+        // Assert
         verify(repo).deleteById(5);
     }
 

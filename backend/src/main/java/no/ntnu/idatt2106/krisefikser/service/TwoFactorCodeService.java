@@ -112,4 +112,33 @@ public class TwoFactorCodeService {
 
         twoFactorRepo.delete(prt);
     }
+
+    /**
+     * Method to send an email containing information about a new registered admin user
+     * 
+     * @param name of the user
+     * @param username of the user
+     * @param password made by the superadmin for that user
+     * @param email which the message will be sent to
+     */
+    public void registerAdmin(String name, String username, String password, String email) {
+        String body = "<p>Hello <strong>" + name + "</strong>,</p>"
+                    + "<p>A superadmin has created an admin account for you:</p>"
+                    + "<h2>Username: <strong>" + username + "</strong></h2>"
+                    + "<h2>Password: <strong>" + password + "</strong></h2>"
+                    + "<p>Information about address and household, as well as password can be changed/ updated once you have logged in.</p>";
+
+        EmailRequest req = new EmailRequest(
+            email,
+            "New account",
+            body,
+            true
+        );
+
+        try {
+            emailService.sendEmail(req);
+        } catch (Exception ex) {
+            throw new RuntimeException("Unable to send new account information", ex);
+        }
+    }
 }

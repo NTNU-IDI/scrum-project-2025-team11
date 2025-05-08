@@ -4,6 +4,7 @@ import { useItemTypeStore } from '@/stores/itemStore';
 import { useHouseholdStore } from '@/stores/householdStore';
 import { ItemService } from '@/api/ItemService';
 import { useInventoryStore } from '@/stores/inventoryStore';
+import { useToast } from 'vue-toast-notification';
 
 /**
  * Store instances
@@ -15,6 +16,7 @@ const householdStore = useHouseholdStore();
 const inventoryStore = useInventoryStore();
 const itemTypeStore = useItemTypeStore();
 
+const $toast = useToast();
 
 /**
 * Property to store the selected item type ID
@@ -35,13 +37,6 @@ const isEditMode = ref(false);
  * @default []
  */
 const list = ref<{ id: number; name: string; quantity: number; unit: string; acquiredDate: string }[]>([]);
-
-/**
- * Property to store the response message
- * @property {string} responseMessage
- * @default ''
- */
-const responseMessage = ref('');
 
 /**
  * Function to load the inventory items
@@ -109,7 +104,6 @@ const chooseItemType = (itemTypeId: any, name: string) => {
 const toggleEditMode = () => {
     itemTypeStore.toggleEditMode();
     isEditMode.value = !isEditMode.value;
-    responseMessage.value = '';
 }
 
 /**
@@ -127,9 +121,18 @@ const deleteItem =  async (itemId: number) => {
 
     for (const item of matchingItems) {
         await inventoryStore.deleteItem(itemId, item.acquiredDate);
+        if(!inventoryStore.inventory.map(item => item.itemId).includes(itemId)) {
+            $toast.success('Vare er slettet fra lageret', {
+            duration: 3000,
+            position: 'top-right'
+        });
+        } else {
+            $toast.error('Feil ved sletting av vare', {
+            duration: 3000,
+            position: 'top-right'
+        });
+        }
     }
-
-    responseMessage.value = `${matchingItems[0].itemName || 'Vare'} er slettet fra lageret`;
     await loadInventory(); 
 }
 </script>
@@ -151,7 +154,6 @@ const deleteItem =  async (itemId: number) => {
     <button :class="['dark-button', { active: isEditMode }]" @click="() => { toggleEditMode(); $emit('hide-new-item-box'); }">
         {{ isEditMode ? 'Ferdig' : 'Endre lager' }}
     </button>
-    <p class="user-response">{{ responseMessage }}</p>
 </template>
 <style scoped>
     .grey-container {

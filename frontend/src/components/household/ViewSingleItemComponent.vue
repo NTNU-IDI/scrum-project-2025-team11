@@ -4,6 +4,7 @@ import { useItemTypeStore } from '@/stores/itemStore';
 import { useHouseholdStore } from '@/stores/householdStore';
 import type { HouseholdItemRequest, EditableItem } from '@/types/Inventory';
 import { useInventoryStore } from '@/stores/inventoryStore';
+import { useToast } from 'vue-toast-notification';
 
 /**
  * Store instances
@@ -14,6 +15,8 @@ import { useInventoryStore } from '@/stores/inventoryStore';
 const householdStore = useHouseholdStore();
 const itemTypeStore = useItemTypeStore();
 const inventoryStore = useInventoryStore();
+
+const $toast = useToast();
 
 /**
  * Property to store the selected item type ID from store
@@ -49,13 +52,6 @@ const allTypeItems = ref<EditableItem[]>([]);
 const isEditMode = computed(() => itemTypeStore.isEditMode);
 
 /**
- * Property to store the response message
- * @property {string} responseMessage
- * @default ''
- */
-const responseMessage = ref('');
-
-/**
  * Function to load the inventory items
  * @returns {Promise<void>}
  */
@@ -63,7 +59,10 @@ const loadItems = async () => {
     await householdStore.fetchHousehold();
     
     if (!householdStore.id) {
-        responseMessage.value = 'Kunne ikke finne husstand';
+        $toast.error('Kunne ikke finne husstand', {
+            duration: 3000,
+            position: 'top-right'
+        });
         return;
     }
     await inventoryStore.fetchInventory();
@@ -94,7 +93,6 @@ watch(itemTypeId, (newId) => {
 watch(isEditMode, (newValue, oldValue) => {
     if (oldValue && !newValue) {
         updateItems();
-        responseMessage.value = '';
     }
 });
 
@@ -132,7 +130,12 @@ const updateItems = async () => {
                 acquiredDate: item.acquiredDate,
             };
             await inventoryStore.updateItem(updatedItem)
-            responseMessage.value = `${item.itemName} er oppdatert`;
+            .then(() => {
+                $toast.success(`${item.itemName} er oppdatert`, {
+                    duration: 3000,
+                    position: 'top-right'
+                });
+            })
             item.dirty = false;
         }
     }
@@ -145,22 +148,34 @@ const updateItems = async () => {
  */
 const deleteItem = async (item: EditableItem) => {
     if (!householdStore.id) {
-        responseMessage.value = 'Kunne ikke finne husstand';
+        $toast.error('Feil ved sletting av vare', {
+            duration: 3000,
+            position: 'top-right'
+        });
         return;
     }
     if (!itemTypeId.value) {
-        responseMessage.value = 'Kunne ikke finne artikkeltype';
+        $toast.error('Feil ved sletting av vare', {
+            duration: 3000,
+            position: 'top-right'
+        });
         return;
     }
     if(confirm('Er du sikker på at du vil slette denne artikkelen?')) {
         await inventoryStore.deleteItem(itemTypeId.value, item.acquiredDate)
         .then( async () => {
-            responseMessage.value = `${item.itemName} er slettet fra lageret`;
+            $toast.success('Vare er slettet var lageret', {
+                duration: 3000,
+                position: 'top-right'
+            });
             items.value = items.value.filter(item => item.itemId !== itemTypeId.value);
             await loadItems();
         })
         .catch(error => {
-            responseMessage.value = `Feil: ${error.message}`;
+            $toast.error('Feil ved sletting av vare'+ error, {
+            duration: 3000,
+            position: 'top-right'
+        });
         });
     }
 }
@@ -201,8 +216,6 @@ const deleteItem = async (item: EditableItem) => {
             </div>
         </div>
     </div>
-
-    <p class="user-response">{{ responseMessage }}</p>
 </template>
 
 <style scoped>

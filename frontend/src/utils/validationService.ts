@@ -92,21 +92,25 @@ export function validateIconType(type: string): boolean {
 
 // Function to validate latitude
 export function validateLatitude(lat: number): boolean {
+  if (!lat) return false;
   return coordinateRegex.test(lat.toString()) && lat >= -90 && lat <= 90;
 }
 
 // Function to validate longitude
 export function validateLongitude(lon: number): boolean {
+  if (!lon) return false;
   return coordinateRegex.test(lon.toString()) && lon >= -180 && lon <= 180;
 }
 
 // Function to validate radius
 export function validateRadius(radius: number): boolean {
-  return coordinateRegex.test(radius.toString()) && radius >= 0;
+  if (!radius) return false;
+  return coordinateRegex.test(radius.toString()) && radius > 0;
 }
 
 // Function to validate severity
 export function validateSeverity(severity: number): boolean {
+  if (!severity) return false;
   return coordinateRegex.test(severity.toString()) && severity >= 0 && severity <= 5;
 }
 
