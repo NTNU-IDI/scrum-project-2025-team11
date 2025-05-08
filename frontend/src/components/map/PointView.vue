@@ -121,6 +121,10 @@ import {
   validateLatitude,
   validateLongitude
 } from '@/utils/validationService';
+import {
+  resolveAddressFromText,
+  resolveAddressFromCoords
+} from '@/utils/geoService';
 
 const pointStore = usePointStore();
 const isEdit = computed(() => props.mode === 'edit');
@@ -208,42 +212,38 @@ async function resolveAddress() {
   if (!address.value.trim()) return;
 
   try {
-    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address.value)}`);
-    const data = await response.json();
+    const result = await resolveAddressFromText(address.value);
 
-    if (data.length > 0) {
-      const newLat = parseFloat(data[0].lat);
-      const newLon = parseFloat(data[0].lon);
-
-      pointData.value.latitude = newLat;
-      pointData.value.longitude = newLon;
+    if (result) {
+      pointData.value.latitude = result.lat;
+      pointData.value.longitude = result.lon;
       addressError.value = '';
-      
-      // Emit event with new coordinates
-      emit('coordinates-updated', { 
-        latitude: newLat,
-        longitude: newLon
+
+      emit('coordinates-updated', {
+        latitude: result.lat,
+        longitude: result.lon
       });
     } else {
       addressError.value = 'Fant ingen koordinater for adressen.';
     }
-  } catch (err) {
-    addressError.value = 'En feil skjedde ved oppslag av adresse.';
+  } catch (err: any) {
+    addressError.value = err.message;
   }
 }
 
 async function resolveCoords(lat: number, lon: number) {
   try {
-    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
-    const data = await response.json();
-    if (data?.display_name) {
-      address.value = data.display_name;
+    const resolvedAddress = await resolveAddressFromCoords(lat, lon);
+
+    if (resolvedAddress) {
+      address.value = resolvedAddress;
+      addressError.value = '';
     } else {
       address.value = '';
       addressError.value = 'Fant ikke adresse for koordinatene.';
     }
-  } catch (err) {
-    addressError.value = 'Feil ved oppslag av adresse.';
+  } catch (err: any) {
+    addressError.value = err.message;
   }
 }
 

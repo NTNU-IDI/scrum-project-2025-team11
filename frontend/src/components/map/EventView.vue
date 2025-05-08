@@ -52,6 +52,7 @@
 <script lang="ts" setup>
 import type { EventResponseDTO } from "@/types/Event";
 import { computed, defineProps, type PropType, ref, watch, defineEmits } from 'vue';
+import { resolveAddressFromCoords } from '@/utils/geoService';
 
 const address = ref('');
 const addressError = ref('');
@@ -77,16 +78,17 @@ watch(
 
 async function resolveCoords(lat: number, lon: number) {
   try {
-    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
-    const data = await response.json();
-    if (data?.display_name) {
-      address.value = data.display_name;
+    const result = await resolveAddressFromCoords(lat, lon);
+
+    if (result) {
+      address.value = result;
+      addressError.value = '';
     } else {
       address.value = '';
       addressError.value = 'Fant ikke adresse for koordinatene.';
     }
-  } catch (err) {
-    addressError.value = 'Feil ved oppslag av adresse.';
+  } catch (err: any) {
+    addressError.value = err.message || 'Feil ved oppslag av adresse.';
   }
 }
 </script>

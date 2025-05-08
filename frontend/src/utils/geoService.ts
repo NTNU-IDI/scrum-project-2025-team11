@@ -33,3 +33,44 @@ export function getEventColor(severity: number) {
     ? "var(--yellow)"
     : "var(--bad-red)";
 }
+
+export async function resolveAddressFromText(
+  address: string
+): Promise<{ lat: number; lon: number } | null> {
+  if (!address.trim()) return null;
+
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+        address
+      )}`
+    );
+    const data = await response.json();
+
+    if (data.length > 0) {
+      return {
+        lat: parseFloat(data[0].lat),
+        lon: parseFloat(data[0].lon),
+      };
+    } else {
+      return null;
+    }
+  } catch (err) {
+    throw new Error("En feil skjedde ved oppslag av adresse.");
+  }
+}
+
+export async function resolveAddressFromCoords(
+  lat: number,
+  lon: number
+): Promise<string | null> {
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+    );
+    const data = await response.json();
+    return data?.display_name || null;
+  } catch (err) {
+    throw new Error("En feil skjedde ved oppslag av koordinater.");
+  }
+}
