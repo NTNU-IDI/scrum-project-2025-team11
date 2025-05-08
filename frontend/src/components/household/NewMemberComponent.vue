@@ -1,26 +1,32 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { validateEmail } from '@/utils/validationService';    
+import { useToast } from 'vue-toast-notification';
+import { useHouseholdStore } from '@/stores/householdStore';
 
+const $toast = useToast();
+const householdStore = useHouseholdStore();
 const email = ref('');
 const errorMsg = ref('');
 
-const emit = defineEmits(['hide-new-member-box']);
+const emit = defineEmits(['hide-new-member-box', 'invite-success']);
 
-const sendInvitationLink = () => {
-    // TODO: send invitation link
-
-    // TODO: make email validation
-    
+const sendInvitationLink = async () => {
     if(!validateEmail(email.value)) {
         errorMsg.value = 'Vennligst skriv inn en gyldig e-postadresse';
-        console.log(errorMsg.value);
-        alert(errorMsg.value);
         return;
     }
-    
-
-    emit('hide-new-member-box');
+    try{
+        await householdStore.inviteMember(email.value.trimEnd())
+        emit('invite-success');
+        email.value = '';
+        errorMsg.value = '';
+    } catch (error) {
+        $toast.error(householdStore.errrMsg || 'Noe gikk galt. Vennligst prøv igjen.', {
+            duration: 3000,
+            position: 'top-right'
+        });
+    }
 }
 
 </script>

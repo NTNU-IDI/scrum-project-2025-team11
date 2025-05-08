@@ -28,19 +28,23 @@ watch(() => adminUserStore.adminUsers, async (newUsers) => {
     }));
 });
 
-const deleteUser = (id: number) => {
-   adminUserStore.deleteUser(id);
-   if(adminUserStore.adminUsers.map(user => user.id).includes(id)) {
-    $toast.error('Kunne ikke slette bruker', {
-        duration: 3000,
-        position: 'top-right'
-    });
-   } else {
-    $toast.success('Bruker slettet', {
-        duration: 3000,
-        position: 'top-right'
-    });
-   }
+const deleteUser = async (id: number) => {
+    if(confirm('Er du sikker på at du vil slette denne adminbrukeren?')) {
+        await adminUserStore.deleteUser(id);
+        if(adminUserStore.adminUsers.map(user => user.id).includes(id)) {
+            if(adminUserStore.errorMsg !== '') {
+                $toast.error(adminUserStore.errorMsg, {
+                    duration: 3000,
+                    position: 'top-right'
+                });
+            }
+        } else {
+            $toast.success('Bruker slettet', {
+                duration: 3000,
+                position: 'top-right'
+            });
+        }
+    }
 };
 </script>
 <template>
