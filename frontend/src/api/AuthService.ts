@@ -100,6 +100,7 @@ export async function refreshToken() {
             userStore.logout()
             alert("Du har blitt logget ut grunnet utgått sesjon.")
             router.push("/")
+            throw new Error("Refresh token failure.")
         });
 }
 
