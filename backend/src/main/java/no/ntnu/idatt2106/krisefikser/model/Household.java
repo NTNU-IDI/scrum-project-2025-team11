@@ -44,8 +44,8 @@ public class Household {
    */
   @Schema(description = "Count of how many people exist in a household", example = "4")
   @JsonProperty("memberCount")
-  @Column(name = "member_count", nullable = false)
-  private Integer memberCount;
+  @Column(name = "member_count")
+  private Integer memberCount = 1;
 
   /**
    * Reference to the address associated with the household.

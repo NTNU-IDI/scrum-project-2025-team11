@@ -2,14 +2,17 @@ import axios from "axios";
 import {useUserStore} from "@/stores/userStore.ts";
 import {useCredentialStore} from "@/stores/credentialStore.ts";
 import {useRouter} from "vue-router";
+import {useToast} from "vue-toast-notification";
 import router from "@/router";
+
+const $toast = useToast()
 
 export async function confirm2fa(code: string) {
     const credentialStore = useCredentialStore()
     const userStore = useUserStore()
     if (credentialStore.username === '' || credentialStore.password === '') {
-        alert("Nettsiden støtte på et problem med to-faktor-autentiseringen. Vennligst forsøk å logge inn på nytt.")
         router.push("/login")
+        let instance = $toast.error("Nettsiden støtte på et problem med to-faktor-autentiseringen. Vennligst forsøk å logge inn på nytt.")
         return
     }
 
@@ -29,9 +32,9 @@ export async function confirm2fa(code: string) {
             router.push("/")
         })
         .catch((error) => {
-            alert("Noe gikk galt under autentiseringen. Vennligst forsøk å logge inn på nytt.")
             userStore.logout()
             router.push("/login")
+            let instance = $toast.error("Noe gikk galt under autentiseringen. Vennligst forsøk å logge inn på nytt.")
         })
 }
 
@@ -51,12 +54,12 @@ export async function login(username: string, password: string) {
         })
         .catch((error) => {
             if (error.status === 400) {
-                alert("Kunne ikke logge inn med gitt brukernavn og passord. " +
+                let instance = $toast.error("Kunne ikke logge inn med gitt brukernavn og passord. " +
                     "Forsikre deg om at de er riktige og prøv igjen.")
             } else if (error.status === 500) {
-                alert("Serveren møtte på et uventet problem. Vennligst vent og prøv igjen senere.")
+                let instance = $toast.error("Serveren møtte på et uventet problem. Vennligst vent og prøv igjen senere.")
             } else {
-                alert("Noe uventet har oppstått. Vennligst vent og prøv igjen senere.")
+                let instance = $toast.error("Noe uventet har oppstått. Vennligst vent og prøv igjen senere.")
             }
         });
 }
@@ -81,9 +84,9 @@ export async function registerNormalUser(firstName: string, lastName: string, us
         })
         .catch((error) => {
             if (error.status === 409) {
-                alert("Brukernavn eller epost allrede i bruk. Vennligst prøv noe annet.")
+                let instance = $toast.error("Brukernavn eller epost allrede i bruk. Vennligst prøv noe annet.")
             } else {
-                alert("Noe uventet har oppstått. Vennligst vent og prøv igjen senere.")
+                let instance = $toast.error("Noe uventet har oppstått. Vennligst vent og prøv igjen senere.")
             }
         });
 }
@@ -98,8 +101,8 @@ export async function refreshToken() {
         })
         .catch(() =>{
             userStore.logout()
-            alert("Du har blitt logget ut grunnet utgått sesjon.")
             router.push("/")
+            let instance = $toast.error("Du har blitt logget ut grunnet utgått sesjon.")
             throw new Error("Refresh token failure.")
         });
 }

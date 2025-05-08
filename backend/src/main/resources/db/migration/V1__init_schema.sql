@@ -39,7 +39,7 @@ CREATE TABLE ADDRESS (
 CREATE TABLE HOUSEHOLD (
   id            INT PRIMARY KEY AUTO_INCREMENT,
   name          VARCHAR(255) NOT NULL,
-  member_count  INT          NOT NULL,
+  member_count  INT          DEFAULT 1,
   address_id    INT,
   CONSTRAINT FK_HH_ADDR FOREIGN KEY (address_id) REFERENCES ADDRESS(id)
 );
