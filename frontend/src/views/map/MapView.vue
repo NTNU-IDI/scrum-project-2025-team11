@@ -71,6 +71,7 @@ const viewingNearest = ref(false);
 const isNavigating = ref(false); 
 const iconsOverviewRef = ref();
 const isEditMode = ref(false);
+const userLocationFetched = ref(false);
 const selectedPoint = ref<PointOfInterest>({
   id: 0,
   name: '',
@@ -90,6 +91,8 @@ let map: L.Map;
 let temporaryMarker: L.Marker | null = null;
 let markers: L.Marker[] = [];
 let eventLayers: L.Circle[] = [];
+let userLat: number | null = null;
+let userLon: number | null = null;
 
 declare global {
   interface Window {
@@ -116,6 +119,7 @@ onMounted(async () => {
   });
   watch(activeEvents, () => {
     addEvents(map);
+    updateCrisisAlertVisibility();
   });
 
   // Get user location and set marker
@@ -160,6 +164,7 @@ const mapClickHandler = (e: L.LeafletMouseEvent) => {
 };
 
 watch(isEditMode, (newValue) => {
+  updateCrisisAlertVisibility();
   if (role.value === 'admin') {
     if (newValue) {
       map.on('click', mapClickHandler);
@@ -226,14 +231,15 @@ function updateMarkerPosition(coords: { latitude: number, longitude: number }) {
   selectedPoint.value.longitude = coords.longitude;
 }
 
-function getUserPosition(callback: (lat: number, lon: number) => void) {
-  if (!navigator.geolocation) return;
+function getUserPosition(callback: (lat: number, lon: number) => void, force: boolean = false) {
+  if (!navigator.geolocation || (userLocationFetched.value && !force)) return;
 
   navigator.geolocation.getCurrentPosition(
     (pos) => {
-      callback(pos.coords.latitude, pos.coords.longitude);
-      const userLat = pos.coords.latitude;
-      const userLon = pos.coords.longitude;
+      userLat = pos.coords.latitude;
+      userLon = pos.coords.longitude;
+      userLocationFetched.value = true;
+      callback(userLat, userLon);
 
       L.marker([userLat, userLon], { icon: userIcon })
         .addTo(map)
@@ -241,15 +247,27 @@ function getUserPosition(callback: (lat: number, lon: number) => void) {
         .openPopup();
 
       map.setView([userLat, userLon], 13);
-      checkIfInCrisisArea(userLat, userLon);
     },
     (err) => console.error("Error getting location: ", err)
   );
 }
 
+function isInCrisisArea(lat: number, lon: number): boolean {
+  return activeEvents.value.some(event => 
+    calculateDistance(lat, lon, event.latitude, event.longitude) <= event.radius
+  );
+}
+
+function updateCrisisAlertVisibility() {
+  if (userLat !== null && userLon !== null) {
+    showCrisisAlert.value = isInCrisisArea(userLat, userLon) && !isEditMode.value;
+  }
+}
+
+
 function checkIfInCrisisArea(userLatitude: number, userLongitude: number) {
   showCrisisAlert.value = false;
-  eventStore.activeEvents.forEach(event => {
+  activeEvents.value.forEach(event => {
     const distance = calculateDistance(userLatitude, userLongitude, event.latitude, event.longitude);
     
     if (distance <= event.radius) {
@@ -260,7 +278,7 @@ function checkIfInCrisisArea(userLatitude: number, userLongitude: number) {
 
 function addEvents(map: L.Map) {
   clearEventLayers();
-  eventStore.activeEvents.forEach(event => {
+  activeEvents.value.forEach(event => {
     const color = getEventColor(event.severity);
     const circle = L.circle([event.latitude, event.longitude], {
       color,
@@ -310,6 +328,7 @@ function clearRouting() {
 
 async function findNearestShelter() {
   isEditMode.value = false;
+  getUserPosition(() => {}, true);
   if (!pointStore.selectedIcons.includes('shelter')) {
     iconsOverviewRef.value?.forceIncludeShelter();
     pointStore.updateSelectedIcons([...pointStore.selectedIcons, 'shelter']);
@@ -343,11 +362,12 @@ function toggleEditMode() {
   isEditMode.value = !isEditMode.value;
 
   if (isEditMode.value) {
-    $toast.info('Redigeringsmodus aktivert. Klikk på et sted for å opprette et punkt, eller klikk på et eksisterende punkt for å redigere det.');
+    $toast.info('Redigeringsmodus aktivert. Klikk på et sted for å opprette et punkt, eller klikk på et eksisterende punkt for å redigere det.', { duration: 7000 });
     clearEventLayers();
     eventStore.stopPollingActiveEvents();
+    
   } else {
-    $toast.info('Redigeringsmodus deaktivert. Du er nå i visningsmodus.');
+    $toast.info('Redigeringsmodus deaktivert. Du er nå i visningsmodus.', { duration: 5000 });
     eventStore.startPollingActiveEvents();
     removeTempMarker();
     addEvents(map);

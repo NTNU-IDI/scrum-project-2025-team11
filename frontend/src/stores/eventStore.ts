@@ -32,8 +32,7 @@ export const useEventStore = defineStore("events", {
     async fetchActiveEvents() {
       try {
         const data = await EventService.findActive();
-        this.activeEvents = data;
-        return this.activeEvents;
+        this.activeEvents = Array.isArray(data) ? data : [];
       } catch (error) {
         console.error("Error fetching active events:", error);
         this.activeEvents = [];
