@@ -76,7 +76,6 @@ class HouseholdControllerIntegrationTest {
 
         HouseholdRequestDTO householdRequestDTO = new HouseholdRequestDTO();
         householdRequestDTO.setName("Integration Home");
-        householdRequestDTO.setMemberCount(4);
         householdRequestDTO.setAddress(addressDTO);
 
         // Create Household
@@ -86,7 +85,6 @@ class HouseholdControllerIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.name").value("Integration Home"))
-                .andExpect(jsonPath("$.memberCount").value(4))
                 .andReturn().getResponse().getContentAsString();
 
         // Extract household ID
@@ -102,7 +100,7 @@ class HouseholdControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(hhid))
                 .andExpect(jsonPath("$.name").value("Integration Home"))
-                .andExpect(jsonPath("$.memberCount").value(4));
+                .andExpect(jsonPath("$.memberCount").value(1));
 
         // Verify in database
         Household householdInDb = householdRepository.findById(hhid).orElse(null);
@@ -113,36 +111,34 @@ class HouseholdControllerIntegrationTest {
     @Test
     @WithMockUser(username = "erling-b")
     void testUpdateHousehold() throws Exception {
-      // --- 1) Preload an existing household in DB ---
+      // Preload an existing household in DB 
       Household initial = new Household();
       initial.setName("Original Home");
-      initial.setMemberCount(2);
       initial = householdRepository.save(initial);
   
-      // --- 2) Create user “bob” → that household ---
+      // Create user “bob” → that household
       testUser.setHousehold(initial);
       userRepository.save(testUser);
   
-      // --- 3) Build the JSON update payload ---
+      // Build the JSON update payload
       String updateJson = """
         {
-          "name": "Updated Home",
-          "memberCount": 5
+          "name": "Updated Home"
         }
       """;
   
-      // --- 4) PUT /api/household/update  (no {id}) ---
+      // PUT /api/household/update  (no {id}) 
       mockMvc.perform(put("/api/household/update")
                      .contentType(MediaType.APPLICATION_JSON)
                      .content(updateJson))
              .andExpect(status().isOk())
              .andExpect(jsonPath("$.id").value(initial.getId()))
              .andExpect(jsonPath("$.name").value("Updated Home"))
-             .andExpect(jsonPath("$.memberCount").value(5));
+             .andExpect(jsonPath("$.memberCount").value(1));
   
       // verify in the DB 
       Household updated = householdRepository.findById(initial.getId()).orElseThrow();
       assertThat(updated.getName()).isEqualTo("Updated Home");
-      assertThat(updated.getMemberCount()).isEqualTo(5);
+      assertThat(updated.getMemberCount()).isEqualTo(1);
     }
 }

@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import no.ntnu.idatt2106.krisefikser.mapper.HouseholdMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -105,12 +104,8 @@ public class HouseholdController {
         String username = authentication.getName();
         User user = userService.getUserByUsername(username).orElse(null);
         int hhId = user.getHouseholdId();
-        Household household = householdService.findById(hhId).orElse(null);
-        if (household == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(HouseholdMapper.toResponseDTO(household));
-        }
+        HouseholdResponseDTO household = householdService.getHouseholdWithMembers(hhId);
+        return ResponseEntity.ok(household);
     }
 
     /* TODO add maybe on delete cascade so that it is possible to delete entries
@@ -189,10 +184,10 @@ public class HouseholdController {
     })
     @GetMapping("/inviteCode")
     public ResponseEntity<HouseholdResponseDTO> getHouseholdByInviteCode(@RequestParam String inviteCode) {
-        Household household = householdInviteCodeService.consumeInviteCode(inviteCode);
+        HouseholdResponseDTO household = householdInviteCodeService.consumeInviteCode(inviteCode);
         if (household == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(HouseholdMapper.toResponseDTO(household));
+        return ResponseEntity.ok(household);
     }
 }

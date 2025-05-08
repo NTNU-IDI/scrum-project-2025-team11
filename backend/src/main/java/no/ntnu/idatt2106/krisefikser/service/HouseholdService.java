@@ -3,11 +3,15 @@ package no.ntnu.idatt2106.krisefikser.service;
 import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.mapper.HouseholdMapper;
 import no.ntnu.idatt2106.krisefikser.repository.HouseholdRepository;
+import no.ntnu.idatt2106.krisefikser.repository.UserRepository;
 import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdResponseDTO;
 import no.ntnu.idatt2106.krisefikser.dto.HouseholdUpdateDTO;
+import no.ntnu.idatt2106.krisefikser.exceptionhandler.ResourceNotFoundException;
 import no.ntnu.idatt2106.krisefikser.model.Household;
+import no.ntnu.idatt2106.krisefikser.model.User;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,6 +30,7 @@ public class HouseholdService {
      */
     private final HouseholdRepository householdRepository;
     private final AddressService addressService;
+    private final UserRepository userRepository;
 
     public Optional<Household> findById(int id) {
         return householdRepository.findById(id);
@@ -40,7 +45,7 @@ public class HouseholdService {
      * @throws RuntimeException if the household with the given ID is not found.
      */
     public HouseholdResponseDTO updateHousehold(int id, HouseholdUpdateDTO newHousehold) {
-        Household currentHousehold = householdRepository.findById(id).orElseThrow(() -> new RuntimeException("Household id not found"));
+        Household currentHousehold = householdRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Household", "id", id));
         if (newHousehold.getMemberCount() != 0) {
             currentHousehold.setMemberCount(newHousehold.getMemberCount());
         }
@@ -48,7 +53,7 @@ public class HouseholdService {
             currentHousehold.setName(newHousehold.getName());
         }
         Household updatedHousehold = householdRepository.save(currentHousehold);
-        return HouseholdMapper.toResponseDTO(updatedHousehold);
+        return HouseholdMapper.toResponseDTO(updatedHousehold, userRepository.findByHousehold_Id(updatedHousehold.getId()));
     }
 
     /**
@@ -62,9 +67,6 @@ public class HouseholdService {
         if (newHousehold.getName() == null) {
             throw new IllegalArgumentException("Name is missing");
         }
-        if (newHousehold.getMemberCount() == 0) {
-            throw new IllegalArgumentException("Member count is missing");
-        }
         if (newHousehold.getAddress() == null) {
             throw new IllegalArgumentException("Invalid address format, make sure to fill all fields");
         }
@@ -73,7 +75,8 @@ public class HouseholdService {
         household.setMemberCount(newHousehold.getMemberCount());
         household.setAddress(addressService.findById(addressResponseDTO.getId()).orElseThrow(() -> new RuntimeException("Address id not found")));
         Household savedHousehold = householdRepository.save(household);
-        return HouseholdMapper.toResponseDTO(savedHousehold);
+        List<User> members = userRepository.findByHousehold_Id(savedHousehold.getId());
+        return HouseholdMapper.toResponseDTO(savedHousehold, members);
     }
 
     /**
@@ -95,10 +98,20 @@ public class HouseholdService {
         householdRepository.deleteById(id);
     }
 
+    public HouseholdResponseDTO getHouseholdWithMembers(int householdId) {
+        Household household = householdRepository.findById(householdId)
+                .orElseThrow(() -> new ResourceNotFoundException("Household", "id", householdId));
+        List<User> members = userRepository.findByHousehold_Id(householdId);
+        return HouseholdMapper.toResponseDTO(household, members);
+    }
+
     public List<HouseholdResponseDTO> findAll() {
         return householdRepository.findAll()
                 .stream()
-                .map(HouseholdMapper::toResponseDTO)
+                .map(household -> {
+                    List<User> members = userRepository.findByHousehold_Id(household.getId());
+                    return HouseholdMapper.toResponseDTO(household, members);
+                })
                 .toList();
     }
 }
