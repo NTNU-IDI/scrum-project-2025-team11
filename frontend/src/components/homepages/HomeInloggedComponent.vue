@@ -1,0 +1,48 @@
+<template>  
+  <main class="main-content">
+    <div class="info-header">
+      <h1>Min beredskap</h1>
+      <p>Her kan du sjekke din beredskap.</p>
+    </div>
+
+    <div class="grid-container">
+      <router-link to="/household" class="box registered">
+        <h3>Husstand og Beredskapslager</h3>
+        <p>Se oversikt over medlemmene i husstanden din, og sjekk om du har nok forsyninger til en krise.</p>
+      </router-link>
+    </div>
+
+    <PreparednessComponent />
+
+    <div class="info-header">
+      <h1>Våre tjenester</h1>
+      <p>Nedenfor finner du en oversikt over de ulike tjenestene vi tilbyr.</p>
+    </div>
+
+    <div class="grid-container">
+      
+      <div class="box info">
+        <h3>Om kartet</h3>
+        <p>Her er ulike tjenester du kan finne på kartet</p>
+        <br><p><i class="fa fa-check-square" aria-hidden="true"></i> Finne helsetjenester og medisinsk hjelp.</p>
+        <br><p><i class="fa fa-check-square" aria-hidden="true"></i> Finne møtesteder under en krise.</p>
+        <br><p><i class="fa fa-check-square" aria-hidden="true"></i> Finne tilfluktsrom i nærheten.</p>
+        <br><a href="/map" class="button login"><i class="fa fa-map" aria-hidden="true"></i> Til kartet</a> 
+      </div>
+
+      <div class="box info">
+        <h3>Husstand og Beredskapslager</h3>
+        <p>Her er ulike tjenester du kan finne om Husstand og Beredskapslager:</p>
+        <br><p><i class="fa fa-check-square"></i> Se oversikt over medlemmene i husstanden din.</p>
+        <br><p><i class="fa fa-check-square"></i> Sjekk om du har nok forsyninger til en krise.</p>
+        <br><p><i class="fa fa-check-square"></i> Invitere andre inn i husstanden din.</p>
+        <br><a href="/household" class="button login"><i class="fa fa-gear"></i> Til Husstand og Beredskapslager</a> 
+      </div>
+
+    </div>
+  </main>
+</template>
+
+<script lang="ts" setup>
+import PreparednessComponent from '../PreparednessComponent.vue'
+</script>

@@ -1,4 +1,5 @@
 @import "./base.css";
+@import url('@/assets/icons/font-awesome-4.7.0/css/font-awesome.min.css');
 
 body {
   font-family: "Inter", sans-serif;
@@ -306,8 +307,7 @@ button:disabled:hover {
 .info-header {
   background-color: #ffffff;
   color: var(--darkest-blue);
-  padding: 24px;
-  border-radius: 8px;
+  padding: 2px;
   margin: 40px 125px 20px 125px;
   text-align: center;
 }
@@ -366,6 +366,23 @@ button:disabled:hover {
   cursor: pointer;
 }
 
+.box.info {
+  background-color: var(--light-blue);
+  border: 2px solid var(--light-blue);
+  color: white;
+}
+.box.info h3 {
+  text-transform: uppercase;
+}
+.box.info:hover { 
+  background-color: var(--light-blue);
+  border: 2px solid var(--light-blue);
+  color: white;
+  transform: scale(1);
+  cursor: default;
+  pointer-events: none;
+}
+
 /* Boks som ikke skal kunne trykkes på */
 .box.unavailable {
   background-color: var(--lightest-blue);
@@ -420,7 +437,9 @@ button:disabled:hover {
 .header {
   background-color: var(--dark-blue);
   color: white;
-  padding: 16px;
+  padding: 1px;
+  box-shadow: inset 0 4px 10px rgba(1, 0, 0, 1.5);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
 }
 
 .header-container {

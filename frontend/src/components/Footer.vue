@@ -1,24 +1,15 @@
 <template>
   <footer class="footer">
     <div class="footer-content">
-      <h1>Andre tjenester</h1>
-
-      <div class="footer-links">
-        |
-        <a href="/about">Om oss </a> |
-        <a href="/privacy">Personvern</a> |
-        <a href="/contact">Kontakt oss</a> |
-        <a href="/userhome">User home (for testing)</a> |
-        <a href="/admin">Admin (for testing)</a> |
-        <a href="/auth">Auth (for testing)</a> |
-        <a href="/superadmin">Admin (for testing)</a> |
-        <a href="/forgot">Forgot (for testing)</a> |
-        <a href="/reset">Reset (for testing)</a>
-        <br />
-        <br />
-        <br />
-        <br />
-      </div>
+      <h2>Andre tjenester</h2>
+      <nav class="footer-links" aria-label="Nyttige lenker">
+        <a href="/personvern"><i class="fa fa-lock" aria-hidden="true"></i> Personvern</a>
+        <a href="/userhome">User home (for testing)</a>
+        <a href="/admin">Admin (for testing)</a>
+        <a href="/superadmin">Superadmin (for testing)</a>
+        <br>
+        <br>
+      </nav>
     </div>
   </footer>
 </template>
