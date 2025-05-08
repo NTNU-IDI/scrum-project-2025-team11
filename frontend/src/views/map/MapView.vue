@@ -1,6 +1,6 @@
 <template>
   <div class="layout-map-page">
-    <Header />
+    <HeaderBase />
     <div class="map-page">
       <div v-if="showCrisisAlert" class="crisis-alert">
         <p><strong>Viktig melding:</strong> Du er i et kriseområde!</p>
@@ -43,7 +43,7 @@
 
 <script setup lang="ts">
 import Footer from '@/components/Footer.vue';
-import Header from '@/components/Header.vue';
+import HeaderBase from '@/components/HeaderBase.vue';
 import EventsOverview from '../../components/map/EventsOverview.vue';
 import IconsOverview from '../../components/map/IconsOverview.vue';
 import PointView from '../../components/map/PointView.vue';
