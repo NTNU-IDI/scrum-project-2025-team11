@@ -93,7 +93,6 @@ export async function registerNormalUser(firstName: string, lastName: string, us
 
 export async function refreshToken() {
     const userStore = useUserStore()
-    const router = useRouter()
 
     await axios.post("http://localhost:8080/auth/refresh", {},{withCredentials: true})
         .then((response) => {
@@ -109,7 +108,6 @@ export async function refreshToken() {
 
 export function logOutUser() {
     const userStore = useUserStore()
-    const router = useRouter()
 
     userStore.logout()
     router.push("/")
