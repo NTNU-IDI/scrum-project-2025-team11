@@ -27,7 +27,10 @@ export const useEventStore = defineStore("events", {
       this.lat = lat;
       this.lng = lng;
     },
-    // TODO: In admin view: watch for this trigger, and call clearTriggerNewItem
+    clearCoordinates() {
+      this.lat = null;
+      this.lng = null;
+    },
     triggerNewEvent() {
       this.openNewEvent = true;
     },

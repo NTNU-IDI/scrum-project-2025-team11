@@ -178,8 +178,8 @@ function handleAddPoint() {
 function handleAddEvent() {
   showSelectType.value = false;
   eventStore.setCoordinates(selectedPoint.value.latitude, selectedPoint.value.longitude);
+  eventStore.triggerNewEvent();
   router.push('/admin');
-  // TODO: Navigate to admin view and click on new event button and prefill lat and lng
 }
 
 watch(isEditMode, (newValue) => {

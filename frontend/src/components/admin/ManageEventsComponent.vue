@@ -9,6 +9,7 @@ import { useToast } from 'vue-toast-notification';
 const showNewEventBox = ref(false);
 const toggleNewEventBox = () => {
     showNewEventBox.value = !showNewEventBox.value;
+    eventStore.clearTriggerNewEvent();
 }
 
 const showSingleEventBox = ref(false);
@@ -30,6 +31,11 @@ const newEvent = () => {
     });
 
 }
+const closeNewEventBox = () => {
+    showNewEventBox.value = false;
+    eventStore.clearTriggerNewEvent();
+    eventStore.clearCoordinates();
+};
 watch(() => eventStore.chosenEvent, (newEvent) => {
     if (newEvent && newEvent.id !==  undefined) {
         showSingleEventBox.value = true;
@@ -51,10 +57,12 @@ watch(() => eventStore.chosenEvent, (newEvent) => {
         <ViewEventsComponent @event-selected="chooseEventId"/>
         <EditEventComponent v-if="showSingleEventBox" @hide-edit-box="showSingleEventBox = false"/>
 
-        <div class="modal-overlay" v-if="showNewEventBox" @click.self="showNewEventBox = false">
+        <div class="modal-overlay" v-if="showNewEventBox || eventStore.openNewEvent" @click.self="showNewEventBox = false">
             <NewEventComponent
-            @close="showNewEventBox = false"
-            @hide-new-event-box="showNewEventBox = false"
+            :lat="eventStore.lat"
+            :lng="eventStore.lng"
+            @close="closeNewEventBox"
+            @hide-new-event-box="closeNewEventBox"
             @new-event-success="newEvent"
             />
         </div>

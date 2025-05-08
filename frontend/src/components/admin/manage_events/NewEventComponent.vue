@@ -5,12 +5,17 @@ import { validateLatitude, validateLongitude, validatePointDescription, validate
 import { useEventStore } from '@/stores/eventStore';
 import { severityLevels } from '@/utils/values';
 
+const props = defineProps<{
+  lat: number | null;
+  lng: number | null;
+}>();
+
 // Props
 const name = ref('');
 const severity = ref();
 const radius = ref();
-const latitude = ref();
-const longitude = ref();
+const latitude = ref(props.lat ?? '');
+const longitude = ref(props.lng ?? '');
 const description = ref('');
 const startTime = ref();
 const endTime = ref();
@@ -34,11 +39,11 @@ const validateEvent = () => {
         errorMsg.value = ('Radius må fylles ut');
         return false;
     }
-    if (!validateLatitude(latitude.value)) {
+    if (!validateLatitude(Number(latitude.value))) {
         errorMsg.value = ('Lengdegrad må fylles ut');
         return false;
     }
-    if (!validateLongitude(longitude.value)) {
+    if (!validateLongitude(Number(longitude.value))) {
         errorMsg.value = ('Breddegrad må fylles ut');
         return false;
     }
@@ -69,8 +74,8 @@ const addEvent = () => {
             iconType: selectedIcon.value,
             startTime: startTime.value + ':00',
             endTime: endTime.value + ':00',
-            latitude: latitude.value,
-            longitude: longitude.value,
+            latitude: Number(latitude.value),
+            longitude: Number(longitude.value),
             severity: severity.value,
             radius: radius.value,
         });
@@ -80,8 +85,8 @@ const addEvent = () => {
             description: description.value,
             iconType: selectedIcon.value,
             startTime: startTime.value + ':00',
-            latitude: latitude.value,
-            longitude: longitude.value,
+            latitude: Number(latitude.value),
+            longitude: Number(longitude.value),
             severity: severity.value,
             radius: radius.value,
         });
