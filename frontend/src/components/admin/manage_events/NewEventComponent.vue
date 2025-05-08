@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
-import { eventIcons } from '@/utils/icons';
+import { eventIcons } from '@/utils/values';
 import { validateLatitude, validateLongitude, validatePointDescription, validatePointName, validateRadius, validateSeverity } from '@/utils/validationService';
 import { useEventStore } from '@/stores/eventStore';
+import { severityLevels } from '@/utils/values';
 
 // Props
 const name = ref('');
@@ -17,7 +18,6 @@ const selectedIcon = ref('none');
 const emit = defineEmits(['hide-new-event-box', 'new-event-success']);
 const icons = eventIcons;
 const eventStore = useEventStore();
-const severityLevels = [0, 1, 2, 3, 4, 5];
 const errorMsg = ref('');
 
 const validateEvent = () => {

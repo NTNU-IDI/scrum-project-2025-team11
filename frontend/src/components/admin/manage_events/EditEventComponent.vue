@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import { useEventStore } from '@/stores/eventStore';
 import { onMounted, ref, watch } from 'vue';
-import { eventIcons } from '@/utils/icons';
+import { eventIcons } from '@/utils/values';
 import { formatDate, formatDateForInput } from '@/utils/formatDate';
 import { validateIconType, validateLatitude, validateLongitude, validatePointDescription, validateRadius, validateSeverity } from '@/utils/validationService';
 import { useToast } from 'vue-toast-notification';
+import { severityLevels } from '@/utils/values';
 
 // Store imports
 const eventStore = useEventStore();
@@ -27,7 +28,6 @@ const localEvent = ref({
 const isEventDirty = ref(false);
 const selectedIcon = ref('none');
 const icons = eventIcons;
-const severityLevels = [0, 1, 2, 3, 4, 5];
 const errorMsg = ref('');
 
 // Load events from store

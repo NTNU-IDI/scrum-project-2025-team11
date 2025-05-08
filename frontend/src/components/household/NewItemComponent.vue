@@ -5,6 +5,8 @@ import { ItemService } from '@/api/ItemService';
 import type { Item } from '@/types/Item';
 import { useHouseholdStore } from '@/stores/householdStore';
 import { useInventoryStore } from '@/stores/inventoryStore';
+import { unitTypes } from '@/utils/values';
+import { useToast } from 'vue-toast-notification';
 
 /**
  * Store instances
@@ -14,6 +16,8 @@ import { useInventoryStore } from '@/stores/inventoryStore';
 const householdStore = useHouseholdStore();
 const inventoryStore = useInventoryStore();
 
+const $toast = useToast();
+
 /**
  * Property to store the list of existing item types
  * @property {Array} existingTypes
@@ -22,11 +26,18 @@ const inventoryStore = useInventoryStore();
 const existingTypes = ref<Item[]>([])
 
 /**
- * Property to define if the dropdown is shown
+ * Property to define if the type dropdown is shown
  * @property {boolean} isEditMode
  * @default false
  */
 const showDropdown = ref(false);
+
+/**
+ * Property to define if the unit dropdown is shown
+ * @property {boolean} isEditMode
+ * @default false
+ */
+ const showUnitDropdown = ref(false);
 
 /**
  * Property to store the new item values
@@ -51,7 +62,7 @@ const errorMsg = ref('');
  * Property to define emits
  * @property {function} emit
  */
-const emit = defineEmits(['hide-new-item-box']);
+const emit = defineEmits(['hide-new-item-box', 'new-item-success']);
 
 // Fetch existing item types when the component is mounted
 onMounted(async () => {
@@ -124,10 +135,17 @@ const addItem = async () => {
         return;
     }
 
-    await inventoryStore.upsertItem(newHouseholdItem);
-    errorMsg.value = `${newHouseholdItem.name} er lagt til i lageret`;
-    emit('hide-new-item-box');
+    try{
+        await inventoryStore.upsertItem(newHouseholdItem);
+        emit('new-item-success');
+    } catch (error) {
+        $toast.error('Feil ved opprettelse av artikkel!', {
+            duration: 3000,
+            position: 'top-right'
+        });
+    }
 }
+    
 
 // Select type from dropdown
 const selectOption = (itemName: string) => {
@@ -135,7 +153,7 @@ const selectOption = (itemName: string) => {
     showDropdown.value = false;
 }
 
-// Add option to dropdown
+// Add option to type dropdown
 const addItemOption = async (newName: string) => {
     if (!newName) {
         return;
@@ -147,10 +165,17 @@ const addItemOption = async (newName: string) => {
     }
 }
 
+// Select unit from dropdown
+const selectUnitOption = (itemName: string) => {
+    newUnit.value = itemName;
+    showUnitDropdown.value = false;
+}
+
 // Handle enter keydown event
 const handleKeydown = (event: KeyboardEvent, name: string) => {
   if (event.key === 'Enter') {
     addItemOption(name);
+    showUnitDropdown.value = false;
   }
 };
 
@@ -166,9 +191,11 @@ const handleKeydown = (event: KeyboardEvent, name: string) => {
         <div class="item-input">
             <p>{{errorMsg}}</p>
             <div class="type-container"> 
-                <input placeholder="*Velg eksisterende eller ny vare..." class="edit-input"
+                <label for="type-input" class="grey-text">Vare:</label>
+                <input placeholder="f.eks. Hermetiske tomater" class="edit-input"
                     v-model="newName"
                     type="text"
+                    id="type-input"
                     @focus="showDropdown = true"
                     @keydown="handleKeydown($event, newName)"
                 />                           
@@ -185,14 +212,39 @@ const handleKeydown = (event: KeyboardEvent, name: string) => {
             </div>
 
             <div class="quantity-container">
-                <input type="number" class="edit-input" placeholder="*Mengde"
-                    min="0" 
-                    step="1" 
-                    aria-label="Quantity" 
-                    v-model="newQuantity"
-                />
-                <input type="text" class="edit-input" placeholder="*Enhet" v-model="newUnit" />
+                <div class="quantity-label">
+                    <label for="number-input" class="grey-text">Antall:</label>
+                    <input type="number" class="edit-input" placeholder="f.eks. 10"
+                        min="0" 
+                        step="1" 
+                        aria-label="Quantity" 
+                        id="number-input"
+                        v-model="newQuantity"
+                    />
+                </div>
+                
+                <div class="type-container">
+                    <label for="unit-input" class="grey-text">Måleenhet:</label>
+                    <input placeholder="f.eks. kg" class="edit-input"
+                        v-model="newUnit"
+                        type="text"
+                        id="unit-input"
+                        @focus="showUnitDropdown = true"
+                        @keydown="handleKeydown($event, newUnit)"
+                    />      
+                    <ul v-if="showUnitDropdown" class="dropdown-list">
+                        <li
+                            v-for="type in unitTypes"
+                            :key="type"
+                            @click="selectUnitOption(type)"
+                            class="dropdown-item"
+                        >
+                            {{ type }}
+                        </li>
+                    </ul>
+                </div>
             </div>
+
             <label for="date-input" class="grey-text">Utløpsdato:</label>
             <input type="date" class="edit-input" v-model="newExpirationDate" />
         </div>
@@ -226,6 +278,10 @@ const handleKeydown = (event: KeyboardEvent, name: string) => {
         margin-right: 1rem;
     }
 
+    #unit-input {
+        width: 10rem;
+    }
+
     .type-container {
         position: relative; 
     }
@@ -233,10 +289,11 @@ const handleKeydown = (event: KeyboardEvent, name: string) => {
     .dropdown-list {
         position: absolute;
         top: 100%; /* Directly below the input */
-        top: 2rem;
+        top: 3.2rem;
         left: 0;
         right: 0;
         max-height: 200px;
+        width: 10rem;
         overflow-y: auto;
         background: white;
         border-radius: 0.25rem;
@@ -272,7 +329,7 @@ const handleKeydown = (event: KeyboardEvent, name: string) => {
     .dark-button {
         width: 10rem; 
         height: 3rem; 
-        background-color: var(--orange);
+        background-color: var(--good-green);
     }
 
     .cancel-button {
