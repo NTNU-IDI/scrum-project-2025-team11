@@ -33,6 +33,11 @@
           @close-point-view="closePointForm"
           :show-next-button="viewingNearest && nearestShelters.length > 1"        
         />
+        <EventView 
+          v-if="showEventView" 
+          :event="selectedEvent" 
+          @close="closeEventView" 
+        />
       </div>
 
       <div id="map" class="map"></div>
@@ -48,6 +53,7 @@ import EventsOverview from '../../components/map/EventsOverview.vue';
 import IconsOverview from '../../components/map/IconsOverview.vue';
 import PointView from '../../components/map/PointView.vue';
 import SelectType from '../../components/map/SelectType.vue';
+import EventView from '../../components/map/EventView.vue';
 import L from 'leaflet';
 import 'leaflet-routing-machine';
 import 'leaflet/dist/leaflet.css';
@@ -55,6 +61,7 @@ import userMarkerIcon from '@/assets/ikon/user-maker.svg';
 import { usePointStore } from '@/stores/pointStore';
 import { useUserStore } from "@/stores/userStore.ts";
 import type { PointOfInterest } from "@/types/PointOfInterest";
+import type { EventResponseDTO } from "@/types/Event";
 import { calculateDistance, getEventColor } from '@/utils/geoService';
 import { storeToRefs } from "pinia";
 import { onUnmounted, onMounted, ref, watch } from 'vue';
@@ -82,6 +89,19 @@ const isEditMode = ref(false);
 const userLocationFetched = ref(false);
 const showSelectType = ref(false);
 const showNearestShelterButton = ref(true);
+const showEventView = ref(false);
+const selectedEvent = ref<EventResponseDTO>({
+  id: 0,
+  name: '',
+  description: '',
+  iconType: '',
+  startTime: '',
+  endTime: '',
+  latitude: 0,
+  longitude: 0,
+  radius: 0,
+  severity: 0,
+});
 const selectedPoint = ref<PointOfInterest>({
   id: 0,
   name: '',
@@ -134,7 +154,6 @@ onMounted(async () => {
 
   // Get user location and set marker
   getUserPosition((lat, lon) => {
-    map.setView([lat, lon], 13);
     checkIfInCrisisArea(lat, lon);
   });
 });
@@ -149,6 +168,7 @@ onUnmounted(() => {
 function showPointView(mode: 'view' | 'edit' | 'create', point: PointOfInterest, showMarker: boolean) {
   clearRouting();
   removeTempMarker();
+  showEventView.value = false;
   selectedPoint.value = { ...point };
   formMode.value = mode;
   showSelectType.value = false;
@@ -160,7 +180,6 @@ function showPointView(mode: 'view' | 'edit' | 'create', point: PointOfInterest,
 }
 
 const mapClickHandler = (e: L.LeafletMouseEvent) => {
-  console.log(showPointForm.value);
   if (role.value === 'admin' && isEditMode.value) {
     const { lat, lng } = e.latlng;
     selectedPoint.value = {
@@ -296,7 +315,6 @@ function updateCrisisAlertVisibility() {
   }
 }
 
-
 function checkIfInCrisisArea(userLatitude: number, userLongitude: number) {
   showCrisisAlert.value = false;
   activeEvents.value.forEach(event => {
@@ -317,10 +335,25 @@ function addEvents(map: L.Map) {
       fillColor: color,
       weight: 1,
       radius: event.radius,
-      fillOpacity: 0.3
+      fillOpacity: 0.3,
+      interactive: true
     }).addTo(map);
+
+    circle.on('click', () => {
+      handleEventClick(event);
+    });
     eventLayers.push(circle);
   });
+}
+
+function handleEventClick(event: EventResponseDTO) {
+  selectedEvent.value = event;
+  showPointForm.value = false;
+  showEventView.value = true;
+}
+
+function closeEventView() {
+  showEventView.value = false;
 }
 
 function clearEventLayers() {
@@ -347,8 +380,7 @@ function handleNavigation(coords: { latitude: number, longitude: number }) {
     } as L.Routing.RoutingControlOptions).addTo(map);
 
     isNavigating.value = true;
-    console.log('hei');
-  });
+  }, true);
 }
 
 function clearRouting() {
@@ -471,10 +503,6 @@ function toggleEditMode() {
     display: block;
     visibility: visible;
     pointer-events: auto;
-}
-
-.leaflet-interactive[stroke][fill-opacity] {
-  pointer-events: none;
 }
 
 .delete-button {

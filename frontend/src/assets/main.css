@@ -207,6 +207,15 @@ button:disabled:hover {
   scrollbar-color: var(--light-gray) var(--white);
 }
 
+.point-detail-container {
+  padding-top: 7px;
+}
+
+.point-detail {
+  margin-bottom: 10px;
+  font-size: var(--font-size-small);
+}
+
 .close-icon {
   position: absolute;
   top: 5px;

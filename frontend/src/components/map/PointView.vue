@@ -310,15 +310,6 @@ const deletePoint = async () => {
   gap: 5px;
 }
 
-.point-detail-container {
-  padding-top: 7px;
-}
-
-.point-detail {
-  margin-bottom: 10px;
-  font-size: var(--font-size-small);
-}
-
 .point-input {
   width: 100%;
   padding: 0.5rem;
