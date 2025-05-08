@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ntnu.idatt2106.krisefikser.config.TestSecurityConfig;
 import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
+import no.ntnu.idatt2106.krisefikser.mapper.AddressMapper;
 import no.ntnu.idatt2106.krisefikser.model.Address;
 import no.ntnu.idatt2106.krisefikser.model.Household;
 import no.ntnu.idatt2106.krisefikser.model.User;
@@ -56,6 +57,9 @@ public class AddressControllerTest {
 
   @MockitoBean
   private UserService userService;
+
+  @MockitoBean
+  private AddressMapper addressMapper; 
 
   @Nested
   @DisplayName("Positive test cases")
@@ -110,6 +114,15 @@ public class AddressControllerTest {
       mockUser.setUsername("testUser");
       mockUser.setHousehold(hh);
 
+      AddressResponseDTO addressResponseDTO = new AddressResponseDTO();
+      addressResponseDTO.setId(1);
+      addressResponseDTO.setStreet("Tors veg 24");
+      addressResponseDTO.setPostalCode("7035");
+      addressResponseDTO.setCity("Trondheim");
+      addressResponseDTO.setLatitude(65.10);
+      addressResponseDTO.setLongitude(75.10);
+
+      when(addressMapper.toResponseDTO(address)).thenReturn(addressResponseDTO);
       when(userService.getUserByUsername("testUser")).thenReturn(Optional.of(mockUser));
 
       mvc.perform(get("/api/addresses/me"))
