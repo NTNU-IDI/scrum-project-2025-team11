@@ -3,10 +3,10 @@
     <div class="footer-content">
       <h2>Andre tjenester</h2>
       <nav class="footer-links" aria-label="Nyttige lenker">
-        <a href="/personvern"><i class="fa fa-lock" aria-hidden="true"></i> Personvern</a>
+        <a href="/personvern"><i class="fa fa-lock" aria-hidden="true"></i> Personvern</a> <!--
         <a href="/userhome">User home (for testing)</a>
         <a href="/admin">Admin (for testing)</a>
-        <a href="/superadmin">Superadmin (for testing)</a>
+        <a href="/superadmin">Superadmin (for testing)</a> -->
         <br>
         <br>
       </nav>
@@ -25,7 +25,6 @@
   padding: 20px;
 }
 
-/** The footer title  h1*/
 .footer h1 {
   font-size: 32px;
   font-weight: bold;
@@ -80,5 +79,31 @@
 .link-button:hover {
   color: #d1d5db;
 }
+
+@media (max-width: 768px) {
+  .footer {
+    text-align: center;
+    padding: 32px 16px;
+  }
+
+  .footer-content h2 {
+    font-size: 18px;
+    text-align: center;
+  }
+
+  .footer-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .footer-links a {
+    margin: 0; /* Fjern horisontal margin */
+    font-size: 16px;
+  }
+}
+
 
 </style>
