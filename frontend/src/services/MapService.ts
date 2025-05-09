@@ -1,0 +1,178 @@
+import L from "leaflet";
+import userMarkerIcon from "@/assets/ikon/user-maker.svg";
+import "leaflet-routing-machine";
+import type { PointOfInterest } from "@/types/PointOfInterest";
+import type { EventResponseDTO } from "@/types/Event";
+import { getEventColor } from "@/utils/geoService";
+import { type Ref } from "vue";
+import { useToast } from "vue-toast-notification";
+
+const $toast = useToast();
+let userPositionMarker: L.Marker | null = null;
+let storedPosition: { lat: number; lon: number } | null = null;
+
+export const userIcon = L.icon({
+  iconUrl: userMarkerIcon,
+  iconSize: [35, 35],
+  iconAnchor: [20, 40],
+  popupAnchor: [0, -40],
+});
+
+export function addMarkersToMap(
+  map: L.Map,
+  points: PointOfInterest[],
+  markers: L.Marker[],
+  role: Ref<string>,
+  isEditMode: Ref<boolean>,
+  showPointView: Function
+) {
+  markers.forEach((marker) => map.removeLayer(marker));
+  markers.length = 0;
+
+  points.forEach((point) => {
+    const customIcon = L.divIcon({
+      html: `<div class="map-icon ${point.iconType}" style="margin: 0;"></div>`,
+      className: "",
+      iconSize: [20, 20],
+      iconAnchor: [10, 10],
+    });
+
+    const marker = L.marker([point.latitude, point.longitude], {
+      icon: customIcon,
+    }).addTo(map);
+    markers.push(marker);
+
+    marker.on("click", () => {
+      if (role.value === "admin" && isEditMode.value) {
+        showPointView("edit", point, true);
+      } else {
+        showPointView("view", point, true);
+      }
+    });
+  });
+}
+
+export function addEventsToMap(
+  map: L.Map,
+  activeEvents: EventResponseDTO[],
+  eventLayers: L.Circle[],
+  handleEventClick: (event: EventResponseDTO) => void
+) {
+  clearEventLayers(eventLayers, map);
+
+  activeEvents.forEach((event) => {
+    const color = getEventColor(event.severity);
+    const circle = L.circle([event.latitude, event.longitude], {
+      color,
+      fillColor: color,
+      weight: 2.5,
+      radius: event.radius,
+      fillOpacity: 0.15,
+      interactive: true,
+    }).addTo(map);
+
+    circle.on("click", () => {
+      handleEventClick(event);
+    });
+
+    eventLayers.push(circle);
+  });
+}
+
+export function clearEventLayers(eventLayers: L.Circle[], map: L.Map) {
+  eventLayers.forEach((layer) => map.removeLayer(layer));
+  eventLayers.length = 0;
+}
+
+export function setUserPositionMarker(map: L.Map, lat: number, lon: number) {
+  if (userPositionMarker) {
+    map.removeLayer(userPositionMarker);
+  }
+  userPositionMarker = L.marker([lat, lon], { icon: userIcon }).addTo(map);
+  return userPositionMarker;
+}
+
+export function removeUserPositionMarker(map: L.Map) {
+  if (userPositionMarker) {
+    map.removeLayer(userPositionMarker);
+    userPositionMarker = null;
+  }
+}
+
+function storeUserPosition(lat: number, lon: number) {
+  storedPosition = { lat, lon };
+}
+
+function getStoredUserPosition() {
+  return storedPosition;
+}
+
+export function hasUserLocation(): boolean {
+  return storedPosition !== null;
+}
+
+export function getUserPosition(
+  map: L.Map,
+  callback?: (lat: number, lon: number) => void,
+  force: boolean = false
+): Promise<{ lat: number; lon: number } | null> {
+  return new Promise((resolve) => {
+    if (!force && hasUserLocation()) {
+      const position = getStoredUserPosition();
+      if (position) {
+        callback?.(position.lat, position.lon);
+        resolve(position);
+        return;
+      }
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        setUserPositionMarker(map, lat, lon);
+        storeUserPosition(lat, lon);
+        callback?.(lat, lon);
+        resolve({ lat, lon });
+      },
+      (err) => {
+        resolve(null);
+      }
+    );
+  });
+}
+
+export function createRoutingControl(
+  map: L.Map,
+  startLat: number,
+  startLon: number,
+  endLat: number,
+  endLon: number
+) {
+  removeUserPositionMarker(map);
+
+  const routingControl = L.Routing.control({
+    waypoints: [L.latLng(startLat, startLon), L.latLng(endLat, endLon)],
+    routeWhileDragging: false,
+    lineOptions: {
+      styles: [{ color: "var(--navigation)", weight: 6 }],
+      extendToWaypoints: false,
+      missingRouteTolerance: 0,
+    },
+    createMarker: function (i: number, waypoint: any) {
+      if (i === 0) {
+        return L.marker(waypoint.latLng, { icon: userIcon });
+      }
+      return L.marker(waypoint.latLng);
+    },
+    draggableWaypoints: false,
+  } as any).addTo(map);
+  map.setView([startLat, startLon], 15);
+  return routingControl;
+}
+
+export function clearRoutingControl(map: L.Map, routingControl: any) {
+  if (routingControl) {
+    map.removeControl(routingControl);
+  }
+}

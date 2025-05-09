@@ -12,6 +12,20 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.util.Date;
 
+/**
+ * Utility component for working with JSON Web Tokens (JWT) in the application.
+ * <p>
+ * Upon initialization, it creates a signing key and parser based on the configured secret.
+ * Provides methods to generate access and refresh tokens with custom expirations,
+ * extract username and role claims from tokens, and validate tokens for authenticity and expiration.
+ * <p>
+ * Configuration properties:
+ * <ul>
+ *   <li><code>jwt.secret</code> - the secret key used for signing tokens</li>
+ *   <li><code>jwt.expiration</code> - expiration duration for access tokens (in milliseconds)</li>
+ *   <li><code>jwt.refreshExpiration</code> - expiration duration for refresh tokens (in milliseconds)</li>
+ * </ul>
+ */
 @Component
 public class JwtUtil {
   private SecretKey key;

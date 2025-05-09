@@ -10,21 +10,39 @@ export const useEventStore = defineStore("events", {
     events: [] as EventResponseDTO[],
     activeEvents: [] as EventResponseDTO[],
     chosenEvent: {} as EventResponseDTO,
+    lat: null as number | null,
+    lng: null as number | null,
+    openNewEvent: false,
+    errorMsg: "",
   }),
 
   actions: {
     startPollingActiveEvents() {
+      this.fetchActiveEvents();
       pollingService.start(() => this.fetchActiveEvents());
     },
     stopPollingActiveEvents() {
       pollingService.stop();
+    },
+    setCoordinates(lat: number, lng: number) {
+      this.lat = lat;
+      this.lng = lng;
+    },
+    clearCoordinates() {
+      this.lat = null;
+      this.lng = null;
+    },
+    triggerNewEvent() {
+      this.openNewEvent = true;
+    },
+    clearTriggerNewEvent() {
+      this.openNewEvent = false;
     },
     async fetchEvents() {
       try {
         await EventService.findAll().then((data) => {
           this.events = data;
         });
-        console.log(this.events);
       } catch (error) {
         console.error("Error fetching event:", error);
       }
@@ -32,8 +50,7 @@ export const useEventStore = defineStore("events", {
     async fetchActiveEvents() {
       try {
         const data = await EventService.findActive();
-        this.activeEvents = data;
-        return this.activeEvents;
+        this.activeEvents = Array.isArray(data) ? data : [];
       } catch (error) {
         console.error("Error fetching active events:", error);
         this.activeEvents = [];
@@ -65,10 +82,11 @@ export const useEventStore = defineStore("events", {
       try {
         await EventService.update(id, event).then((data) => {
           this.chosenEvent = data;
+
           this.fetchEvents();
         });
       } catch (error) {
-        console.error("Error updating event:", error);
+        this.errorMsg = error as string;
       }
     },
     async save(event: EventRequestDTO) {
@@ -78,7 +96,7 @@ export const useEventStore = defineStore("events", {
           this.fetchEvents();
         });
       } catch (error) {
-        console.error("Error saving event:", error);
+        this.errorMsg = error as string;
       }
     },
     async delete(id: number) {

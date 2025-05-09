@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.media.*;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -262,6 +263,7 @@ public class EventController {
                   content = @Content(mediaType = "application/json", schema = @Schema(implementation = EventResponseDTO.class))), 
     @ApiResponse(responseCode = "400", description = "Invalid event data")
   })
+  @SecurityRequirement(name = "jwtCookieAuth")
   @PreAuthorize("hasRole('admin')")
   @PostMapping
   public ResponseEntity<EventResponseDTO> saveEvent(
@@ -287,6 +289,7 @@ public class EventController {
                   content = @Content(mediaType = "application/json", schema = @Schema(implementation = EventResponseDTO.class))), 
     @ApiResponse(responseCode = "404", description = "Event not found")
   })
+  @SecurityRequirement(name = "jwtCookieAuth")
   @PreAuthorize("hasRole('admin')")
   @PutMapping("/{id}")
   public ResponseEntity<EventResponseDTO> updateEvent(
@@ -305,12 +308,12 @@ public class EventController {
   @Operation(
     summary = "Delete an event", 
     description = "Delete an event from the database by its ID"
-    //,security = @SecurityRequirement
   )
   @ApiResponses(value = {
     @ApiResponse(responseCode = "204", description = "Event deleted successfully"), 
     @ApiResponse(responseCode = "404", description = "Event not found")
   })
+  @SecurityRequirement(name = "jwtCookieAuth")
   @PreAuthorize("hasRole('admin')")
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteEvent(

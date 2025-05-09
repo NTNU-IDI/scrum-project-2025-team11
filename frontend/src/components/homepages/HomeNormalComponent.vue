@@ -1,7 +1,8 @@
 <template>
   <main class="main-content">
     <div class="info-header">
-      <h1>Velkommen til Krisefikseren!</h1>
+      <h1>Velkommen til Krisefikser.no!</h1>
+      <p>- Beredskap gjort enkelt - </p>
     </div>
     
     <PreparednessComponent />
@@ -19,7 +20,8 @@
         <br><p><i class="fa fa-check-square" aria-hidden="true"></i> Finne helsetjenester og medisinsk hjelp.</p>
         <br><p><i class="fa fa-check-square" aria-hidden="true"></i> Finne møtesteder under en krise.</p>
         <br><p><i class="fa fa-check-square" aria-hidden="true"></i> Finne tilfluktsrom i nærheten.</p>
-        <br><a href="/map" class="button login"><i class="fa fa-map" aria-hidden="true"></i> Til kartet</a> 
+        <br>
+        <router-link to="/map" class="button login"><i class="fa fa-map" aria-hidden="true"></i> Til kartet</router-link>
       </div>
 
       <router-link to="/login" class="box unavailable" data-tooltip="Logg inn for å få tilgang." aria-disabled="true" tabindex="-1">

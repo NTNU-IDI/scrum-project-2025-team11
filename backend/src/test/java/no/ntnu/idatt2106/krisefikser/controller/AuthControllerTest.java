@@ -12,6 +12,7 @@ import no.ntnu.idatt2106.krisefikser.security.JwtAuthFilter;
 import no.ntnu.idatt2106.krisefikser.security.JwtUtil;
 import no.ntnu.idatt2106.krisefikser.service.AddressService;
 import no.ntnu.idatt2106.krisefikser.service.HouseholdService;
+import no.ntnu.idatt2106.krisefikser.service.RecaptchaService;
 import no.ntnu.idatt2106.krisefikser.service.RefreshTokenService;
 import no.ntnu.idatt2106.krisefikser.service.TwoFactorCodeService;
 import no.ntnu.idatt2106.krisefikser.service.UserService;
@@ -76,6 +77,9 @@ class AuthControllerTest {
 
     @MockitoBean
     private HouseholdService householdService;
+
+    @MockitoBean
+    private RecaptchaService recaptchaService;
     
     @Autowired
     private ObjectMapper objectMapper;
@@ -136,8 +140,10 @@ class AuthControllerTest {
         loginRequest.setPassword(password);
 
         when(userService.getUserByUsername(username)).thenReturn(Optional.empty());
+        when(recaptchaService.validateCaptcha(anyString(), anyString())).thenReturn(true);
 
         mockMvc.perform(post("/auth/login")
+                .param("recaptchaToken", "testToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isBadRequest());
@@ -150,8 +156,10 @@ class AuthControllerTest {
         userRequest.setEmail("taken@example.com");
 
         when(userService.emailExists(userRequest.getEmail())).thenReturn(true);
+        when(recaptchaService.validateCaptcha(anyString(), anyString())).thenReturn(true);
 
         mockMvc.perform(post("/auth/register")
+                .param("recaptchaToken", "testToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userRequest)))
                 .andExpect(status().isConflict());

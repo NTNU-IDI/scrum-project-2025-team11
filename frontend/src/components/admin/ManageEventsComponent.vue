@@ -9,6 +9,7 @@ import { useToast } from 'vue-toast-notification';
 const showNewEventBox = ref(false);
 const toggleNewEventBox = () => {
     showNewEventBox.value = !showNewEventBox.value;
+    eventStore.clearTriggerNewEvent();
 }
 
 const showSingleEventBox = ref(false);
@@ -24,12 +25,19 @@ const $toast = useToast();
 
 const newEvent = () => {
     showNewEventBox.value = false;
+    eventStore.clearTriggerNewEvent();
+    eventStore.clearCoordinates();
     $toast.success('Ny hendelse opprettet!', {
         duration: 3000,
         position: 'top-right'
     });
 
 }
+const closeNewEventBox = () => {
+    eventStore.clearTriggerNewEvent();
+    eventStore.clearCoordinates();
+    showNewEventBox.value = false;
+};
 watch(() => eventStore.chosenEvent, (newEvent) => {
     if (newEvent && newEvent.id !==  0 && newEvent.id !== undefined) {
         showSingleEventBox.value = true;
@@ -51,10 +59,12 @@ watch(() => eventStore.chosenEvent, (newEvent) => {
         <ViewEventsComponent @event-selected="chooseEventId"/>
         <EditEventComponent v-if="showSingleEventBox" @hide-edit-box="showSingleEventBox = false"/>
 
-        <div class="modal-overlay" v-if="showNewEventBox" @click.self="showNewEventBox = false">
+        <div class="modal-overlay" v-if="showNewEventBox || eventStore.openNewEvent" @click.self="showNewEventBox = false">
             <NewEventComponent
-            @close="showNewEventBox = false"
-            @hide-new-event-box="showNewEventBox = false"
+            :lat="eventStore.lat"
+            :lng="eventStore.lng"
+            @close="closeNewEventBox"
+            @hide-new-event-box="closeNewEventBox"
             @new-event-success="newEvent"
             />
         </div>
