@@ -1,15 +1,23 @@
 <script setup lang="ts">
 import {login} from "@/api/AuthService.ts";
 import {ref} from "vue";
+import { useReCaptcha } from 'vue-recaptcha-v3';
+
+const { executeRecaptcha } = useReCaptcha()!;
 
 const username = ref('')
 const password = ref('')
 const errorMessage = ref('');
+const recaptchaToken = ref('')
 
-function attemptLogin() {
+async function attemptLogin() {
   errorMessage.value = ''
+
+  recaptchaToken.value = await executeRecaptcha('login');
+  console.log(recaptchaToken.value);
+
   if (simpleValidation()) {
-    login(username.value, password.value)
+    login(username.value, password.value, recaptchaToken.value)
   }
 }
 
