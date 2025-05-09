@@ -49,13 +49,13 @@ public class InventoryController {
      * @param itemId optional filter by a specific item ID
      * @return 200 OK with list of inventory entries
      */
-    @GetMapping
     @Operation(summary = "List household inventory items",
-               description = "Returns all inventory entries for the current user's household, optionally filtered by item ID.")
+    description = "Returns all inventory entries for the current user's household, optionally filtered by item ID.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Inventory items retrieved successfully"),
         @ApiResponse(responseCode = "401", description = "Authentication required")
     })
+    @GetMapping
     public ResponseEntity<List<HouseholdItemResponse>> list(
         @Parameter(description = "ID of the item to filter by", required = false)
         @RequestParam(required = false) Integer itemId
@@ -70,15 +70,15 @@ public class InventoryController {
      * @param req request body containing item details
      * @return 201 Created with the new inventory entry
      */
-    @PostMapping
     @Operation(summary = "Add inventory item",
-               description = "Creates a new inventory entry for the current user's household.")
+    description = "Creates a new inventory entry for the current user's household.")
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Inventory entry created"),
         @ApiResponse(responseCode = "400", description = "Invalid input data"),
         @ApiResponse(responseCode = "401", description = "Authentication required"),
         @ApiResponse(responseCode = "404", description = "Household not found")
     })
+    @PostMapping
     public ResponseEntity<HouseholdItemResponse> add(
         @Valid @RequestBody HouseholdItemRequest req
     ) {
@@ -98,15 +98,15 @@ public class InventoryController {
      * @param req request body with updated fields
      * @return 200 OK with updated inventory entry
      */
-    @PutMapping("/{itemId}/{acquiredDate}")
     @Operation(summary = "Update inventory entry",
-               description = "Modifies an existing inventory entry identified by item ID and acquisition date.")
+    description = "Modifies an existing inventory entry identified by item ID and acquisition date.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Inventory entry updated successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid input data"),
         @ApiResponse(responseCode = "401", description = "Authentication required"),
         @ApiResponse(responseCode = "404", description = "Inventory entry not found")
     })
+    @PutMapping("/{itemId}/{acquiredDate}")
     public ResponseEntity<HouseholdItemResponse> update(
         @PathVariable Integer itemId,
         @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime acquiredDate,
@@ -124,14 +124,14 @@ public class InventoryController {
      * @param itemId the item ID
      * @return 204 No Content if removals succeeded
      */
-    @DeleteMapping("/{itemId}")
     @Operation(summary = "Remove all purchases of an item",
-               description = "Deletes every inventory entry of the specified item in the household.")
+    description = "Deletes every inventory entry of the specified item in the household.")
     @ApiResponses({
         @ApiResponse(responseCode = "204", description = "All entries removed"),
         @ApiResponse(responseCode = "401", description = "Authentication required"),
         @ApiResponse(responseCode = "404", description = "No entries found for item")
     })
+    @DeleteMapping("/{itemId}")
     public ResponseEntity<Void> removeAll(@PathVariable Integer itemId) {
         service.removeAll(getHhId(), itemId);
         return ResponseEntity.noContent().build();
@@ -144,14 +144,14 @@ public class InventoryController {
      * @param acquiredDate the acquisition timestamp
      * @return 204 No Content if removal succeeded
      */
-    @DeleteMapping("/{itemId}/{acquiredDate}")
     @Operation(summary = "Remove specific purchase entry",
-               description = "Deletes a single inventory entry matching item ID and acquisition date.")
+    description = "Deletes a single inventory entry matching item ID and acquisition date.")
     @ApiResponses({
         @ApiResponse(responseCode = "204", description = "Entry removed"),
         @ApiResponse(responseCode = "401", description = "Authentication required"),
         @ApiResponse(responseCode = "404", description = "Inventory entry not found")
     })
+    @DeleteMapping("/{itemId}/{acquiredDate}")
     public ResponseEntity<Void> removeOne(
         @PathVariable Integer itemId,
         @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime acquiredDate
@@ -166,15 +166,15 @@ public class InventoryController {
      * @param req request body containing upsert details
      * @return 201 Created with the new or linked inventory entry
      */
-    @PostMapping("/upsert")
     @Operation(summary = "Upsert inventory entry",
-               description = "Creates a new item if needed and adds it to inventory, or links an existing item.")
+    description = "Creates a new item if needed and adds it to inventory, or links an existing item.")
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Upsert operation successful"),
         @ApiResponse(responseCode = "400", description = "Invalid input data"),
         @ApiResponse(responseCode = "401", description = "Authentication required"),
         @ApiResponse(responseCode = "404", description = "Household not found")
     })
+    @PostMapping("/upsert")
     public ResponseEntity<HouseholdItemResponse> upsert(
         @Valid @RequestBody UpsertInventoryRequest req
     ) {

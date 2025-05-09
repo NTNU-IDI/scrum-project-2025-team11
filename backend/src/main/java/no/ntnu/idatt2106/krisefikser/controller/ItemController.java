@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import no.ntnu.idatt2106.krisefikser.mapper.ItemMapper;
 import no.ntnu.idatt2106.krisefikser.model.Item;
 import no.ntnu.idatt2106.krisefikser.service.ItemService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -26,6 +28,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/items")
 @CrossOrigin(origins = "*")
+@SecurityRequirement(name = "jwtCookieAuth")
+@PreAuthorize("isAuthenticated()")
 @RequiredArgsConstructor
 @Tag(name = "Item API", description = "Operations for managing item definitions")
 public class ItemController {

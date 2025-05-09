@@ -139,7 +139,7 @@ public class HouseholdController {
         @ApiResponse(responseCode = "401", description = "Authentication required")
     })
     @SecurityRequirement(name = "jwtCookieAuth")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all")
     public ResponseEntity<List<HouseholdResponseDTO>> getAllHouseholds() {
         List<HouseholdResponseDTO> list = householdService.findAll();

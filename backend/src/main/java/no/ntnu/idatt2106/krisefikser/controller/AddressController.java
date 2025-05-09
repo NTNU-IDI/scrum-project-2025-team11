@@ -62,6 +62,7 @@ public class AddressController {
     @ApiResponse(responseCode = "200", description = "Addresses retrieved successfully"),
     @ApiResponse(responseCode = "204", description = "No addresses found")
   })
+  @PreAuthorize("hasRole('admin')")
   @GetMapping
   public ResponseEntity<List<AddressResponseDTO>> getAllAddresses() {
     List<AddressResponseDTO> addresses = addressService.findAllAddresses();
