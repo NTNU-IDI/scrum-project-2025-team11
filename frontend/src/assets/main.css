@@ -375,6 +375,11 @@ button:disabled:hover {
   gap: 10px;
   max-height: calc(100% - 20px);
   overflow: hidden;
+  pointer-events: none;
+}
+
+.corner-container > * {
+  pointer-events: auto;
 }
 
 .corner-container.crisis-mode {
