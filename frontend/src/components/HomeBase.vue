@@ -3,7 +3,6 @@
 import HomeNormalComponent from "@/components/homepages/HomeNormalComponent.vue";
 import HomeInloggedComponent from "@/components/homepages/HomeInloggedComponent.vue";
 import HomeAdminComponent  from "@/components/homepages/HomeAdminComponent.vue";
-import HomeSuperAdminComponent  from "@/components/homepages/HomeSuperAdminComponent.vue";
 import ManageUsersComponent from "@/components/admin/ManageUsersComponent.vue";
 
 import {useUserStore} from "@/stores/userStore.ts";
