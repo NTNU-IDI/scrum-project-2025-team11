@@ -42,7 +42,7 @@ function changePasswordVisibility() {
     <form v-on:submit.prevent>
       <label>Brukernavn <span class="importantStar">*</span><input type="text" v-model="username"/></label>
       <label>Passord <span class="importantStar">*</span><input :type="passwordInputType" v-model="password" id="iptPassword"/></label>
-      <label><input type="checkbox" id="cbPassword" v-model="showPassword"> Vis passord</label>
+      <label><input type="checkbox" id="cbPassword" v-model="showPassword" @change="changePasswordVisibility"> Vis passord</label>
       <br> <br>
       <button class="good-button" type="submit" @click="attemptLogin">Logg inn</button>
     </form>
