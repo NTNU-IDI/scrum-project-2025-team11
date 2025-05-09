@@ -2,6 +2,7 @@
   <main class="main-content">
     <div class="info-header">
       <h1>Velkommen til Krisefikser.no!</h1>
+      <p>- Beredskap gjort enkelt - </p>
     </div>
     
     <PreparednessComponent />

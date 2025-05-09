@@ -1,15 +1,8 @@
 <template>  
   <main class="main-content">
     <div class="info-header">
-      <h1>Min beredskap</h1>
-      <p>Her kan du sjekke din beredskap.</p>
-    </div>
-
-    <div class="grid-container">
-      <router-link to="/household" class="box registered">
-        <h3>Husstand og Beredskapslager</h3>
-        <p>Se oversikt over medlemmene i husstanden din, og sjekk om du har nok forsyninger til en krise.</p>
-      </router-link>
+      <h1>Velkommen til Krisefikser.no!</h1>
+      <p>- Beredskap gjort enkelt - </p>
     </div>
 
     <PreparednessComponent />
@@ -36,7 +29,7 @@
         <br><p><i class="fa fa-check-square"></i> Se oversikt over medlemmene i husstanden din.</p>
         <br><p><i class="fa fa-check-square"></i> Sjekk om du har nok forsyninger til en krise.</p>
         <br><p><i class="fa fa-check-square"></i> Invitere andre inn i husstanden din.</p>
-        <br><router-link to="/household" class="button login"><i class="fa fa-gear" aria-hidden="true"></i> Til Husstand og Beredskapslager</router-link>      
+        <br><router-link to="/household" class="button login"><i class="fa fa-medkit" aria-hidden="true"></i> Til min beredskap</router-link>      
       </div>
 
     </div>
