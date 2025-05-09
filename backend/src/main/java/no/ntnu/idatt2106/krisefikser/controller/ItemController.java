@@ -1,61 +1,73 @@
 package no.ntnu.idatt2106.krisefikser.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.dto.ItemRequest;
 import no.ntnu.idatt2106.krisefikser.dto.ItemResponse;
 import no.ntnu.idatt2106.krisefikser.mapper.ItemMapper;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ntnu.idatt2106.krisefikser.model.Item;
 import no.ntnu.idatt2106.krisefikser.service.ItemService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
 
 import java.net.URI;
 import java.util.List;
 
 /**
- * Controller class for managing items in the system.
- * This class handles HTTP requests related to item operations, such as creating, 
- * updating, deleting, and retrieving items.
- * 
+ * REST controller for managing items in the global catalog.
+ * <p>
+ * Provides endpoints to list, retrieve, create, update, and delete item entities.
  */
 @RestController
 @RequestMapping("/api/items")
 @CrossOrigin(origins = "*")
-@Tag(name = "Item API")
+@RequiredArgsConstructor
+@Tag(name = "Item API", description = "Operations for managing item definitions")
 public class ItemController {
 
     private final ItemService service;
     private final ItemMapper mapper;
 
-    public ItemController(ItemService service, ItemMapper mapper) {
-        this.service = service;
-        this.mapper  = mapper;
-    }
-
     /**
-     * Retrieves a list of all items in the system.
+     * Retrieves all items in the system.
      *
-     * @return a list of {@link ItemResponse} objects representing all items
+     * @return 200 OK with the list of item response DTOs
      */
     @GetMapping
-    @Operation(summary = "List all items")
-    public List<ItemResponse> list() {
-        return service.findAll().stream()
-                      .map(mapper::toResponse)
-                      .toList();
+    @Operation(summary = "List all items",
+               description = "Fetches a list of all items available in the system.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Items retrieved successfully")
+    })
+    public ResponseEntity<List<ItemResponse>> list() {
+        List<ItemResponse> responses = service.findAll().stream()
+                                             .map(mapper::toResponse)
+                                             .toList();
+        return ResponseEntity.ok(responses);
     }
 
     /**
-     * Retrieves an item by its ID.
+     * Retrieves a single item by its ID.
      *
-     * @param id the ID of the item to retrieve
-     * @return a {@link ResponseEntity} containing the item if found, or 404 Not Found if not found
+     * @param id the unique identifier of the item
+     * @return 200 OK with the item data if found, or 404 Not Found
      */
     @GetMapping("/{id}")
-    @Operation(summary = "Get an item by ID")
-    public ResponseEntity<ItemResponse> getOne(@PathVariable Integer id) {
+    @Operation(summary = "Get item by ID",
+               description = "Retrieves the details of an item given its ID.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Item found and returned"),
+        @ApiResponse(responseCode = "404", description = "Item not found")
+    })
+    public ResponseEntity<ItemResponse> getOne(
+        @Parameter(description = "ID of the item to retrieve", required = true)
+        @PathVariable Integer id
+    ) {
         return service.findById(id)
                       .map(mapper::toResponse)
                       .map(ResponseEntity::ok)
@@ -63,41 +75,56 @@ public class ItemController {
     }
 
     /**
-     * Creates a new item.
+     * Creates a new item in the system.
      *
-     * @param req the request body containing item details
-     * @return a {@link ResponseEntity} containing the created item and its location
+     * @param req the item request payload
+     * @return 201 Created with the new item, or 400 Bad Request for invalid data
      */
     @PostMapping
-    @Operation(summary = "Create a new item")
+    @Operation(summary = "Create a new item",
+               description = "Adds a new item record to the system catalog.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Item created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid item data provided")
+    })
     public ResponseEntity<ItemResponse> create(
+        @Parameter(description = "Item creation payload", required = true)
         @Valid @RequestBody ItemRequest req
     ) {
-        Item saved = service.create(mapper.toEntity(req));
-        return ResponseEntity
-            .created(URI.create("/api/items/" + saved.getId()))
-            .body(mapper.toResponse(saved));
+        Item entity = mapper.toEntity(req);
+        Item saved = service.create(entity);
+        ItemResponse response = mapper.toResponse(saved);
+        URI location = URI.create(String.format("/api/items/%d", saved.getId()));
+        return ResponseEntity.created(location).body(response);
     }
 
     /**
-     * Updates an existing item.
+     * Updates an existing item by ID.
      *
      * @param id  the ID of the item to update
-     * @param req the request body containing updated item details
-     * @return a {@link ResponseEntity} containing the updated item, or 404 Not Found if not found
+     * @param req the updated item data
+     * @return 200 OK with the updated item, or 404 Not Found if the item does not exist
      */
     @PutMapping("/{id}")
-    @Operation(summary = "Update an existing item")
+    @Operation(summary = "Update an item",
+               description = "Modifies an existing item record identified by its ID.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Item updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid update data provided"),
+        @ApiResponse(responseCode = "404", description = "Item not found")
+    })
     public ResponseEntity<ItemResponse> update(
+        @Parameter(description = "ID of the item to update", required = true)
         @PathVariable Integer id,
+        @Parameter(description = "Updated item payload", required = true)
         @Valid @RequestBody ItemRequest req
     ) {
         if (service.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        Item toSave = mapper.toEntity(req);
-        toSave.setId(id);
-        Item updated = service.update(id, toSave);
+        Item entity = mapper.toEntity(req);
+        entity.setId(id);
+        Item updated = service.update(id, entity);
         return ResponseEntity.ok(mapper.toResponse(updated));
     }
 
@@ -105,13 +132,20 @@ public class ItemController {
      * Deletes an item by its ID.
      *
      * @param id the ID of the item to delete
-     * @return a {@link ResponseEntity} indicating the result of the deletion
+     * @return 204 No Content on successful deletion
      */
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete an item")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+    @Operation(summary = "Delete an item",
+               description = "Removes the item record identified by its ID from the system.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "204", description = "Item deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Item not found")
+    })
+    public ResponseEntity<Void> delete(
+        @Parameter(description = "ID of the item to delete", required = true)
+        @PathVariable Integer id
+    ) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
-
 }
