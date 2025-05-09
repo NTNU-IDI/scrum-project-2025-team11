@@ -25,6 +25,8 @@ const $toast = useToast();
 
 const newEvent = () => {
     showNewEventBox.value = false;
+    eventStore.clearTriggerNewEvent();
+    eventStore.clearCoordinates();
     $toast.success('Ny hendelse opprettet!', {
         duration: 3000,
         position: 'top-right'
@@ -32,9 +34,9 @@ const newEvent = () => {
 
 }
 const closeNewEventBox = () => {
-    showNewEventBox.value = false;
     eventStore.clearTriggerNewEvent();
     eventStore.clearCoordinates();
+    showNewEventBox.value = false;
 };
 watch(() => eventStore.chosenEvent, (newEvent) => {
     if (newEvent && newEvent.id !==  0 && newEvent.id !== undefined) {

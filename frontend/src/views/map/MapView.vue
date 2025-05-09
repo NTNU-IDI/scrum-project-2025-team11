@@ -57,13 +57,12 @@ import { useUserStore } from "@/stores/userStore.ts";
 import type { PointOfInterest } from "@/types/PointOfInterest";
 import type { EventResponseDTO } from "@/types/Event";
 import { isUserInCrisisArea } from '@/utils/geoService';
-import { addMarkersToMap, addEventsToMap, clearEventLayers, createRoutingControl, clearRoutingControl, userIcon } from '@/services/MapService'; 
+import { addMarkersToMap, addEventsToMap, clearEventLayers, createRoutingControl, clearRoutingControl, getUserPosition, setUserPositionMarker } from '@/services/MapService'; 
 import { storeToRefs } from "pinia";
 import { onUnmounted, onMounted, ref, watch } from 'vue';
 import { useEventStore } from '@/stores/eventStore'; 
 import { useToast } from 'vue-toast-notification';
 import { useRouter } from 'vue-router'
-
 
 const router = useRouter()
 const $toast = useToast();
@@ -93,6 +92,7 @@ let map: L.Map;
 let temporaryMarker: L.Marker | null = null;
 let markers: L.Marker[] = [];
 let eventLayers: L.Circle[] = [];
+let userMarker: L.Marker | null = null;
 let userLat: number | null = null;
 let userLon: number | null = null;
 
@@ -127,9 +127,12 @@ onMounted(async () => {
   });
 
   // Get user location and set marker
-  getUserPosition((lat, lon) => {
+  const position = await getUserPosition(map);
+  if (position) {
+    userLat = position.lat;
+    userLon = position.lon;
     checkIfInCrisisArea();
-  });
+  }
 });
 
 onUnmounted(() => {
@@ -234,24 +237,6 @@ function updateMarkerPosition(coords: { latitude: number, longitude: number }) {
   selectedPoint.value.longitude = coords.longitude;
 }
 
-function getUserPosition(callback: (lat: number, lon: number) => void, force: boolean = false) {
-  if (!navigator.geolocation || (userLocationFetched.value && !force)) return;
-
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      userLat = pos.coords.latitude;
-      userLon = pos.coords.longitude;
-      userLocationFetched.value = true;
-      callback(userLat, userLon);
-
-      L.marker([userLat, userLon], { icon: userIcon })
-        .addTo(map)
-      map.setView([userLat, userLon], 13);
-    },
-    (err) => console.error("Error getting location: ", err)
-  );
-}
-
 function checkIfInCrisisArea() {
 if (userLat !== null && userLon !== null) {
   if (!isEditMode.value) {
@@ -273,12 +258,18 @@ function closeEventView() {
   showEventView.value = false;
 }
 
-function handleNavigation(coords: { latitude: number, longitude: number }) {
-  getUserPosition((userLat, userLon) => {
-    clearRouting();
+async function handleNavigation(coords: { latitude: number, longitude: number }) {
+  clearRouting();
+  const position = await getUserPosition(map);
+  if (position) {
+    userLat = position.lat;
+    userLon = position.lon;
     window.routingControl = createRoutingControl(map, userLat, userLon, coords.latitude, coords.longitude);
     isNavigating.value = true;
-  }, true);
+  } else {
+    handleNoPosition();
+    isNavigating.value = false;
+  } 
 }
 
 function clearRouting() {
@@ -287,19 +278,32 @@ function clearRouting() {
   window.routingControl = null;
   isNavigating.value = false;
   showNearestShelterButton.value = true;
+  if (userLat !== null && userLon !== null) {
+    setUserPositionMarker(map, userLat, userLon);
+  }
 }
 
 async function findNearestShelter() {
   isEditMode.value = false;
-  showNearestShelterButton.value = false;
 
-  if (!userLat || !userLon) {
-    getUserPosition(async () => {
-      await locateAndShowShelters(userLat!, userLon!);
-    }, true);
+  const position = await getUserPosition(map);
+  if (position) {
+    userLat = position.lat;
+    userLon = position.lon;
+    await locateAndShowShelters(position.lat, position.lon);
+    showNearestShelterButton.value = false;
   } else {
-    await locateAndShowShelters(userLat, userLon);
+    handleNoPosition();
+    showNearestShelterButton.value = true;
   }
+}
+
+function handleNoPosition() {
+  $toast.clear();
+  $toast.warning(
+    "Vi har ikke tilgang til posisjonen din. Tillat posisjonstjenester i nettleseren for navigasjon og finne nærmeste tilfluktsrom.",
+    { duration: 7000 }
+  );
 }
 
 async function locateAndShowShelters(lat: number, lon: number) {
@@ -319,7 +323,7 @@ async function locateAndShowShelters(lat: number, lon: number) {
   viewingNearest.value = true;
   
   const firstShelter = nearestShelters.value[0];
-  map.setView([firstShelter.latitude, firstShelter.longitude], 15); // <-- Focus before opening view
+  map.setView([firstShelter.latitude, firstShelter.longitude], 15);
   showPointView('view', firstShelter, true, true);
 }
 
@@ -347,6 +351,7 @@ function toggleEditMode() {
   } else {
     $toast.info('Redigeringsmodus deaktivert. Du er nå i visningsmodus.', { duration: 5000 });
     eventStore.startPollingActiveEvents();
+    showSelectType.value = false;
     removeTempMarker();
     addEventsToMap(map, activeEvents.value, eventLayers, handleEventClick);
   }

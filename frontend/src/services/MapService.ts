@@ -5,6 +5,11 @@ import type { PointOfInterest } from "@/types/PointOfInterest";
 import type { EventResponseDTO } from "@/types/Event";
 import { getEventColor } from "@/utils/geoService";
 import { type Ref } from "vue";
+import { useToast } from "vue-toast-notification";
+
+const $toast = useToast();
+let userPositionMarker: L.Marker | null = null;
+let storedPosition: { lat: number; lon: number } | null = null;
 
 export const userIcon = L.icon({
   iconUrl: userMarkerIcon,
@@ -79,6 +84,64 @@ export function clearEventLayers(eventLayers: L.Circle[], map: L.Map) {
   eventLayers.length = 0;
 }
 
+export function setUserPositionMarker(map: L.Map, lat: number, lon: number) {
+  if (userPositionMarker) {
+    map.removeLayer(userPositionMarker);
+  }
+  userPositionMarker = L.marker([lat, lon], { icon: userIcon }).addTo(map);
+  return userPositionMarker;
+}
+
+export function removeUserPositionMarker(map: L.Map) {
+  if (userPositionMarker) {
+    map.removeLayer(userPositionMarker);
+    userPositionMarker = null;
+  }
+}
+
+function storeUserPosition(lat: number, lon: number) {
+  storedPosition = { lat, lon };
+}
+
+function getStoredUserPosition() {
+  return storedPosition;
+}
+
+export function hasUserLocation(): boolean {
+  return storedPosition !== null;
+}
+
+export function getUserPosition(
+  map: L.Map,
+  callback?: (lat: number, lon: number) => void,
+  force: boolean = false
+): Promise<{ lat: number; lon: number } | null> {
+  return new Promise((resolve) => {
+    if (!force && hasUserLocation()) {
+      const position = getStoredUserPosition();
+      if (position) {
+        callback?.(position.lat, position.lon);
+        resolve(position);
+        return;
+      }
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        setUserPositionMarker(map, lat, lon);
+        storeUserPosition(lat, lon);
+        callback?.(lat, lon);
+        resolve({ lat, lon });
+      },
+      (err) => {
+        resolve(null);
+      }
+    );
+  });
+}
+
 export function createRoutingControl(
   map: L.Map,
   startLat: number,
@@ -86,6 +149,8 @@ export function createRoutingControl(
   endLat: number,
   endLon: number
 ) {
+  removeUserPositionMarker(map);
+
   const routingControl = L.Routing.control({
     waypoints: [L.latLng(startLat, startLon), L.latLng(endLat, endLon)],
     routeWhileDragging: false,
@@ -102,6 +167,7 @@ export function createRoutingControl(
     },
     draggableWaypoints: false,
   } as any).addTo(map);
+  map.setView([startLat, startLon], 15);
   return routingControl;
 }
 
