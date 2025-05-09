@@ -94,12 +94,20 @@ export function validateIconType(type: string): boolean {
 // Function to validate latitude
 export function validateLatitude(lat: number): boolean {
   if (!lat) return false;
+
+  const decimalPlacesRegex = /^-?\d+(\.\d{1,7})?$/; 
+  if(!decimalPlacesRegex.test(lat.toString())) return false;
+
   return coordinateRegex.test(lat.toString()) && lat >= -90 && lat <= 90;
 }
 
 // Function to validate longitude
 export function validateLongitude(lon: number): boolean {
   if (!lon) return false;
+
+  const decimalPlacesRegex = /^-?\d+(\.\d{1,7})?$/; 
+  if(!decimalPlacesRegex.test(lon.toString())) return false;
+
   return coordinateRegex.test(lon.toString()) && lon >= -180 && lon <= 180;
 }
 
@@ -111,7 +119,7 @@ export function validateRadius(radius: number): boolean {
 
 // Function to validate severity
 export function validateSeverity(severity: number): boolean {
-  if (!severity) return false;
+  if (severity === null || severity === undefined) return false;
   return (
     coordinateRegex.test(severity.toString()) && severity >= 0 && severity <= 5
   );

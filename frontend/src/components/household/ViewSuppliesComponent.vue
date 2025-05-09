@@ -91,7 +91,7 @@ watch(() => inventoryStore.inventory, async (newItems) => {
         quantity: grouped[id].quantity,
         unit: grouped[id].unit,
         acquiredDate: newItems.find(item => item.itemId === id)?.acquiredDate || '',
-        expirationDate: grouped[id].expirationDate.toISOString().split('T')[0]
+        expirationDate: grouped[id].expirationDate
     }));
 }, { immediate: true });
 

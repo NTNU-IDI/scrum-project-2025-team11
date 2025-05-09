@@ -24,6 +24,7 @@ const emit = defineEmits(['hide-new-event-box', 'new-event-success']);
 const icons = eventIcons;
 const eventStore = useEventStore();
 const errorMsg = ref('');
+const response = ref('');
 
 const validateEvent = () => {
     errorMsg.value = '';
@@ -63,12 +64,12 @@ const validateEvent = () => {
 }
 
 // Add event 
-const addEvent = () => {
+const addEvent = async () => {
     if (!validateEvent()) {
         return;
     }
     if (endTime.value) {
-        eventStore.save({
+        await eventStore.save({
             name: name.value,
             description: description.value,
             iconType: selectedIcon.value,
@@ -78,6 +79,12 @@ const addEvent = () => {
             longitude: Number(longitude.value),
             severity: severity.value,
             radius: radius.value,
+        }).catch((error) => {
+            response.value = error;
+            $toast.error('Feil ved opprettelse av bruker!' + error, {
+                duration: 3000,
+                position: 'top-right'
+            });
         });
     } else {
         eventStore.save({
@@ -89,9 +96,23 @@ const addEvent = () => {
             longitude: Number(longitude.value),
             severity: severity.value,
             radius: radius.value,
+        }).catch((error) => {
+            response.value = error;
+            $toast.error('Feil ved opprettelse av bruker!' + error, {
+                duration: 3000,
+                position: 'top-right'
+            });
         });
     }
-    emit('new-event-success');
+    if (response.value) {
+        $toast.error('Feil ved opprettelse av hendelse!' + response.value, {
+            duration: 3000,
+            position: 'top-right'
+        });
+    } else {
+        emit('new-event-success');
+    }
+    
     
 }
 
@@ -121,8 +142,8 @@ const addEvent = () => {
 
             <!-- Coordinates -->
              <div class="double-label-container">
-                <label for="coordinate-input">*Lengdegrad</label>
                 <label for="coordinate-input">*Breddegrad</label>
+                <label for="coordinate-input">*Lengdegrad</label>
             </div>
             <div class="double-input-container">
                 <input type="text" class="edit-input" id="coordinate-input" placeholder="f.eks 62.1008" v-model="latitude" />
