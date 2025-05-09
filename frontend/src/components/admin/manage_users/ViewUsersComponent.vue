@@ -117,6 +117,10 @@ h1 {
     padding-left: 1.5rem;
 }
 
+.delete-button:hover {
+    background-color: transparent;
+}
+
 #id-header, #id {
     width: 2rem;
     justify-content: center; 
