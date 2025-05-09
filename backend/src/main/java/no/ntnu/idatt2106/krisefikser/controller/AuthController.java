@@ -2,16 +2,17 @@
 
   import java.util.Arrays;
   import java.util.Map;
+import java.util.logging.Logger;
 
-  import lombok.RequiredArgsConstructor;
+import lombok.RequiredArgsConstructor;
   import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
   import org.springframework.security.crypto.password.PasswordEncoder;
   import org.springframework.web.bind.annotation.PostMapping;
   import org.springframework.web.bind.annotation.RequestBody;
   import org.springframework.web.bind.annotation.RequestMapping;
-  import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
   import io.swagger.v3.oas.annotations.Operation;
   import io.swagger.v3.oas.annotations.Parameter;
@@ -35,6 +36,7 @@ import no.ntnu.idatt2106.krisefikser.model.User.Role;
 import no.ntnu.idatt2106.krisefikser.security.JwtUtil;
 import no.ntnu.idatt2106.krisefikser.service.AddressService;
 import no.ntnu.idatt2106.krisefikser.service.HouseholdService;
+import no.ntnu.idatt2106.krisefikser.service.RecaptchaService;
 import no.ntnu.idatt2106.krisefikser.service.RefreshTokenService;
 import no.ntnu.idatt2106.krisefikser.service.TwoFactorCodeService;
 import no.ntnu.idatt2106.krisefikser.service.UserService;
@@ -51,6 +53,9 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
     private final TwoFactorCodeService twoFactorCodeService;
     private final AddressService addressService;
     private final HouseholdService householdService;
+    private final RecaptchaService recaptchaService;
+
+    Logger logger = Logger.getLogger(AuthController.class.getName());
 
     @Operation(
       summary = "Refresh JWT token",
@@ -110,7 +115,14 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
       @ApiResponse(responseCode = "400", description = "Invalid credentials")
     })
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, 
+        @RequestParam ("recaptchaToken") String recaptchaToken, 
+        HttpServletResponse response) {
+
+      if (!recaptchaService.validateCaptcha(recaptchaToken, "login")) {
+          return ResponseEntity.status(422).body("Invalid reCAPTCHA");
+      }
+      
       String username = loginRequest.getUsername();
       String password = loginRequest.getPassword();
 
@@ -166,17 +178,22 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
     public ResponseEntity<?> register(
           @Parameter(description = "User registration payload", required = true)
           @RequestBody UserRequestDTO body,
+          @RequestParam("recaptchaToken") String recaptchaToken,
           HttpServletResponse response) {
+      
+      if (!recaptchaService.validateCaptcha(recaptchaToken, "register")) {
+        return ResponseEntity.status(422).body("Invalid reCAPTCHA");
+    }
       
       if (userService.emailExists(body.getEmail())) {
         return ResponseEntity
             .status(409) // Conflict
-            .body(null);
+            .body("Email already exists");
       }
       if (userService.usernameExists(body.getUsername())) {
         return ResponseEntity
             .status(409) // Conflict
-            .body(null);
+            .body("Username already exists");
       }
 
       UserResponseDTO saved = userService.saveUser(body, Role.normal);
