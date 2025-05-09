@@ -35,7 +35,7 @@
 
           <div class="point-detail">
             <strong>Koordinater:</strong>
-            <div>{{ pointData.latitude }}, {{ pointData.longitude }}</div>
+            <div>{{ pointData.latitude.toFixed(7) }}, {{ pointData.longitude.toFixed(7) }}</div>
           </div>
 
           <div class="point-detail" v-if="address && !addressError">
@@ -198,11 +198,11 @@ const hasValidationError = computed(() => {
     return true;
   }
   if (!validatePointDescription(pointData.value.description)) {
-    validationError.value = "Beskrivelsen kan ikke være tom.";
+    validationError.value = "Beskrivelsen må være på minst 5 tegn, og max 100 tegn.";
     return true;
   }
   if (!validateLatitude(pointData.value.latitude)) {
-    validationError.value = "Breddegrad må være et tall mellom -90 og 90.";
+    validationError.value = "Breddegrad må være et tall mellom -90 og 90";
     return true;
   }
   if (!validateLongitude(pointData.value.longitude)) {
