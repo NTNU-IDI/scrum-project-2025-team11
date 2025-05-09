@@ -1,0 +1,27 @@
+package no.ntnu.idatt2106.krisefikser.scheduling;
+
+import no.ntnu.idatt2106.krisefikser.repository.ItemRepository;
+
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+@Component
+public class OrphanItemCleanupTask {
+
+    private final ItemRepository itemRepository;
+
+    public OrphanItemCleanupTask(ItemRepository itemRepository) {
+        this.itemRepository = itemRepository;
+    }
+
+    /**
+     * Runs every day at 02:00 in the Europe/Oslo timezone.
+     */
+    @Scheduled(cron = "0 5 2 * * *", zone = "Europe/Oslo")
+    @Transactional
+    public void purgeOrphanItems() {
+        int deleted = itemRepository.deleteOrphanItems();
+        System.out.println("Orphan-cleanup: deleted " + deleted + " items at 02:00");
+    }
+}
