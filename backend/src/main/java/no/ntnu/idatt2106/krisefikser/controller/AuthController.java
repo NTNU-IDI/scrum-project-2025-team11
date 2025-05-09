@@ -6,7 +6,10 @@
   import lombok.RequiredArgsConstructor;
   import org.springframework.http.HttpStatus;
   import org.springframework.http.ResponseEntity;
-  import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
   import org.springframework.web.bind.annotation.PostMapping;
   import org.springframework.web.bind.annotation.RequestBody;
   import org.springframework.web.bind.annotation.RequestMapping;
@@ -268,6 +271,43 @@
       userService.saveUser(body, Role.admin);
 
       twoFactorCodeService.registerAdmin(body.getFirstName(), body.getUsername(), body.getPassword(), body.getEmail());
+      return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+      summary = "Logs a user out",
+      description = "Logs a user out by revoking the refresh token, and setting both cookies max age to be 0"
+    )
+    @ApiResponses(
+      @ApiResponse(responseCode = "200", description = "User successfully logged out")
+    )
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/log-out") 
+    public ResponseEntity<?> logOut(HttpServletResponse response, HttpServletRequest request) {
+      Cookie[] cookies = request.getCookies();
+      if (cookies != null) {
+        for (Cookie cookie : cookies) {
+          if ("refreshToken".equals(cookie.getName())) {
+            refreshTokenService.revokeToken(cookie.getValue());
+          }
+        }
+      }
+      
+      Cookie jwtCookie = new Cookie("jwtToken", "");
+      jwtCookie.setMaxAge(0);
+      jwtCookie.setPath("/");
+      jwtCookie.setHttpOnly(true);
+      jwtCookie.setSecure(false);
+
+      Cookie refreshCookie = new Cookie("refreshToken", "");
+      refreshCookie.setMaxAge(0);
+      refreshCookie.setPath("/auth/refresh");
+      refreshCookie.setHttpOnly(true);
+      refreshCookie.setSecure(false);
+
+      response.addCookie(jwtCookie);
+      response.addCookie(refreshCookie);
+
       return ResponseEntity.ok().build();
     }
   }
