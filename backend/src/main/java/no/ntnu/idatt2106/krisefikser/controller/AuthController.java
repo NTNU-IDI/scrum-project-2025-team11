@@ -6,40 +6,38 @@ import java.util.Map;
   import lombok.RequiredArgsConstructor;
   import org.springframework.http.HttpStatus;
   import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+  import org.springframework.security.access.prepost.PreAuthorize;
+  import org.springframework.security.crypto.password.PasswordEncoder;
   import org.springframework.web.bind.annotation.PostMapping;
   import org.springframework.web.bind.annotation.RequestBody;
   import org.springframework.web.bind.annotation.RequestMapping;
   import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
-import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
-import no.ntnu.idatt2106.krisefikser.dto.ConfirmAuthenticationRequest;
-import no.ntnu.idatt2106.krisefikser.dto.HouseholdRequestDTO;
-import no.ntnu.idatt2106.krisefikser.dto.HouseholdResponseDTO;
-import no.ntnu.idatt2106.krisefikser.dto.LoginRequest;
-import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
-import no.ntnu.idatt2106.krisefikser.dto.UserResponseDTO;
-import no.ntnu.idatt2106.krisefikser.model.User;
-import no.ntnu.idatt2106.krisefikser.model.User.Role;
-import no.ntnu.idatt2106.krisefikser.security.JwtUtil;
-import no.ntnu.idatt2106.krisefikser.service.AddressService;
-import no.ntnu.idatt2106.krisefikser.service.HouseholdService;
-import no.ntnu.idatt2106.krisefikser.service.RefreshTokenService;
-import no.ntnu.idatt2106.krisefikser.service.TwoFactorCodeService;
-import no.ntnu.idatt2106.krisefikser.service.UserService;
+  import io.swagger.v3.oas.annotations.Operation;
+  import io.swagger.v3.oas.annotations.Parameter;
+  import io.swagger.v3.oas.annotations.media.Content;
+  import io.swagger.v3.oas.annotations.media.Schema;
+  import io.swagger.v3.oas.annotations.responses.ApiResponse;
+  import io.swagger.v3.oas.annotations.responses.ApiResponses;
+  import jakarta.servlet.http.Cookie;
+  import jakarta.servlet.http.HttpServletRequest;
+  import jakarta.servlet.http.HttpServletResponse;
+  import jakarta.validation.Valid;
+  import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
+  import no.ntnu.idatt2106.krisefikser.dto.ConfirmAuthenticationRequest;
+  import no.ntnu.idatt2106.krisefikser.dto.HouseholdRequestDTO;
+  import no.ntnu.idatt2106.krisefikser.dto.HouseholdResponseDTO;
+  import no.ntnu.idatt2106.krisefikser.dto.LoginRequest;
+  import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
+  import no.ntnu.idatt2106.krisefikser.dto.UserResponseDTO;
+  import no.ntnu.idatt2106.krisefikser.model.User;
+  import no.ntnu.idatt2106.krisefikser.model.User.Role;
+  import no.ntnu.idatt2106.krisefikser.security.JwtUtil;
+  import no.ntnu.idatt2106.krisefikser.service.AddressService;
+  import no.ntnu.idatt2106.krisefikser.service.HouseholdService;
+  import no.ntnu.idatt2106.krisefikser.service.RefreshTokenService;
+  import no.ntnu.idatt2106.krisefikser.service.TwoFactorCodeService;
+  import no.ntnu.idatt2106.krisefikser.service.UserService;
 
 /**
  * Controller class for handling authentication-related operations.
@@ -267,6 +265,7 @@ public class AuthController {
     @ApiResponse(responseCode = "400", description = "Invalid registration information"),
     @ApiResponse(responseCode = "409", description = "Either the email or username already exist")
   })
+  @PreAuthorize("hasRole('super_admin')")
   @PostMapping("/register-admin")
   public ResponseEntity<?> registerAdmin(@RequestBody UserRequestDTO body) throws Exception {
     if (userService.emailExists(body.getEmail())) {
@@ -300,6 +299,13 @@ public class AuthController {
     return ResponseEntity.ok().build();
   }
 
+  /**
+   * Logs a user out by setting the refresh token and jwt token max age to 0
+   * 
+   * @param response cookies sent back
+   * @param request cookies recieved from client
+   * @return status code 200 if everything is okay
+   */
   @Operation(
       summary = "Logs a user out",
       description = "Logs a user out by revoking the refresh token, and setting both cookies max age to be 0"
