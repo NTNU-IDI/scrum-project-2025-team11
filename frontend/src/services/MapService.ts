@@ -62,7 +62,7 @@ export function addEventsToMap(
       fillColor: color,
       weight: 2.5,
       radius: event.radius,
-      fillOpacity: 0.3,
+      fillOpacity: 0.15,
       interactive: true,
     }).addTo(map);
 

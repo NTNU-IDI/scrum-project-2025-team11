@@ -30,11 +30,11 @@ export function toRadians(degrees: number): number {
 
 export function getEventColor(severity: number) {
   if (severity === 0 || severity === 1) {
-    return "var(--bad-red)";
+    return "var(--yellow)";
   } else if (severity === 2 || severity === 3) {
     return "var(--light-orange)";
   } else if (severity === 4 || severity === 5) {
-    return "var(--yellow)";
+    return "var(--bad-red)";
   } else {
     return "var(--bad-red)";
   }

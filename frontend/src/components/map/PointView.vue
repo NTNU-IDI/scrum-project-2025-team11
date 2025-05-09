@@ -87,9 +87,9 @@
           <!-- Coordinates -->
           <div v-if="inputMethod === 'coordinates'" class="coordinates-input">
             <label class="point-label">Breddegrad</label>
-            <input class="point-input" v-model="pointData.latitude" type="number" placeholder="F.eks. 63,41" />
+            <input class="point-input" v-model="pointData.latitude" @change="clampLatitude" type="number" step="0.0001" min="-90" max="90" placeholder="F.eks. 63,41" />
             <label class="point-label">Lengdegrad</label>
-            <input class="point-input" v-model="pointData.longitude" type="number" placeholder="F.eks. 10,40" />
+            <input class="point-input" v-model="pointData.longitude" @change="clampLongitude" type="number" step="0.0001" min="-180" max="180" placeholder="F.eks. 10,40" />
           </div>
 
           <!-- Address -->
@@ -115,7 +115,6 @@
       </div>
   </div>
 </template>
-
 
 <script lang="ts" setup>
 import type { PointOfInterest } from "@/types/PointOfInterest";
@@ -191,7 +190,7 @@ watch(() => [pointData.value.latitude, pointData.value.longitude], ([newLat, new
 
 const hasValidationError = computed(() => {
   if (!validatePointName(pointData.value.name)) {
-    validationError.value = "Ugyldig navn. Bruk kun bokstaver, tall og noen skilletegn.";
+    validationError.value = "Navnet kan ikke være tomt.";
     return true;
   }
   if (!validateIconType(pointData.value.iconType)) {
@@ -199,7 +198,7 @@ const hasValidationError = computed(() => {
     return true;
   }
   if (!validatePointDescription(pointData.value.description)) {
-    validationError.value = "Beskrivelsen må være på minst 5 tegn.";
+    validationError.value = "Beskrivelsen kan ikke være tom.";
     return true;
   }
   if (!validateLatitude(pointData.value.latitude)) {
@@ -267,6 +266,16 @@ function nextShelter() {
 
 function stopNavigation() {
   emit('stop-navigation');
+}
+
+function clampLatitude() {
+  if (pointData.value.latitude > 90) pointData.value.latitude = 90;
+  if (pointData.value.latitude < -90) pointData.value.latitude = -90;
+}
+
+function clampLongitude() {
+  if (pointData.value.longitude > 180) pointData.value.longitude = 180;
+  if (pointData.value.longitude < -180) pointData.value.longitude = -180;
 }
 
 const createPoint = async () => {
