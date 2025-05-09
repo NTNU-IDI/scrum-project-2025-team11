@@ -1,8 +1,11 @@
 package no.ntnu.idatt2106.krisefikser.service;
 
 import jakarta.transaction.Transactional;
+
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -66,11 +69,25 @@ public class RefreshTokenService {
         return token;
     }
 
+    /**
+     * Set refresh token to revoked making it not useable.
+     * 
+     * @param tokenString the string of the token to look up by
+     */
     @Transactional
     public void revokeToken(String tokenString) {
         repository.findByToken(tokenString).ifPresent(token -> {
             token.setRevoked(true);
             repository.save(token);
         });
+    }
+
+    /**
+     * Method to delete all revoked refresh tokens with expiration date before current time.
+     * Should happen everyday at 2 AM.
+     */
+    @Scheduled(cron = "0 0 2 * * ?")
+    public void cleanUpRevokedTokens() {
+        repository.deleteAllByRevokedTrueAndExpirationDateBefore(Instant.now());
     }
 }

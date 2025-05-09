@@ -3,41 +3,41 @@ package no.ntnu.idatt2106.krisefikser.controller;
 import java.util.Arrays;
 import java.util.Map;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+  import lombok.RequiredArgsConstructor;
+  import org.springframework.http.HttpStatus;
+  import org.springframework.http.ResponseEntity;
+  import org.springframework.security.access.prepost.PreAuthorize;
+  import org.springframework.security.crypto.password.PasswordEncoder;
+  import org.springframework.web.bind.annotation.PostMapping;
+  import org.springframework.web.bind.annotation.RequestBody;
+  import org.springframework.web.bind.annotation.RequestMapping;
+  import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
-import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
-import no.ntnu.idatt2106.krisefikser.dto.ConfirmAuthenticationRequest;
-import no.ntnu.idatt2106.krisefikser.dto.HouseholdRequestDTO;
-import no.ntnu.idatt2106.krisefikser.dto.HouseholdResponseDTO;
-import no.ntnu.idatt2106.krisefikser.dto.LoginRequest;
-import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
-import no.ntnu.idatt2106.krisefikser.dto.UserResponseDTO;
-import no.ntnu.idatt2106.krisefikser.model.User;
-import no.ntnu.idatt2106.krisefikser.model.User.Role;
-import no.ntnu.idatt2106.krisefikser.security.JwtUtil;
-import no.ntnu.idatt2106.krisefikser.service.AddressService;
-import no.ntnu.idatt2106.krisefikser.service.HouseholdService;
-import no.ntnu.idatt2106.krisefikser.service.RefreshTokenService;
-import no.ntnu.idatt2106.krisefikser.service.TwoFactorCodeService;
-import no.ntnu.idatt2106.krisefikser.service.UserService;
+  import io.swagger.v3.oas.annotations.Operation;
+  import io.swagger.v3.oas.annotations.Parameter;
+  import io.swagger.v3.oas.annotations.media.Content;
+  import io.swagger.v3.oas.annotations.media.Schema;
+  import io.swagger.v3.oas.annotations.responses.ApiResponse;
+  import io.swagger.v3.oas.annotations.responses.ApiResponses;
+  import jakarta.servlet.http.Cookie;
+  import jakarta.servlet.http.HttpServletRequest;
+  import jakarta.servlet.http.HttpServletResponse;
+  import jakarta.validation.Valid;
+  import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
+  import no.ntnu.idatt2106.krisefikser.dto.ConfirmAuthenticationRequest;
+  import no.ntnu.idatt2106.krisefikser.dto.HouseholdRequestDTO;
+  import no.ntnu.idatt2106.krisefikser.dto.HouseholdResponseDTO;
+  import no.ntnu.idatt2106.krisefikser.dto.LoginRequest;
+  import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
+  import no.ntnu.idatt2106.krisefikser.dto.UserResponseDTO;
+  import no.ntnu.idatt2106.krisefikser.model.User;
+  import no.ntnu.idatt2106.krisefikser.model.User.Role;
+  import no.ntnu.idatt2106.krisefikser.security.JwtUtil;
+  import no.ntnu.idatt2106.krisefikser.service.AddressService;
+  import no.ntnu.idatt2106.krisefikser.service.HouseholdService;
+  import no.ntnu.idatt2106.krisefikser.service.RefreshTokenService;
+  import no.ntnu.idatt2106.krisefikser.service.TwoFactorCodeService;
+  import no.ntnu.idatt2106.krisefikser.service.UserService;
 
 /**
  * Controller class for handling authentication-related operations.
@@ -298,5 +298,49 @@ public class AuthController {
     twoFactorCodeService.registerAdmin(body.getFirstName(), body.getUsername(), body.getPassword(), body.getEmail());
     return ResponseEntity.ok().build();
   }
+
+  /**
+   * Logs a user out by setting the refresh token and jwt token max age to 0
+   * 
+   * @param response cookies sent back
+   * @param request cookies recieved from client
+   * @return status code 200 if everything is okay
+   */
+  @Operation(
+      summary = "Logs a user out",
+      description = "Logs a user out by revoking the refresh token, and setting both cookies max age to be 0"
+    )
+    @ApiResponses(
+      @ApiResponse(responseCode = "200", description = "User successfully logged out")
+    )
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/log-out") 
+    public ResponseEntity<?> logOut(HttpServletResponse response, HttpServletRequest request) {
+      Cookie[] cookies = request.getCookies();
+      if (cookies != null) {
+        for (Cookie cookie : cookies) {
+          if ("refreshToken".equals(cookie.getName())) {
+            refreshTokenService.revokeToken(cookie.getValue());
+          }
+        }
+      }
+      
+      Cookie jwtCookie = new Cookie("jwtToken", "");
+      jwtCookie.setMaxAge(0);
+      jwtCookie.setPath("/");
+      jwtCookie.setHttpOnly(true);
+      jwtCookie.setSecure(false);
+
+      Cookie refreshCookie = new Cookie("refreshToken", "");
+      refreshCookie.setMaxAge(0);
+      refreshCookie.setPath("/auth/refresh");
+      refreshCookie.setHttpOnly(true);
+      refreshCookie.setSecure(false);
+
+      response.addCookie(jwtCookie);
+      response.addCookie(refreshCookie);
+
+      return ResponseEntity.ok().build();
+    }
 }
 

@@ -1,5 +1,6 @@
 package no.ntnu.idatt2106.krisefikser.repository;
 
+import java.time.Instant;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +15,5 @@ import no.ntnu.idatt2106.krisefikser.model.RefreshToken;
  */
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Integer>{
     Optional<RefreshToken> findByToken(String token);
+    void deleteAllByRevokedTrueAndExpirationDateBefore(Instant expiry);
 }
