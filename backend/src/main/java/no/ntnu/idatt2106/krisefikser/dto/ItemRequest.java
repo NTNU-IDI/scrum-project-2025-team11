@@ -9,12 +9,7 @@ import lombok.Setter;
 
 
 /**
- * Data Transfer Object for Item Request
- * This class is used to transfer item data in the request.
- * 
- * It contains the following fields:
- * - name: Name of the item
- * - description: Detailed description of the item
+ * DTO for creating or updating an item.
  */
 @Getter @Setter @NoArgsConstructor
 @Schema(description = "Payload for creating or updating an Item")

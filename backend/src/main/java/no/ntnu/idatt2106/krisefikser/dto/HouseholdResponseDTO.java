@@ -6,6 +6,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+/**
+ * DTO for returning household data to the client.
+ */
 @Data
 public class HouseholdResponseDTO {
     @Schema(description = "Unique identifier in the household table", example = "1")
