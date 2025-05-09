@@ -46,15 +46,15 @@ describe("IconsOverview", () => {
     const ul = wrapper.find("ul.map-overview-details");
     const header = wrapper.find(".map-overview-box-header");
 
-    expect(ul.isVisible()).toBe(false);
-
-    await header.trigger("click");
-    await wrapper.vm.$nextTick();
     expect(ul.isVisible()).toBe(true);
 
     await header.trigger("click");
     await wrapper.vm.$nextTick();
     expect(ul.isVisible()).toBe(false);
+
+    await header.trigger("click");
+    await wrapper.vm.$nextTick();
+    expect(ul.isVisible()).toBe(true);
 
     wrapper.unmount();
   });
