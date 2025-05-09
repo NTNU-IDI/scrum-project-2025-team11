@@ -18,10 +18,10 @@ public class OrphanItemCleanupTask {
     /**
      * Runs every day at 02:00 in the Europe/Oslo timezone.
      */
-    @Scheduled(cron = "0 5 2 * * *", zone = "Europe/Oslo")
+    @Scheduled(cron = "0 05 2 * * *", zone = "Europe/Oslo")
     @Transactional
     public void purgeOrphanItems() {
         int deleted = itemRepository.deleteOrphanItems();
-        System.out.println("Orphan-cleanup: deleted " + deleted + " items at 02:00");
+        System.out.println("Orphan-cleanup: deleted " + deleted + " items at 02:05");
     }
 }
