@@ -3,6 +3,9 @@ package no.ntnu.idatt2106.krisefikser.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+/**
+ * DTO for returning event data to the client.
+ */
 @Data
 public class EventResponseDTO {
   

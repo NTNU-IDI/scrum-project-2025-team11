@@ -17,6 +17,7 @@ import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
 import {useUserStore} from "@/stores/userStore.ts";
 import {useToast} from "vue-toast-notification";
+import PreparationsView from "@/views/PreparationsView.vue";
 
 const $toast = useToast()
 
@@ -56,6 +57,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/userhome",
     name: "UserHomeView",
     component: UserHomeView,
+    meta: { requiresNormalUser: true }
   },
   {
     path: "/superadmin",
@@ -78,6 +80,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/adminhome',
     name: 'HomeAdminView',
     component: HomeAdminView,
+    meta: { requiresAdmin: true }
   },
   { path: '/about',
     name: 'AboutView',
@@ -93,12 +96,26 @@ const routes: Array<RouteRecordRaw> = [
     name: "ResetPassword",
     component: ResetPassword,
   },
+
+
+  {
+    path: "/headers",
+    name: "Headers",
+    component: Headers,
+  },
+  {
+    path: "/beredskap/:stage",
+    name: "Beredskap",
+    component: PreparationsView
+  }
 ];
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
 });
+
+// Accesse 
 
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
@@ -115,6 +132,8 @@ router.beforeEach((to, from, next) => {
   } else {
     next()
   }
+  
 })
+  
 
 export default router;

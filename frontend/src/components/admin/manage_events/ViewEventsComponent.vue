@@ -36,7 +36,7 @@ watch(() => eventStore.events, async (newEvents) => {
 watch(() => eventStore.chosenEvent, async (newEvent) => {
     if (newEvent) {
         selectedEventId.value = newEvent.id;
-    }
+    } 
 });
 
 // Choose an item in the supply
@@ -73,6 +73,7 @@ const chooseEvent = (eventId: any) => {
     }
     .grey-container {
         height: auto;
+        width: 25vw;
     }
 
     .article-card {

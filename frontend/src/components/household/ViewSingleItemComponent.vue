@@ -131,7 +131,7 @@ const updateItems = async () => {
             };
             await inventoryStore.updateItem(updatedItem)
             .then(() => {
-                $toast.success(`${item.itemName} er oppdatert`, {
+                $toast.success(`Vare er oppdatert`, {
                     duration: 3000,
                     position: 'top-right'
                 });
@@ -180,6 +180,24 @@ const deleteItem = async (item: EditableItem) => {
     }
 }
 
+const checkExpirationDate = (expirationDate: string) => {
+    const today = new Date();
+    const expiration = new Date(expirationDate);
+    today.setHours(0, 0, 0, 0);
+    expiration.setHours(0, 0, 0, 0);
+
+    if (expiration < today) {
+        console.log('Expired');
+        return 2;
+    } else if (expiration.getTime() - today.getTime() < 7 * 24 * 60 * 60 * 1000) {
+        console.log('Expiring soon');
+        return 1;
+    } else {
+        console.log('Not expired');
+        return 0;
+    }
+}
+
 </script>
 <template>
     <h1 class="medium-header">Informasjon om artikkel</h1>
@@ -212,6 +230,12 @@ const deleteItem = async (item: EditableItem) => {
                     <div class="exp-date">
                         <span class="grey-text">Utløper: </span> {{ item.expirationDate }}
                     </div>
+                    <div v-if="checkExpirationDate(item.expirationDate) === 2">
+                        <i class="fa fa-exclamation-triangle"></i>
+                    </div>
+                    <div v-else-if="checkExpirationDate(item.expirationDate) === 1">
+                        <i class="fa fa-hourglass-end"></i>
+                    </div>
                 </div>
             </div>
         </div>
@@ -222,7 +246,7 @@ const deleteItem = async (item: EditableItem) => {
     .grey-container {
         background-color: var(--light-blue);
         margin-bottom: 4.1rem;
-        width: 500px;
+        width: 35vw;
     }
 
     .small-header {
@@ -262,6 +286,16 @@ const deleteItem = async (item: EditableItem) => {
     .exp-date {
         display: flex;
         align-items: center;
+    }
+
+    .info {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+    }
+
+    i {
+        margin-top: 0.4rem;
     }
 
     @media(max-width: 480px) {

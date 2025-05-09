@@ -1,33 +1,34 @@
 <template>
   <header class="header">
     <div class="header-container">
-      <div class="header-icons">
-        <img src="../assets/invertednew.png" alt="Logo" class="logo" @click="goToHome" data-tooltip="Til hjemmesiden" />
-        <img src="../assets/ikon/map-trifold-fill.png" alt="Kart" class="icon" @click="goToMap" data-tooltip="Til kartet" />
-        <img src="../assets/ikon/lightbulb-fill.png" alt="Beredskap" class="icon" @click="goToInformation" data-tooltip="Beredskap" />
+      <div class="header-left">
+        <img src="../assets/invertednew.png" alt="Logo" class="logo" @click="goToHome"/>
+        <nav class="nav-buttons">
+          <router-link to="/" class="button other"><i class="fa fa-home" aria-hidden="true"></i> Hjem</router-link>
+          <router-link to="/map" class="button other"><i class="fa fa-map-o" aria-hidden="true"></i> Kart</router-link>
+        </nav>
       </div>
 
-      <nav class="nav-buttons">
-        <a href="/login" class="button login">Logg inn</a>
+      <nav class="header-right">
+        <router-link to="/login" class="button login"><i class="fa fa-sign-in" aria-hidden="true"></i> Logg inn / <i class="fa fa-user-plus" aria-hidden="true"></i> Registrer deg</router-link>
       </nav>
+      <button class="hamburger" @click="toggleMobileMenu"><i class="fa fa-bars" aria-hidden="true"></i> Meny</button>
     </div>
+
+    <nav v-if="isMobileMenuOpen" class="mobile-nav">
+      <router-link to="/" class="button other"><i class="fa fa-home" aria-hidden="true"></i> Hjem</router-link>
+      <router-link to="/map" class="button other"><i class="fa fa-map-o" aria-hidden="true"></i> Kart</router-link>
+      <router-link to="/login" class="button login"><i class="fa fa-sign-in" aria-hidden="true"></i> Logg inn / <i class="fa fa-user-plus" aria-hidden="true"></i> Registrer</router-link>
+    </nav>
   </header>
 </template>
 
 <script lang="ts" setup>
 import { useRouter } from 'vue-router'
-const router = useRouter()
-const goToMap = () => {
-  router.push('/map')
-}
-const goToHome = () => {
-  router.push('/')
-}
-const goToLogin = () => {
-  router.push('/login')
-}
-const goToInformation = () => {
-  router.push('/information')
-}
-</script>
+import { ref } from 'vue'
 
+const router = useRouter()
+const goToHome = () => router.push('/')
+const isMobileMenuOpen = ref(false)
+const toggleMobileMenu = () => isMobileMenuOpen.value = !isMobileMenuOpen.value
+</script>

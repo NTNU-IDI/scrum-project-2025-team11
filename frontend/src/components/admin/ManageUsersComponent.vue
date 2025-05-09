@@ -20,7 +20,7 @@ const displaySuccess = () => {
 <div class="container">
     <div class="header-box"> 
         <h1>Administrere adminbrukere</h1>
-        <p>Her kan du administrere adminbrukere. Husk at du igjennom dette grensesnittet har tilgang til krtiske opplysninger -  vennligst ta ansvaret som følger med det.</p>
+        <p>Her kan du administrere adminbrukere. Husk at du igjennom dette grensesnittet har tilgang til kritiske opplysninger -  vennligst ta ansvaret som følger med det.</p>
     </div>   
     <div class="page-container">
         <ViewUsersComponent />
@@ -69,5 +69,16 @@ h1 {
     background-color: var(--orange);
     margin-left: auto;
     margin-top: 4.7rem;
+}
+
+@media (max-width: 480px) {
+    .page-container {
+        flex-direction: column;
+    }
+   
+    .modal-overlay {
+        overflow-x: hidden;
+        top: 0;
+    }
 }
 </style>

@@ -4,8 +4,8 @@ import NewMemberComponent from '@/components/household/NewMemberComponent.vue';
 import ViewMembersComponent from '@/components/household/ViewMembersComponent.vue';
 import ViewSingleItemComponent from '@/components/household/ViewSingleItemComponent.vue';
 import ViewSuppliesComponent from '@/components/household/ViewSuppliesComponent.vue';
-import Header from '@/components/Header.vue';
-import Footer from '@/components/Footer.vue';
+import HeaderBase from '@/components/HeaderBase.vue'
+import Footer from '@/components/Footer.vue'
 import { ref } from 'vue';
 import { useToast } from 'vue-toast-notification';
 
@@ -41,10 +41,18 @@ const newItemSuccess = () => {
         position: 'top-right'
     });
 }
+
+const inviteSuccess = () => {
+	isMemberBoxVisible.value = false;
+	$toast.success(`Invitasjonslink sendt!`, {
+		duration: 3000,
+		position: 'top-right'
+    });
+}
 </script>
 
 <template>
-	<Header />
+	<HeaderBase />
   	<div class="page-container">
 		<h1>Min husstand</h1>
 		<div class="members-container">
@@ -54,6 +62,7 @@ const newItemSuccess = () => {
 				<NewMemberComponent
 				@close="isMemberBoxVisible = false"
 				@hide-new-member-box="isMemberBoxVisible = false"
+				@invite-success="inviteSuccess"
 				/>
 			</div>
 		</div>
@@ -65,7 +74,11 @@ const newItemSuccess = () => {
 			<div class="items-column">
 			<ViewSingleItemComponent />
 			</div>
-			<button class="dark-button" id="add-button" @click="toggleNewItemBox">+ Ny vare</button> 
+			<div class="icon-button-container">
+				<button class="dark-button" id="add-button" @click="toggleNewItemBox">+ Ny vare</button> 
+				<p><i class="fa fa-exclamation-triangle"></i> Gått ut på dato</p>
+				<p><i class="fa fa-hourglass-end"></i> Går ut om under en uke</p>
+			</div>
 
 			<div class="modal-overlay" v-if="isItemBoxVisible" @click.self="isItemBoxVisible = false">
 				<NewItemComponent  
@@ -74,6 +87,8 @@ const newItemSuccess = () => {
 				@new-item-success="newItemSuccess"
 				/>
 			</div>
+
+
 		</div>
 
 		
@@ -86,10 +101,10 @@ const newItemSuccess = () => {
 	.page-container {
 		display: flex;
 		flex-direction: column;
-		gap: 2rem;
+		gap: 2vw;
 		padding: 1rem;
     	margin-right: 0px;
-		margin: 0 3rem 0 3rem ;
+		margin: 0 3vw 0 3vw ;
 	}
 
 	h1 {
@@ -100,7 +115,8 @@ const newItemSuccess = () => {
 	.items-container{
 		display: flex;
 		flex-direction: row;
-		gap: 2rem;
+		min-height: 50vh;
+		gap: 2vw;
 		padding: 1rem;
 	
 	}
@@ -121,7 +137,7 @@ const newItemSuccess = () => {
         display: flex;
         align-items: center; 
         justify-content: center; 
-        width: 6.5rem; 
+        width: 6.vm; 
         height: 3.5rem; 
         margin-left: 0px;
         margin-top: 4.75rem;

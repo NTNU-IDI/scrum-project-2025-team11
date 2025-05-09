@@ -23,21 +23,6 @@ function validateCode() {
   }
   return true;
 }
-
-const confirmCodee = async () => { // Function to confirm the verification code
-  /*try {
-    await axios.post('http/localhost:8080/api/2fa/confirm', { // API endpoint for confirming the code
-      code: code.value // The verification code entered by the user
-    })
-    router.push('/userhome') // Redirect to the home page after successful confirmation
-  } catch (err: any) { // Error handling
-    if (err.response && err.response.status === 400) { // Check if the error is a 400 Bad Request
-      errorMessage.value = 'Ugyldig eller utløpt kode. '
-    } else {
-      errorMessage.value = 'En feil oppstod. Prøv igjen'
-    }
-  }*/
-}
 </script>
 
 <template>

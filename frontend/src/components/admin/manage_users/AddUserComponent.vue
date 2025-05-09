@@ -21,6 +21,7 @@ const password = ref('');
 const passwordRepeat = ref('');
 const email = ref('');
 const errorMsg = ref('');
+const emit = defineEmits(['hide-new-user-box', 'new-user-success']);
 
 const validInput = () => {
     if(!validateFirstName(firstName.value)){
@@ -80,6 +81,14 @@ const createUser = async () => {
                 position: 'top-right'
             });
         });
+        if(adminUserStore.errorMsg !== '') {
+            $toast.error(adminUserStore.errorMsg, {
+                duration: 3000,
+                position: 'top-right'
+            });
+        } else {
+            emit('new-user-success');
+        }
     }
 }
 
@@ -94,8 +103,10 @@ const areFieldsEmpty = computed(() => {
         <h1 class="medium-header">Legg til adminbruker</h1>
         <div class="grey-container">
             <div class="input-fields">
-                <div class="header">Opprettelse av ny adminbruker</div>
-                <button class="cancel-button" @click="$emit('hide-new-user-box')">X</button>
+                <div classe="header-x-container">
+                    <button class="cancel-button" @click="$emit('hide-new-user-box')">X</button>
+                    <div class="header">Opprettelse av ny adminbruker</div>
+                </div> 
                 <label class="label" for="first-name">*Fornavn</label>
                 <input type="text" class="user-input" id="first-name" v-model="firstName"></input>
                 <label class="label" for="last-name">*Etternavn</label>
@@ -109,7 +120,7 @@ const areFieldsEmpty = computed(() => {
                 <label class="label" for="repeat-pass">*Gjenta passord</label>
                 <input type="password" class="user-input" id="repeat-pass" v-model="passwordRepeat"></input>
             </div>
-            <button class="dark-button" @click="() => {createUser; $emit('new-user-success');}" :disabled="areFieldsEmpty">+ Opprett adminbruker</button>
+            <button class="dark-button" @click="createUser" :disabled="areFieldsEmpty">+ Opprett adminbruker</button>
             <p class="error-message">{{ errorMsg }}</p>
         </div>
     </div>
@@ -127,6 +138,7 @@ const areFieldsEmpty = computed(() => {
     font-size: var(--font-size-large);
     margin-bottom: 0.5rem;
     background-color: transparent;
+    box-shadow: none;
 }
 
 h1 {
@@ -155,11 +167,20 @@ h1 {
     cursor: not-allowed;
 }
 
+.header-x-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
 .cancel-button {
-    position: absolute;
-    top: 6.5rem;
-    right: -10.5rem;
+    margin-left: 11rem;
     color: var(--bad-red);
     background-color: transparent;
+}
+
+@media (max-width: 480px) {
+    .cancel-button {
+        margin-left: 9rem;
+    }
 }
 </style>

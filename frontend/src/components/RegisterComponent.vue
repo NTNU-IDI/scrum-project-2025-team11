@@ -14,6 +14,8 @@ const username = ref('')
 const email = ref('')
 const password = ref('')
 const repeatedPassword = ref('')
+const passwordInputType = ref('password')
+const showPassword = ref(false)
 //Input for existing household
 const householdCode = ref('');
 //Input for new household
@@ -31,10 +33,8 @@ const errorMessage = ref('');
 const recaptchaToken = ref('');
 
 function validateFields() {
-  let errorInfo = []
   errorMessage.value = ""
   if (!validateFirstName(firstName.value)) {
-    errorInfo.push("hei")
     errorMessage.value = "Sørg for at fornavn kun består av bokstaver, mellomrom og eller bindestrek."
     return false
   }
@@ -47,19 +47,18 @@ function validateFields() {
     return false
   }
   if (!validateUsername(username.value)) {
-    errorMessage.value = "Sørg for at brukernavn kun består av bokstaver og tall."
-    return false
-  }
-  //Password validation should be improved.
-  //Validates that passwords are not empty and that they match
-  if (!validateBothPasswords(password.value, repeatedPassword.value)) {
-    errorMessage.value = "Passordene dine er tomme eller ulike."
+    errorMessage.value = "Sørg for at brukernavn kun består av bokstaver (eksklusivt æ, ø og å) og tall."
     return false
   }
   //Validates that the password matches the regex.
   if(!validatePassword(password.value) || !validatePassword(repeatedPassword.value)) {
     errorMessage.value = "Passordet ditt oppfyller ikke kravene om 8 tegn, med minst én stor bokstav, én liten bokstav," +
         " ett tall og ett spesialtegn."
+    return false
+  }
+  //Validates that passwords are not empty and that they match
+  if (!validateBothPasswords(password.value, repeatedPassword.value)) {
+    errorMessage.value = "Passordene dine er tomme eller ulike."
     return false
   }
   if (householdChoice.value === "new") {
@@ -182,6 +181,14 @@ function handleHouseholdChoice() {
   }
 }
 
+function changePasswordVisibility() {
+  if(showPassword.value === false) {
+    passwordInputType.value = 'password'
+  } else {
+    passwordInputType.value = 'text'
+  }
+}
+
 watch(postalCode, (newPostalCode) => {
   postalCode.value = newPostalCode.replace(/[^0-9]/g, '')
 
@@ -203,26 +210,29 @@ defineExpose({validateFields})
 
 <template>
   <div id="divRegister" class="register-login-container">
-    <h1>Registrer bruker</h1>
+    <h1>Registrer bruker</h1> <br>
     <form v-on:submit.prevent>
+      <p>Vennligst legg inn informasjon for din egen bruker.</p>
       <div id="divConstantInputs">
-        <input type="text" placeholder="Fornavn" v-model="firstName" id="iptFirstName" required>
-        <input type="text" placeholder="Etternavn" v-model="lastName" id="iptLastName" required>
-        <input type="text" placeholder="Brukernavn" v-model="username" id="iptUsername" required>
-        <input type="email" placeholder="Epost" v-model="email" id="iptEmail" required>
-        <input type="password" placeholder="Passord" v-model="password" id="iptPassword" required>
-        <input type="password" placeholder="Gjenta passord" v-model="repeatedPassword" id="iptRepeatedPassword" required>
+        <label>Fornavn <span class="importantStar">*</span><input type="text"  v-model="firstName" id="iptFirstName" required> </label>
+        <label>Etternavn <span class="importantStar">*</span><input type="text" v-model="lastName" id="iptLastName" required> </label>
+        <label>Brukernavn <span class="importantStar">*</span><input type="text" placeholder="F.eks. OlaNord" v-model="username" id="iptUsername" required> </label>
+        <label>Epost <span class="importantStar">*</span><input type="email" v-model="email" id="iptEmail" required> </label>
+        <label>Passord <span class="importantStar">*</span><input :type="passwordInputType" v-model="password" id="iptPassword" required> </label>
+        <label>Gjenta passord<span class="importantStar">*</span><input :type="passwordInputType" v-model="repeatedPassword" id="iptRepeatedPassword" required> </label>
       </div>
-      <br>
+      <label><input type="checkbox" id="cbPassword" v-model="showPassword" @change="changePasswordVisibility"> Vis passord</label>
+      <br> <br>
+      <p>Vennligst legg inn informasjon om ny, eller eksisterende, husstand.</p>
       <label><input type="radio" v-model="householdChoice" value="new" @change="handleHouseholdChoice"> Ny husstand </label>
       <label><input type="radio" v-model="householdChoice" value="existing" @change="handleHouseholdChoice"> Eksisterende husstand </label>
       <br>
       <div id="divNewHouseholdInfo" v-if="hasChosenNewHousehold">
-        <input type="text" placeholder="Husholdningsnavn, f.eks. 'Familien Madsen'" v-model="householdName" id="iptHouseholdName" required>
-        <input type="text" placeholder="Adresse" v-model="address" id="iptAddress" required>
-        <input type="text" placeholder="Postkode" v-model="postalCode" id="iptPostalCode" required>
+        <label>Husholdningsnavn <span class="importantStar">*</span><input type="text" placeholder="F.eks. 'Familien Nordmann'" v-model="householdName" id="iptHouseholdName" required> </label>
+        <label>Adresse <span class="importantStar">*</span><input type="text" v-model="address" id="iptAddress" required> </label>
+        <label>Postkode <span class="importantStar">*</span><input type="text" v-model="postalCode" id="iptPostalCode" required> </label>
       </div>
-      <input type="text" v-if="!hasChosenNewHousehold" placeholder="Husstandsskode" v-model="householdCode" id="iptHouseholdCode" required><br><br>
+      <label v-if="!hasChosenNewHousehold"> Inviteringskode <span class="importantStar">*</span><input type="text" v-model="householdCode" id="iptHouseholdCode" required> </label><br><br>
       <label><input type="checkbox" v-model="privacyPolicyCheck" id="cbPrivacyPolicy" required>
         Jeg godtar og har lest <a href="/personvern" id="linkPrivacyPolicy" target="_blank" class="link"> personvernerklæringen</a> </label> <br>
       <button class="good-button" type="submit" @click="attemptRegistration"> Registrer </button>

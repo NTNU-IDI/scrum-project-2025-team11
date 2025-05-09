@@ -4,18 +4,28 @@ import no.ntnu.idatt2106.krisefikser.dto.PointOfInterestResponseDTO;
 import no.ntnu.idatt2106.krisefikser.model.PointOfInterest;
 
 /**
- * Mapper class to map household entities to PointOfInterestResponseDTO
+ * Utility class for converting PointOfInterest entities into their response DTO format.
+ * <p>
+ * Provides a method to transform the domain model into a transport-friendly structure
+ * suitable for API responses.
  */
 public class PointOfInterestMapper {
 
+    /**
+     * Maps a PointOfInterest entity to a PointOfInterestResponseDTO.
+     *
+     * @param pointOfInterest the source entity containing POI details
+     * @return a populated PointOfInterestResponseDTO with id, name, icon type,
+     *         description, and geographic coordinates
+     */
     public static PointOfInterestResponseDTO toResponseDTO(PointOfInterest pointOfInterest) {
-        PointOfInterestResponseDTO pointOfInterestResponseDTO = new PointOfInterestResponseDTO();
-        pointOfInterestResponseDTO.setId(pointOfInterest.getId());
-        pointOfInterestResponseDTO.setName(pointOfInterest.getName());
-        pointOfInterestResponseDTO.setIconType(pointOfInterest.getIconType());
-        pointOfInterestResponseDTO.setDescription(pointOfInterest.getDescription());
-        pointOfInterestResponseDTO.setLatitude(pointOfInterest.getLatitude());
-        pointOfInterestResponseDTO.setLongitude(pointOfInterest.getLongitude());
-        return pointOfInterestResponseDTO;
+        PointOfInterestResponseDTO dto = new PointOfInterestResponseDTO();
+        dto.setId(pointOfInterest.getId());
+        dto.setName(pointOfInterest.getName());
+        dto.setIconType(pointOfInterest.getIconType());
+        dto.setDescription(pointOfInterest.getDescription());
+        dto.setLatitude(pointOfInterest.getLatitude());
+        dto.setLongitude(pointOfInterest.getLongitude());
+        return dto;
     }
 }

@@ -102,7 +102,6 @@ export async function registerNormalUser(firstName: string, lastName: string, us
 
 export async function refreshToken() {
     const userStore = useUserStore()
-    const router = useRouter()
 
     await axios.post("http://localhost:8080/auth/refresh", {},{withCredentials: true})
         .then((response) => {
@@ -116,10 +115,17 @@ export async function refreshToken() {
         });
 }
 
-export function logOutUser() {
+export async function logOutUser() {
     const userStore = useUserStore()
-    const router = useRouter()
 
-    userStore.logout()
-    router.push("/")
+    await axios.post("http://localhost:8080/auth/log-out", {}, {withCredentials: true})
+        .then(() => {
+            userStore.logout()
+            router.push("/")
+        })
+        .catch(() => {
+            let instance = $toast.error('Fikk ikke til å logge ut. Prøv igjen.')
+        })
+
+
 }

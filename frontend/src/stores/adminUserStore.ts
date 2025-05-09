@@ -5,6 +5,7 @@ import { AdminService } from '@/api/AdminService';
 export const useAdminUserStore = defineStore('adminUsers', {
     state: () => ({
         adminUsers: [] as UserResponseDTO[],
+        errorMsg: '' as string,
     }),
 
     actions: {
@@ -13,24 +14,26 @@ export const useAdminUserStore = defineStore('adminUsers', {
                 const data = await AdminService.findAll();
                 this.adminUsers = data.filter(user => user.role === 'admin');
             } catch (error) {
-                console.error('Error fetching admin users:', error);
+                console.error('Kunne ikke finne adminbrukere:', error);
             }
         },
         async deleteUser(userId: number) {
            try {
-                await AdminService.deleteUser(userId);
+                const response = await AdminService.deleteUser(userId);
+                this.errorMsg = response;
                 await this.fetchUsers();
             }
             catch (error) {
+                this.errorMsg = error as string;
            } 
         },
-
-        async createUser(user: Omit<UserRequestDTO, 'id'>) {
+        async createUser(user: UserRequestDTO) {
             try {
-                await AdminService.create(user);
+                const response = await AdminService.create(user);
+                this.errorMsg = response;
                 await this.fetchUsers(); 
             } catch (error) {
-                console.error('Error adding admin user:', error);
+                this.errorMsg = error as string;
             }
         }
     },

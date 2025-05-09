@@ -1,4 +1,4 @@
-  package no.ntnu.idatt2106.krisefikser.controller;
+package no.ntnu.idatt2106.krisefikser.controller;
 
   import java.util.Arrays;
   import java.util.Map;
@@ -6,7 +6,8 @@ import java.util.logging.Logger;
 
 import lombok.RequiredArgsConstructor;
   import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+  import org.springframework.http.ResponseEntity;
+  import org.springframework.security.access.prepost.PreAuthorize;
   import org.springframework.security.crypto.password.PasswordEncoder;
   import org.springframework.web.bind.annotation.PostMapping;
   import org.springframework.web.bind.annotation.RequestBody;
@@ -23,13 +24,13 @@ import org.springframework.web.bind.annotation.RestController;
   import jakarta.servlet.http.Cookie;
   import jakarta.servlet.http.HttpServletRequest;
   import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
-import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
-import no.ntnu.idatt2106.krisefikser.dto.ConfirmAuthenticationRequest;
-import no.ntnu.idatt2106.krisefikser.dto.HouseholdRequestDTO;
-import no.ntnu.idatt2106.krisefikser.dto.HouseholdResponseDTO;
-import no.ntnu.idatt2106.krisefikser.dto.LoginRequest;
-import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
+  import jakarta.validation.Valid;
+  import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
+  import no.ntnu.idatt2106.krisefikser.dto.ConfirmAuthenticationRequest;
+  import no.ntnu.idatt2106.krisefikser.dto.HouseholdRequestDTO;
+  import no.ntnu.idatt2106.krisefikser.dto.HouseholdResponseDTO;
+  import no.ntnu.idatt2106.krisefikser.dto.LoginRequest;
+  import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
   import no.ntnu.idatt2106.krisefikser.dto.UserResponseDTO;
 import no.ntnu.idatt2106.krisefikser.model.User;
 import no.ntnu.idatt2106.krisefikser.model.User.Role;
@@ -54,9 +55,15 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
     private final AddressService addressService;
     private final HouseholdService householdService;
     private final RecaptchaService recaptchaService;
-
-    Logger logger = Logger.getLogger(AuthController.class.getName());
-
+    private static final Logger logger = Logger.getLogger(AuthController.class.getName());
+    /**
+     * Endpoint to refresh the JWT token. It checks if the refresh token is valid and
+     * generates a new JWT token if it is. The old refresh token is revoked.
+     *
+     * @param request  the HTTP request containing the refresh token
+     * @param response the HTTP response to set the new JWT token
+     * @return a response entity with the new JWT token or an error message
+     */
     @Operation(
       summary = "Refresh JWT token",
       description = "Refreshes the JWT token by generating a new one if old was a valid token")
@@ -106,6 +113,9 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
      * mail address containing the authentication code
      * 
      * @param loginRequest a DTO of the information that is sent such as username and password 
+     * @param response the HTTP response to set the new JWT token
+     * 
+     * * @return a response entity indicating the result of the operation
      */
     @Operation(
       summary = "Checks login credentials",
@@ -136,6 +146,15 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
       return ResponseEntity.ok().build();
     }
 
+    /**
+   * Generates a refresh token and a JWT token for the user.
+   * The refresh token is stored in a cookie with HttpOnly and Secure flags.
+   * The JWT token is also stored in a cookie with HttpOnly and Secure flags.
+   * 
+   * @param username the username of the user
+   * @param user the user object containing user details
+   * @return a cookie containing the refresh token
+   */
     private Cookie generateRefreshToken(String username, User user) {
       String refreshToken = jwtUtil.generateRefreshToken(username);
 
@@ -183,17 +202,18 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
       
       if (!recaptchaService.validateCaptcha(recaptchaToken, "register")) {
         return ResponseEntity.status(422).body("Invalid reCAPTCHA");
-    }
-      
+      }
+
+  
       if (userService.emailExists(body.getEmail())) {
         return ResponseEntity
             .status(409) // Conflict
-            .body("Email already exists");
+            .body("Email already taken");
       }
       if (userService.usernameExists(body.getUsername())) {
         return ResponseEntity
             .status(409) // Conflict
-            .body("Username already exists");
+            .body("Username already taken");
       }
 
       UserResponseDTO saved = userService.saveUser(body, Role.normal);
@@ -256,6 +276,7 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
             @ApiResponse(responseCode = "400", description = "Invalid registration information"),
             @ApiResponse(responseCode = "409", description = "Either the email or username already exist")
     })
+    @PreAuthorize("hasRole('super_admin')")
     @PostMapping("/register-admin")
     public ResponseEntity<?> registerAdmin(@RequestBody UserRequestDTO body) throws Exception {
       if (userService.emailExists(body.getEmail())) {
@@ -288,5 +309,49 @@ import no.ntnu.idatt2106.krisefikser.service.UserService;
       twoFactorCodeService.registerAdmin(body.getFirstName(), body.getUsername(), body.getPassword(), body.getEmail());
       return ResponseEntity.ok().build();
     }
+
+    /**
+   * Logs a user out by setting the refresh token and jwt token max age to 0
+   * 
+   * @param response cookies sent back
+   * @param request cookies recieved from client
+   * @return status code 200 if everything is okay
+   */
+  @Operation(
+    summary = "Logs a user out",
+    description = "Logs a user out by revoking the refresh token, and setting both cookies max age to be 0"
+  )
+  @ApiResponses(
+    @ApiResponse(responseCode = "200", description = "User successfully logged out")
+  )
+  @PreAuthorize("isAuthenticated()")
+  @PostMapping("/log-out") 
+  public ResponseEntity<?> logOut(HttpServletResponse response, HttpServletRequest request) {
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      for (Cookie cookie : cookies) {
+        if ("refreshToken".equals(cookie.getName())) {
+          refreshTokenService.revokeToken(cookie.getValue());
+        }
+      }
+    }
+    
+    Cookie jwtCookie = new Cookie("jwtToken", "");
+    jwtCookie.setMaxAge(0);
+    jwtCookie.setPath("/");
+    jwtCookie.setHttpOnly(true);
+    jwtCookie.setSecure(false);
+
+    Cookie refreshCookie = new Cookie("refreshToken", "");
+    refreshCookie.setMaxAge(0);
+    refreshCookie.setPath("/auth/refresh");
+    refreshCookie.setHttpOnly(true);
+    refreshCookie.setSecure(false);
+
+    response.addCookie(jwtCookie);
+    response.addCookie(refreshCookie);
+
+    return ResponseEntity.ok().build();
   }
+}
 

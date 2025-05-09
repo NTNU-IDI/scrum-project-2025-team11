@@ -2,30 +2,41 @@
   <header class="header">
     <div class="header-container">
       <div class="header-left">
-        <img src="../assets/invertednew.png" alt="Logo" class="logo" @click="goToAdminHome" />
+        <img src="../assets/invertednew.png" alt="Logo" class="logo" @click="goToHome"/>
+        <nav class="nav-buttons">
+          <router-link to="/map" class="button other"><i class="fa fa-map-o" aria-hidden="true"></i> Kart</router-link>
+        </nav>
       </div>
 
       <div class="header-right">
-        <img src="../assets/ikon/map-trifold-fill.png" alt="Kart" class="icon" @click="goToMap" data-tooltip="Til kartet" />
-        <a href="/" class="button logout" @click.prevent="goToLogout">Logg ut</a>
+        <router-link to="/" class="button logout" @click.prevent="logOut"><i class="fa fa-sign-out" aria-hidden="true"></i> Logg ut</router-link>
       </div>
+
+      <button class="hamburger" @click="toggleMobileMenu"><i class="fa fa-bars" aria-hidden="true"></i> Meny</button>
     </div>
+
+    <nav v-if="isMobileMenuOpen" class="mobile-nav">
+      <router-link to="/map" class="button other"><i class="fa fa-map-o" aria-hidden="true"></i> Kart</router-link>
+      <router-link to="/" class="button logout" @click.prevent="logOutUser"><i class="fa fa-sign-out" aria-hidden="true"></i> Logg ut</router-link>
+    </nav>
   </header>
 </template>
 
-
 <script lang="ts" setup>
 import { useRouter } from 'vue-router'
+import { ref } from 'vue'
+import { logOutUser } from '../api/AuthService'
+
 const router = useRouter()
-const goToAdminHome = () => {
-  router.push('/adminhome')
-}
-const goToLogout = () => {
+const goToHome = () => {
   router.push('/')
 }
-const goToMap = () => {
-  router.push('/map')
+const isMobileMenuOpen = ref(false)
+const toggleMobileMenu = () => isMobileMenuOpen.value = !isMobileMenuOpen.value
+
+
+import {logOutUser} from '../api/AuthService';
+async function logOut() {
+  await logOutUser()
 }
-
 </script>
-
