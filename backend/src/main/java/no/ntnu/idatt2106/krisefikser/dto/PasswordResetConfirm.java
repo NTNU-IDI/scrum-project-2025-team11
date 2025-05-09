@@ -8,7 +8,6 @@ import lombok.Setter;
 /**
  * DTO for confirming a password reset.
  */
-
 @Getter
 @Setter
 @AllArgsConstructor

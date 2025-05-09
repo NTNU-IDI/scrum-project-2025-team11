@@ -1,5 +1,5 @@
 @import "./base.css";
-@import url('@/assets/icons/font-awesome-4.7.0/css/font-awesome.min.css');
+@import url("@/assets/icons/font-awesome-4.7.0/css/font-awesome.min.css");
 
 body {
   font-family: "Inter", sans-serif;
@@ -69,7 +69,6 @@ body {
   }
 }
 
-
 h1 {
   font-size: 1.8rem;
   margin-bottom: 1rem;
@@ -124,6 +123,14 @@ button:disabled:hover {
 }
 
 .small-button {
+  font-size: var(--font-size-small);
+}
+
+.small-button-map {
+  flex-shrink: 0;
+  min-width: 150px;
+  box-sizing: border-box;
+  width: 100%;
   font-size: var(--font-size-small);
 }
 
@@ -194,6 +201,50 @@ button:disabled:hover {
   font-weight: bold;
 }
 
+.point-card {
+  position: relative;
+  background: var(--white);
+  border-radius: 10px;
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.point-card-content {
+  padding: 1.2rem;
+  text-align: left;
+  flex: 1;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--light-gray) var(--white);
+}
+
+.point-detail-container {
+  padding-top: 7px;
+}
+
+.point-detail {
+  margin-bottom: 10px;
+  font-size: var(--font-size-small);
+}
+
+.close-icon {
+  position: absolute;
+  top: 5px;
+  right: 15px;
+  font-size: 24px;
+  color: black;
+  cursor: pointer;
+  user-select: none;
+}
+
+.close-icon:hover {
+  color: var(--bad-red);
+}
+
 .map-icon {
   display: inline-block;
   width: 20px;
@@ -220,6 +271,7 @@ button:disabled:hover {
   font-size: var(--font-size-medium);
   margin: 0;
   text-align: left;
+  font-weight: bold;
 }
 
 .map-overview-box {
@@ -252,6 +304,101 @@ button:disabled:hover {
   align-items: center;
   margin-bottom: 0.5rem;
   font-size: var(--font-size-xsmall);
+}
+
+.layout-map-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.map-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.map {
+  flex: 1;
+  width: 100%;
+  z-index: 0;
+}
+
+.map-button {
+  background-color: var(--dark-blue);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: var(--font-size-small);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.map-button:hover {
+  background-color: var(--light-blue);
+  color: var(--white);
+}
+
+.map-button-no-hover {
+  font-size: var(--font-size-small);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  background-color: var(--dark-blue);
+  color: var(--white);
+  border: none;
+}
+
+.map-button-no-hover:hover {
+  background-color: var(--light-blue);
+  color: var(--white);
+  transform: none;
+}
+
+.crisis-alert p {
+  padding: 10px 10px;
+  margin: 0;
+}
+
+.corner-container {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  bottom: 10px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: calc(100% - 20px);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.corner-container > * {
+  pointer-events: auto;
+}
+
+.corner-container.crisis-mode {
+  top: 45px;
+}
+
+.leaflet-touch .leaflet-control-attribution,
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+  display: none;
+}
+
+.leaflet-marker-icon.leaflet-interactive,
+.leaflet-image-layer.leaflet-interactive,
+.leaflet-pane > svg path.leaflet-interactive,
+svg.leaflet-image-layer.leaflet-interactive path {
+  display: block;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 .error-message {
@@ -287,6 +434,9 @@ button:disabled:hover {
 @media (max-width: 768px) {
   .title-map {
     font-size: var(--font-size-medium);
+  }
+  .crisis-alert {
+    font-size: var(--font-size-xsmall);
   }
 }
 /* ---Styling for hjemmesidene! Ikke rør altså!!--- */
@@ -374,7 +524,7 @@ button:disabled:hover {
 .box.info h3 {
   text-transform: uppercase;
 }
-.box.info:hover { 
+.box.info:hover {
   background-color: var(--light-blue);
   border: 2px solid var(--light-blue);
   color: white;
@@ -537,6 +687,15 @@ button:disabled:hover {
   .dark-button {
     width: 5rem;
     height: 3rem;
+  }
+
+  .map-overview-box {
+    background: var(--white);
+    padding: 0.5rem 0.9rem 0.5rem 0.9rem;
+    border-radius: 10px;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
   }
 }
 

@@ -6,6 +6,10 @@ import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
 import no.ntnu.idatt2106.krisefikser.dto.AddressResponseDTO;
 import no.ntnu.idatt2106.krisefikser.model.Address;
 
+/**
+ * Mapper class for converting between AddressRequestDTO, AddressResponseDTO, and Address entity.
+ * This class is responsible for mapping data between the DTOs and the entity.
+ */
 @Component
 public class AddressMapper {
   

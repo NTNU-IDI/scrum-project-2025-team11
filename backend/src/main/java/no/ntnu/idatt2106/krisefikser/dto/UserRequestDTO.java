@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * DTO for creating or updating a user.
+ */
 @Getter 
 @Setter
 @NoArgsConstructor

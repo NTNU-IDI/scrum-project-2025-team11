@@ -3,6 +3,7 @@ package no.ntnu.idatt2106.krisefikser.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.dto.PointOfInterestRequestDTO;
@@ -11,6 +12,7 @@ import no.ntnu.idatt2106.krisefikser.mapper.PointOfInterestMapper;
 import no.ntnu.idatt2106.krisefikser.model.PointOfInterest;
 import no.ntnu.idatt2106.krisefikser.service.PointOfInterestService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -86,6 +88,8 @@ public class PointOfInterestController {
             @ApiResponse(responseCode = "400", description = "Point could not be created," +
                     " make sure all fields are filled and that the icon type is valid")
     })
+    @SecurityRequirement(name = "jwtCookieAuth")
+    @PreAuthorize("hasRole('admin')")
     @PostMapping
     public ResponseEntity<PointOfInterestResponseDTO> createPointOfInterest(@RequestBody PointOfInterestRequestDTO pointOfInterest) {
         PointOfInterestResponseDTO pointOfInterestResponse = pointOfInterestService.save(pointOfInterest);
@@ -103,6 +107,8 @@ public class PointOfInterestController {
             @ApiResponse(responseCode = "204", description = "Point successfully deleted"),
             @ApiResponse(responseCode = "400", description = "Point could not be deleted, does this point even exist?")
     })
+    @SecurityRequirement(name = "jwtCookieAuth")
+    @PreAuthorize("hasRole('admin')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePointOfInterest(@PathVariable int id) {
         if (!pointOfInterestService.existsById(id)) {
@@ -120,6 +126,8 @@ public class PointOfInterestController {
         @ApiResponse(responseCode = "201", description = "Point successfully updated"),
         @ApiResponse(responseCode = "400", description = "Point could not be updated, check if the syntax is correct")
     })
+    @SecurityRequirement(name = "jwtCookieAuth")
+    @PreAuthorize("hasRole('admin')")
     @PutMapping("/{id}")
     public ResponseEntity<PointOfInterestResponseDTO> updatePointOfInterest(
         @PathVariable int id, @RequestBody PointOfInterestRequestDTO updatedPoint) {

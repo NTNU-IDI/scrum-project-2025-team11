@@ -24,6 +24,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import no.ntnu.idatt2106.krisefikser.repository.UserRepository;
 import no.ntnu.idatt2106.krisefikser.security.JwtAuthFilter;
 
+/**
+ * Security configuration class for the application.
+ * This class configures Spring Security settings, including authentication and authorization.
+ */
 @Profile("!test")
 @Configuration
 @EnableMethodSecurity
@@ -38,6 +42,13 @@ public class SecurityConfig {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Configures the security filter chain for the application.
+     *
+     * @param http the HttpSecurity object to configure
+     * @return the configured SecurityFilterChain
+     * @throws Exception if an error occurs during configuration
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -88,6 +99,11 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Configures the UserDetailsService bean for user authentication.
+     *
+     * @return the configured UserDetailsService
+     */
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> {
@@ -104,6 +120,12 @@ public class SecurityConfig {
                 .build();
         };
     }
+
+    /**
+     * Configures the PasswordEncoder bean for password hashing.
+     *
+     * @return the configured PasswordEncoder
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

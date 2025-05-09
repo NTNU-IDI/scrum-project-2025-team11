@@ -106,9 +106,17 @@ export async function refreshToken() {
         });
 }
 
-export function logOutUser() {
+export async function logOutUser() {
     const userStore = useUserStore()
 
-    userStore.logout()
-    router.push("/")
+    await axios.post("http://localhost:8080/auth/log-out", {}, {withCredentials: true})
+        .then(() => {
+            userStore.logout()
+            router.push("/")
+        })
+        .catch(() => {
+            let instance = $toast.error('Fikk ikke til å logge ut. Prøv igjen.')
+        })
+
+
 }

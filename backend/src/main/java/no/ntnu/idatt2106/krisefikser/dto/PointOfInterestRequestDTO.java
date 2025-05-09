@@ -5,6 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import no.ntnu.idatt2106.krisefikser.model.Enums;
 
+/**
+ * DTO for creating or updating a point of interest.
+ */
 @Data
 @NoArgsConstructor
 public class PointOfInterestRequestDTO {

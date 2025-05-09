@@ -9,7 +9,7 @@
       </div>
 
       <div class="header-right">
-        <router-link to="/" class="button logout" @click.prevent="logOutUser"><i class="fa fa-sign-out" aria-hidden="true"></i> Logg ut</router-link>
+        <router-link to="/" class="button logout" @click.prevent="logOut"><i class="fa fa-sign-out" aria-hidden="true"></i> Logg ut</router-link>
       </div>
 
       <button class="hamburger" @click="toggleMobileMenu"><i class="fa fa-bars" aria-hidden="true"></i> Meny</button>
@@ -28,7 +28,15 @@ import { ref } from 'vue'
 import { logOutUser } from '../api/AuthService'
 
 const router = useRouter()
-const goToHome = () => router.push('/')
+const goToHome = () => {
+  router.push('/')
+}
 const isMobileMenuOpen = ref(false)
 const toggleMobileMenu = () => isMobileMenuOpen.value = !isMobileMenuOpen.value
+
+
+import {logOutUser} from '../api/AuthService';
+async function logOut() {
+  await logOutUser()
+}
 </script>
