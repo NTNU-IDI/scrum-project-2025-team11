@@ -297,4 +297,158 @@ describe('RegisterComponent', () => {
             })
         })*/
     })
+    describe(' in case of existing', () => {
+        const wrapper = mount(RegisterComponent)
+
+        //Kan flytte de første feltene før wrapper.findAll til å være på utsida av de to describsa for new eller existing household
+        const errorMessage = wrapper.find("#error")
+        const iptFirstName = wrapper.find("#iptFirstName")
+        const iptLastName = wrapper.find("#iptLastName")
+        const iptUsername = wrapper.find("#iptUsername")
+        const iptEmail = wrapper.find("#iptEmail")
+        const iptPassword = wrapper.find("#iptPassword")
+        const iptRepeatedPassword = wrapper.find("#iptRepeatedPassword")
+        const cbPrivacyPolicy = wrapper.find("#cbPrivacyPolicy")
+
+        describe('  household chosen ', async () => {
+
+            wrapper.findAll("input[type='radio']")[1].trigger("change")
+            await nextTick()
+            const iptHouseholdCode = wrapper.find("#iptHouseholdCode")
+
+            beforeEach(() => {
+                iptFirstName.setValue(FIRST_NAME_V)
+                iptLastName.setValue(LAST_NAME_V)
+                iptUsername.setValue(USERNAME_V)
+                iptEmail.setValue(EMAIL_V)
+                iptPassword.setValue(PASSWORD_V)
+                iptRepeatedPassword.setValue(REPEATED_PASSWORD_V)
+                iptHouseholdCode.setValue("HEIHEI")
+                cbPrivacyPolicy.setValue(true)
+            })
+
+            it('with valid input, no errormessage is shown', () => {
+                expect(wrapper.vm.validateFields()).toBeTruthy()
+                expect((iptFirstName.element as HTMLInputElement).value).toBe(FIRST_NAME_V)
+                expect((iptLastName.element as HTMLInputElement).value).toBe(LAST_NAME_V)
+                expect((iptUsername.element as HTMLInputElement).value).toBe(USERNAME_V)
+                expect((iptPassword.element as HTMLInputElement).value).toBe(PASSWORD_V)
+                expect((iptRepeatedPassword.element as HTMLInputElement).value).toBe(PASSWORD_V)
+                expect((iptHouseholdCode.element as HTMLInputElement).value).toBe("HEIHEI")
+                expect((cbPrivacyPolicy.element as HTMLInputElement).checked).toBe(true)
+
+                expect(errorMessage.text()).toBe(EMPTY_STRING)
+            })
+            it('with invalid first name, errormessage is shown', async () => {
+                await iptFirstName.setValue(EMPTY_STRING)
+                //Got help from ChatGPT with the use of 'iptFirstName.element as HTMLInputElement).value' to get the value of an element
+                expect((iptFirstName.element as HTMLInputElement).value).toBe(EMPTY_STRING)
+                expect(wrapper.vm.validateFields()).toBeFalsy()
+                await nextTick()
+
+                expect(errorMessage.text()).not.toBe(EMPTY_STRING)
+
+                await iptFirstName.setValue(FIRST_NAME_IV_NO)
+                expect((iptFirstName.element as HTMLInputElement).value).toBe(FIRST_NAME_IV_NO)
+                expect(wrapper.vm.validateFields()).toBeFalsy()
+                await nextTick()
+
+                expect(errorMessage.text()).not.toBe(EMPTY_STRING)
+            })
+            it('with invalid last name, errormessage is shown', async () => {
+                await iptLastName.setValue(EMPTY_STRING)
+                expect((iptLastName.element as HTMLInputElement).value).toBe(EMPTY_STRING)
+                expect(wrapper.vm.validateFields()).toBeFalsy()
+                await nextTick()
+
+                expect(errorMessage.text()).not.toBe(EMPTY_STRING)
+
+                await iptLastName.setValue(LAST_NAME_IV_NO)
+                expect((iptLastName.element as HTMLInputElement).value).toBe(LAST_NAME_IV_NO)
+                expect(wrapper.vm.validateFields()).toBeFalsy()
+                await nextTick()
+
+                expect(errorMessage.text()).not.toBe(EMPTY_STRING)
+            })
+            it('with invalid username, errormessage is shown', async () => {
+                await iptUsername.setValue(EMPTY_STRING)
+                expect((iptUsername.element as HTMLInputElement).value).toBe(EMPTY_STRING)
+                expect(wrapper.vm.validateFields()).toBeFalsy()
+                await nextTick()
+
+                expect(errorMessage.text()).not.toBe(EMPTY_STRING)
+
+                await iptUsername.setValue(USERNAME_IV_SPACE)
+                expect((iptUsername.element as HTMLInputElement).value).toBe(USERNAME_IV_SPACE)
+                expect(wrapper.vm.validateFields()).toBeFalsy()
+                await nextTick()
+
+                expect(errorMessage.text()).not.toBe(EMPTY_STRING)
+
+                await iptUsername.setValue(USERNAME_IV_SPECIAL_CHARACTER)
+                expect((iptUsername.element as HTMLInputElement).value).toBe(USERNAME_IV_SPECIAL_CHARACTER)
+                expect(wrapper.vm.validateFields()).toBeFalsy()
+                await nextTick()
+
+                expect(errorMessage.text()).not.toBe(EMPTY_STRING)
+            })
+            it('with invalid email, errormessage is shown', async () => {
+                await iptEmail.setValue(EMPTY_STRING)
+                expect((iptEmail.element as HTMLInputElement).value).toBe(EMPTY_STRING)
+                expect(wrapper.vm.validateFields()).toBeFalsy()
+                await nextTick()
+
+                expect(errorMessage.text()).not.toBe(EMPTY_STRING)
+
+                await iptEmail.setValue(EMAIL_IV)
+                expect((iptEmail.element as HTMLInputElement).value).toBe(EMAIL_IV)
+                expect(wrapper.vm.validateFields()).toBeFalsy()
+                await nextTick()
+
+                expect(errorMessage.text()).not.toBe(EMPTY_STRING)
+            })
+            it('with empty password, errormessage is shown', async () => {
+                await iptPassword.setValue(EMPTY_STRING)
+                expect((iptPassword.element as HTMLInputElement).value).toBe(EMPTY_STRING)
+                expect(wrapper.vm.validateFields()).toBeFalsy()
+                await nextTick()
+
+                expect(errorMessage.text()).not.toBe(EMPTY_STRING)
+            })
+            it('with empty repeated password, errormessage is shown', async () => {
+                await iptRepeatedPassword.setValue(EMPTY_STRING)
+                expect((iptRepeatedPassword.element as HTMLInputElement).value).toBe(EMPTY_STRING)
+                expect(wrapper.vm.validateFields()).toBeFalsy()
+                await nextTick()
+
+                expect(errorMessage.text()).not.toBe(EMPTY_STRING)
+            })
+            it('with identical passwords, but an invalid one, errormessage is shown', async () => {
+                await iptPassword.setValue(PASSWORD_IV)
+                await iptRepeatedPassword.setValue(REPEATED_PASSWORD_IV)
+                expect((iptPassword.element as HTMLInputElement).value).toBe(REPEATED_PASSWORD_IV)
+                expect((iptRepeatedPassword.element as HTMLInputElement).value).toBe(REPEATED_PASSWORD_IV)
+                expect(wrapper.vm.validateFields()).toBeFalsy()
+                await nextTick()
+
+                expect(errorMessage.text()).not.toBe(EMPTY_STRING)
+            })
+            it('with invalid household code, errormessage is shown', async () => {
+                await iptHouseholdCode.setValue(EMPTY_STRING)
+                expect((iptHouseholdCode.element as HTMLInputElement).value).toBe(EMPTY_STRING)
+                expect(wrapper.vm.validateFields()).toBeFalsy()
+                await nextTick()
+
+                expect(errorMessage.text()).not.toBe(EMPTY_STRING)
+            })
+            it('with unchecked privacy policy, errormessage is shown', async () => {
+                await cbPrivacyPolicy.setValue(false)
+                expect((cbPrivacyPolicy.element as HTMLInputElement).checked).toBe(false)
+                expect(wrapper.vm.validateFields()).toBeFalsy()
+                await nextTick()
+
+                expect(errorMessage.text()).not.toBe(EMPTY_STRING)
+            })
+        })
+    })
 })
