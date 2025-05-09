@@ -39,7 +39,9 @@ export class PointService {
   }
 
   static async save(point: PointOfInterest): Promise<PointOfInterest> {
-    const response = await axios.post(POINT_API_URL, point);
+    const response = await axios.post(POINT_API_URL, point, {
+      withCredentials: true,
+    });
     return response.data;
   }
 
@@ -47,11 +49,13 @@ export class PointService {
     id: number,
     point: PointOfInterest
   ): Promise<PointOfInterest> {
-    const response = await axios.put(`${POINT_API_URL}/${id}`, point);
+    const response = await axios.put(`${POINT_API_URL}/${id}`, point, {
+      withCredentials: true,
+    });
     return response.data;
   }
 
   static async remove(id: number): Promise<void> {
-    await axios.delete(`${POINT_API_URL}/${id}`);
+    await axios.delete(`${POINT_API_URL}/${id}`, { withCredentials: true });
   }
 }
