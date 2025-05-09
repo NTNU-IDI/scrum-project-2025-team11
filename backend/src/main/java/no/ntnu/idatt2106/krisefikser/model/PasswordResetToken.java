@@ -49,6 +49,11 @@ public class PasswordResetToken {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    /**
+     * Checks if the token is expired.
+     *
+     * @return true if the token is expired, false otherwise
+     */
     public boolean isExpired() {
         return LocalDateTime.now().isAfter(expiryDate);
     }
