@@ -3,7 +3,7 @@ import {login} from "@/api/AuthService.ts";
 import {ref} from "vue";
 import { useReCaptcha } from 'vue-recaptcha-v3';
 
-const { executeRecaptcha } = useReCaptcha()!;
+const { executeRecaptcha } = useReCaptcha() || {};
 
 const username = ref('')
 const password = ref('')

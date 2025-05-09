@@ -5,7 +5,7 @@ import {validateFirstName, validateLastName, validateEmail, validateUsername, va
 import {registerNormalUser, login} from "@/api/AuthService.ts";
 import { useReCaptcha } from 'vue-recaptcha-v3';
 
-const { executeRecaptcha } = useReCaptcha()!;
+const { executeRecaptcha } = useReCaptcha() || {};
 
 //Input-fields
 const firstName = ref('')
