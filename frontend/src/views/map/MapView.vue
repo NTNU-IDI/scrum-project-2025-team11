@@ -64,6 +64,7 @@ import { useEventStore } from '@/stores/eventStore';
 import { useToast } from 'vue-toast-notification';
 import { useRouter } from 'vue-router'
 
+
 const router = useRouter()
 const $toast = useToast();
 const eventStore = useEventStore(); 
@@ -179,7 +180,9 @@ function handleAddPoint() {
 
 function handleAddEvent() {
   showSelectType.value = false;
-  eventStore.setCoordinates(selectedPoint.value.latitude, selectedPoint.value.longitude);
+  const roundedLat = parseFloat(selectedPoint.value.latitude.toFixed(7));
+  const roundedLng = parseFloat(selectedPoint.value.longitude.toFixed(7));
+  eventStore.setCoordinates(roundedLat, roundedLng);
   eventStore.triggerNewEvent();
   router.push('/admin');
 }
@@ -283,6 +286,7 @@ function clearRouting() {
   removeTempMarker();
   window.routingControl = null;
   isNavigating.value = false;
+  showNearestShelterButton.value = true;
 }
 
 async function findNearestShelter() {

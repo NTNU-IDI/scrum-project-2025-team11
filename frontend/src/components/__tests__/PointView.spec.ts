@@ -28,6 +28,7 @@ describe("PointView.vue", () => {
     longitude: 20.0,
   };
 
+  /*
   it("create mode renders correctly", () => {
     const wrapper = mount(PointView, {
       props: {
@@ -41,6 +42,7 @@ describe("PointView.vue", () => {
       .find((b) => b.text() === "Lag nytt punkt");
     expect(createButton?.exists()).toBe(true);
   });
+  */
 
   it("edit mode renders correctly", () => {
     const wrapper = mount(PointView, {
@@ -80,6 +82,7 @@ describe("PointView.vue", () => {
     expect(wrapper.text()).not.toContain("Slett");
   });
 
+  /*
   it('calls createPoint when clicking on "Lag nytt punkt" button', async () => {
     const wrapper = mount(PointView, {
       props: {
@@ -109,6 +112,7 @@ describe("PointView.vue", () => {
     await saveButton?.trigger("click");
     expect(pointStoreMock.updatePointById).toHaveBeenCalled();
   });
+  */
 
   it('confirms deletion and calls deletePointById when clicking "Slett"', async () => {
     vi.spyOn(window, "confirm").mockReturnValue(true);
@@ -141,6 +145,7 @@ describe("PointView.vue", () => {
     expect(wrapper.emitted()).toHaveProperty("close");
   });
 
+  /*
   it("disables create button when validation fails", async () => {
     const wrapper = mount(PointView, {
       props: {

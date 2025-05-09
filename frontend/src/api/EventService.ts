@@ -53,11 +53,10 @@ export class EventService {
                 throw new Error('Nettverksfeil');
             }
         }
-        
     }
 
     static async delete(id: number): Promise<void> {
-        await axios.delete(`${ITEM_API_URL}/${id}`);
+        await axios.delete(`${ITEM_API_URL}/${id}`, {withCredentials: true});
     }
 }
 
