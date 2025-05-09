@@ -8,10 +8,10 @@
       <div class="corner-container" :class="{ 'crisis-mode': showCrisisAlert }">
         <IconsOverview ref="iconsOverviewRef"/>
         <EventsOverview />
-          <button v-if="!isEditMode && showNearestShelterButton" class="map-button-no-hover" @click="findNearestShelter">
+          <button v-if="!isEditMode && showNearestShelterButton && !isNavigating" class="map-button-no-hover" @click="findNearestShelter">
             Finn 3 nærmeste tilflukstrom
           </button>  
-          <button v-if="role === 'admin'" id="editToggle" @click="toggleEditMode" :class="{ 'delete-button small-button-map': isEditMode, 'map-button-no-hover': !isEditMode }">
+          <button v-if="role === 'admin' && !isNavigating" id="editToggle" @click="toggleEditMode" :class="{ 'delete-button small-button-map': isEditMode, 'map-button-no-hover': !isEditMode }">
             {{ isEditMode ? 'Avslutt redigering' : 'Redigeringsmodus' }}
           </button>
         <SelectType 
@@ -113,9 +113,9 @@ onMounted(async () => {
   eventStore.startPollingActiveEvents();
 
   // POIs
-  addMarkersToMap(map, pointsDisplaying.value, markers, role.value, isEditMode.value, showPointView);
+  addMarkersToMap(map, pointsDisplaying.value, markers, role, isEditMode, showPointView);
   watch(pointsDisplaying, () => {
-    addMarkersToMap(map, pointsDisplaying.value, markers, role.value, isEditMode.value, showPointView);
+    addMarkersToMap(map, pointsDisplaying.value, markers, role, isEditMode, showPointView);
   });
 
   // Events
@@ -332,6 +332,7 @@ function handleNextShelter() {
 
 function toggleEditMode() {
   $toast.clear();
+  removeTempMarker();
   showPointForm.value = false;
   isEditMode.value = !isEditMode.value;
 

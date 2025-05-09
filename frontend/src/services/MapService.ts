@@ -4,6 +4,7 @@ import "leaflet-routing-machine";
 import type { PointOfInterest } from "@/types/PointOfInterest";
 import type { EventResponseDTO } from "@/types/Event";
 import { getEventColor } from "@/utils/geoService";
+import { type Ref } from "vue";
 
 export const userIcon = L.icon({
   iconUrl: userMarkerIcon,
@@ -16,8 +17,8 @@ export function addMarkersToMap(
   map: L.Map,
   points: PointOfInterest[],
   markers: L.Marker[],
-  role: string,
-  isEditMode: boolean,
+  role: Ref<string>,
+  isEditMode: Ref<boolean>,
   showPointView: Function
 ) {
   markers.forEach((marker) => map.removeLayer(marker));
@@ -37,7 +38,7 @@ export function addMarkersToMap(
     markers.push(marker);
 
     marker.on("click", () => {
-      if (role === "admin" && isEditMode) {
+      if (role.value === "admin" && isEditMode) {
         showPointView("edit", point, true);
       } else {
         showPointView("view", point, true);

@@ -1,5 +1,13 @@
 <template>
-  <div class="point-card">
+  <div v-if="props.isNavigating">
+    <div class="point-buttons">
+      <button class="delete-button small-button" @click="stopNavigation">
+        Stopp navigasjon
+      </button>
+    </div>
+  </div>
+
+  <div v-else class="point-card">
     <span class="close-icon" @click="$emit('close')">×</span>
 
       <!-- View mode (for registered and non-registered users) -->
@@ -40,7 +48,6 @@
           <!-- Navigation button -->
            <div class="point-buttons">
             <button v-if="!props.isNavigating"class="good-button small-button" @click="navigateToPoint">Naviger til dette punktet</button>
-            <button v-if="props.isNavigating" class="delete-button small-button" @click="stopNavigation">Stopp navigasjon</button>
             <button v-if="showNextButton && !props.isNavigating" class="map-button" @click="nextShelter">Neste tilfluktsrom</button>
            </div>
         </div>
