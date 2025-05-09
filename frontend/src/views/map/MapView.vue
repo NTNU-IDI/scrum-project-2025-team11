@@ -334,6 +334,7 @@ function handleNextShelter() {
   currentShelterIndex.value = 
     (currentShelterIndex.value + 1) % nearestShelters.value.length;
   showPointView('view', nearestShelters.value[currentShelterIndex.value], true, true);
+  showNearestShelterButton.value = false;
 }
 
 function toggleEditMode() {
@@ -353,6 +354,7 @@ function toggleEditMode() {
     $toast.info('Redigeringsmodus deaktivert. Du er nå i visningsmodus.', { duration: 5000 });
     eventStore.startPollingActiveEvents();
     showSelectType.value = false;
+    showNearestShelterButton.value = true;
     removeTempMarker();
     addEventsToMap(map, activeEvents.value, eventLayers, handleEventClick);
   }
