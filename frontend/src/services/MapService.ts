@@ -60,7 +60,7 @@ export function addEventsToMap(
     const circle = L.circle([event.latitude, event.longitude], {
       color,
       fillColor: color,
-      weight: 1,
+      weight: 2.5,
       radius: event.radius,
       fillOpacity: 0.3,
       interactive: true,

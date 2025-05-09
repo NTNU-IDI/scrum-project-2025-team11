@@ -29,14 +29,17 @@ export function toRadians(degrees: number): number {
 }
 
 export function getEventColor(severity: number) {
-  return severity === 1
-    ? "var(--light-orange)"
-    : severity === 0
-    ? "var(--yellow)"
-    : "var(--bad-red)";
+  if (severity === 0 || severity === 1) {
+    return "var(--bad-red)";
+  } else if (severity === 2 || severity === 3) {
+    return "var(--light-orange)";
+  } else if (severity === 4 || severity === 5) {
+    return "var(--yellow)";
+  } else {
+    return "var(--bad-red)";
+  }
 }
 
-// Tar inn lat long til bruker og alle events
 export function isUserInCrisisArea(
   lat: number,
   lon: number,
