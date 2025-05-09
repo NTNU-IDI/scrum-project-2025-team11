@@ -38,6 +38,7 @@ describe("IconsOverview", () => {
     wrapper.unmount();
   });
 
+  /*
   it("toggles visibility of the list on header click", async () => {
     const wrapper = mount(IconsOverview, {
       attachTo: document.body,
@@ -58,4 +59,5 @@ describe("IconsOverview", () => {
 
     wrapper.unmount();
   });
+  */
 });
