@@ -243,9 +243,6 @@ function getUserPosition(callback: (lat: number, lon: number) => void, force: bo
 
       L.marker([userLat, userLon], { icon: userIcon })
         .addTo(map)
-        .bindPopup("Din posisjon")
-        .openPopup();
-
       map.setView([userLat, userLon], 13);
     },
     (err) => console.error("Error getting location: ", err)
