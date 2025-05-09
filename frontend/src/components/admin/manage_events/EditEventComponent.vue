@@ -166,7 +166,7 @@ const deleteEvent = async () => {
     <div class="header-box-container">
         <h1 class="medium-header">Rediger hendelse</h1>
         <div class="grey-container">
-            <div class="header-box-container">
+            <div class="header-x-container">
                 <h2 class="small-header">{{ localEvent.name }}</h2>
                 <button class="cancel-button" @click="$emit('hide-edit-box')">X</button>
             </div>
@@ -184,7 +184,10 @@ const deleteEvent = async () => {
                 </div>
 
                 <!-- Coordinates -->
-                <label for="coordinate-input">Koordinater</label>
+                <div class="double-label-container">
+                    <label for="severity-input">Lengdegrad</label>
+                    <label for="radius-input">Breddegrad</label>
+                </div>
                 <div class="double-input-container">
                     <input type="text" class="edit-input" id="coordinate-input" @input="isEventDirty = true" v-model="localEvent.latitude" />
                     <input type="text" class="edit-input" id="coordinate-input" @input="isEventDirty = true" v-model="localEvent.longitude" />
@@ -223,6 +226,13 @@ const deleteEvent = async () => {
         overflow-y: hidden;
     }
 
+    .header-x-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        width: 32vw;
+    }
+
     .page-container {
         margin: 1rem;
         display: flex;
@@ -235,6 +245,7 @@ const deleteEvent = async () => {
 
     .small-header {
         color: white;
+        width: 30rem;
     }
 
     label {
@@ -284,9 +295,6 @@ const deleteEvent = async () => {
     }
 
     .cancel-button {
-        position: absolute;
-        top: 23rem;
-        right: -6rem;
         color: white;
         background-color: transparent;
         font-weight: bold;
@@ -314,8 +322,8 @@ const deleteEvent = async () => {
 
     @media (max-width: 480px) {
         .cancel-button {
-            top: 47.5rem;
-            right: -6rem;
+            margin-top: -3rem;
+      
         }
 
         .dark-button {

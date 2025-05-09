@@ -13,6 +13,7 @@ export const useEventStore = defineStore("events", {
     lat: null as number | null,
     lng: null as number | null,
     openNewEvent: false,
+    errorMsg: "",
   }),
 
   actions: {
@@ -81,10 +82,11 @@ export const useEventStore = defineStore("events", {
       try {
         await EventService.update(id, event).then((data) => {
           this.chosenEvent = data;
+
           this.fetchEvents();
         });
       } catch (error) {
-        console.error("Error updating event:", error);
+        this.errorMsg = error as string;
       }
     },
     async save(event: EventRequestDTO) {
@@ -94,7 +96,7 @@ export const useEventStore = defineStore("events", {
           this.fetchEvents();
         });
       } catch (error) {
-        console.error("Error saving event:", error);
+        this.errorMsg = error as string;
       }
     },
     async delete(id: number) {
