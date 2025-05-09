@@ -92,6 +92,7 @@ onMounted( async () => {
         height: 5rem;
         padding: 0 0.5rem 0 0.5rem ;
         scrollbar-width: thin;
+        width: 30rem;
     }
 
     .article-card {
