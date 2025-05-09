@@ -103,7 +103,8 @@ const list = computed(() => {
 
 <style scoped>
     .grey-container {
-        width: 450px;
+        width: 60vw;
+        margin-top: 0.7rem;
     }
     p {
         line-height: 20pt;

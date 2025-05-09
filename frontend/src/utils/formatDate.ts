@@ -3,6 +3,9 @@ export function formatDate(date: Date): string {
 }
 
 export function formatDateForInput(dateString: string): string {
+    if (!dateString) {
+        return ""; 
+    }
     return dateString.slice(0, 16);
 }
 
