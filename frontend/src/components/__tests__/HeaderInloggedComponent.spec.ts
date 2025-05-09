@@ -11,7 +11,11 @@ vi.mock('@/api/AuthService', () => ({
 
 const router = createRouter({
   history: createWebHistory(),
-  routes: []
+  routes: [
+    { path: '/', component: { template: '<div>Hjem</div>' } },
+    { path: '/map', component: { template: '<div>Kart</div>' } },
+    { path: '/household', component: { template: '<div>Min beredskap</div>' } }
+  ]
 })
 
 beforeEach(async () => {
@@ -32,7 +36,7 @@ describe('HeaderComponent', () => {
     expect(wrapper.find('img.logo').exists()).toBe(true)
     expect(wrapper.find('a[href="/"]').exists()).toBe(true)
     expect(wrapper.find('a[href="/map"]').exists()).toBe(true)
-    expect(wrapper.find('a[href="/storage"]').exists()).toBe(true)
+    expect(wrapper.find('a[href="/household"]').exists()).toBe(true)
   })
 
   it('whether it navigates to the front page when the logo is clicked', async () => {
@@ -68,7 +72,7 @@ describe('HeaderComponent', () => {
       }
     })
 
-    const link = wrapper.find('a[href="/storage"]')
+    const link = wrapper.find('a[href="/household"]')
     expect(link.exists()).toBe(true)
     expect(link.text()).toContain('Min beredskap')
   })
