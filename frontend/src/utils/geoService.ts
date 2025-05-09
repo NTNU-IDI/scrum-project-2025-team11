@@ -1,3 +1,5 @@
+import type { EventResponseDTO } from "@/types/Event";
+
 export function calculateDistance(
   lat1: number,
   lon1: number,
@@ -27,9 +29,66 @@ export function toRadians(degrees: number): number {
 }
 
 export function getEventColor(severity: number) {
-  return severity === 1
-    ? "var(--light-orange)"
-    : severity === 0
-    ? "var(--yellow)"
-    : "var(--bad-red)";
+  if (severity === 0 || severity === 1) {
+    return "var(--yellow)";
+  } else if (severity === 2 || severity === 3) {
+    return "var(--light-orange)";
+  } else if (severity === 4 || severity === 5) {
+    return "var(--bad-red)";
+  } else {
+    return "var(--bad-red)";
+  }
+}
+
+export function isUserInCrisisArea(
+  lat: number,
+  lon: number,
+  activeEvents: EventResponseDTO[]
+): boolean {
+  return activeEvents.some(
+    (event) =>
+      calculateDistance(lat, lon, event.latitude, event.longitude) <=
+      event.radius
+  );
+}
+
+export async function resolveAddressFromText(
+  address: string
+): Promise<{ lat: number; lon: number } | null> {
+  if (!address.trim()) return null;
+
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+        address
+      )}`
+    );
+    const data = await response.json();
+
+    if (data.length > 0) {
+      return {
+        lat: parseFloat(data[0].lat),
+        lon: parseFloat(data[0].lon),
+      };
+    } else {
+      return null;
+    }
+  } catch (err) {
+    throw new Error("En feil skjedde ved oppslag av adresse.");
+  }
+}
+
+export async function resolveAddressFromCoords(
+  lat: number,
+  lon: number
+): Promise<string | null> {
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+    );
+    const data = await response.json();
+    return data?.display_name || null;
+  } catch (err) {
+    throw new Error("En feil skjedde ved oppslag av koordinater.");
+  }
 }

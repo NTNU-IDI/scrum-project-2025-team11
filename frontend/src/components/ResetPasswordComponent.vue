@@ -29,7 +29,7 @@ function changePasswordVisibility() {
   if(showPassword.value === false) {
     passwordInputType.value = 'password'
   } else {
-    passwordInputType.value = 'type'
+    passwordInputType.value = 'text'
   }
 }
 
@@ -44,8 +44,8 @@ function changePasswordVisibility() {
               Du skal ha blitt tilsendt en e-post med en bekreftelseskode. Vennligst skriv inn koden og det nye passordet.
           </p>
           <label>Bekreftelseskode <span class="importantStar">*</span><input type="text" v-model="code"/>  </label>
-          <label>Nytt passord <span class="importantStar">*</span><br> <input :type="passwordInputType" v-model="password" /> </label>
-          <label>Gjenta nytt passord <span class="importantStar">*</span><br><input :type="passwordInputType" v-model="repeatedPassword" /> </label>
+          <label>Nytt passord <span class="importantStar">*</span><br> <input :type="passwordInputType" v-model="password" id="iptPassword"/> </label>
+          <label>Gjenta nytt passord <span class="importantStar">*</span><br><input :type="passwordInputType" v-model="repeatedPassword" id="iptRepeatedPassword" /> </label>
           <label><input type="checkbox" id="cbPassword" v-model="showPassword" @change="changePasswordVisibility"> Vis passord</label>
           <br>
           <p id="error" class="error-message">{{errorMessage}}</p>

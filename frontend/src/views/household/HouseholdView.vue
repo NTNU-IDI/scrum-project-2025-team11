@@ -74,7 +74,11 @@ const inviteSuccess = () => {
 			<div class="items-column">
 			<ViewSingleItemComponent />
 			</div>
-			<button class="dark-button" id="add-button" @click="toggleNewItemBox">+ Ny vare</button> 
+			<div class="icon-button-container">
+				<button class="dark-button" id="add-button" @click="toggleNewItemBox">+ Ny vare</button> 
+				<p><i class="fa fa-exclamation-triangle"></i> Gått ut på dato</p>
+				<p><i class="fa fa-hourglass-end"></i> Går ut om under en uke</p>
+			</div>
 
 			<div class="modal-overlay" v-if="isItemBoxVisible" @click.self="isItemBoxVisible = false">
 				<NewItemComponent  
@@ -83,6 +87,8 @@ const inviteSuccess = () => {
 				@new-item-success="newItemSuccess"
 				/>
 			</div>
+
+
 		</div>
 
 		
@@ -95,10 +101,10 @@ const inviteSuccess = () => {
 	.page-container {
 		display: flex;
 		flex-direction: column;
-		gap: 2rem;
+		gap: 2vw;
 		padding: 1rem;
     	margin-right: 0px;
-		margin: 0 3rem 0 3rem ;
+		margin: 0 3vw 0 3vw ;
 	}
 
 	h1 {
@@ -110,7 +116,7 @@ const inviteSuccess = () => {
 		display: flex;
 		flex-direction: row;
 		min-height: 50vh;
-		gap: 2rem;
+		gap: 2vw;
 		padding: 1rem;
 	
 	}
@@ -131,7 +137,7 @@ const inviteSuccess = () => {
         display: flex;
         align-items: center; 
         justify-content: center; 
-        width: 6.5rem; 
+        width: 6.vm; 
         height: 3.5rem; 
         margin-left: 0px;
         margin-top: 4.75rem;

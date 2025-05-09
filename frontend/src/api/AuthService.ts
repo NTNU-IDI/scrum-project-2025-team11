@@ -39,10 +39,10 @@ export async function confirm2fa(code: string) {
 }
 
 
-export async function login(username: string, password: string) {
+export async function login(username: string, password: string, recaptchaToken: string) {
     const credentialStore = useCredentialStore()
 
-    await axios.post("http://localhost:8080/auth/login", {
+    await axios.post(`http://localhost:8080/auth/login?recaptchaToken=${recaptchaToken}`, {
         username: username,
         password: password
     }, {
@@ -56,6 +56,8 @@ export async function login(username: string, password: string) {
             if (error.status === 400) {
                 let instance = $toast.error("Kunne ikke logge inn med gitt brukernavn og passord. " +
                     "Forsikre deg om at de er riktige og prøv igjen.")
+            } else if (error.status === 422) {
+                let instance = $toast.error("Recaptcha verifisering feilet. Vennligst ikke vær en robot.")
             } else if (error.status === 500) {
                 let instance = $toast.error("Serveren møtte på et uventet problem. Vennligst vent og prøv igjen senere.")
             } else {
@@ -65,16 +67,19 @@ export async function login(username: string, password: string) {
 }
 
 export async function registerNormalUser(firstName: string, lastName: string, username: string, email: string,
-                                          password: string, householdId: number) {
+                                          password: string, householdId: number, recaptchaToken: string) {
     const credentialStore = useCredentialStore()
+    console.log(recaptchaToken)
 
-    await axios.post("http://localhost:8080/auth/register", {
+    await axios.post(
+            `http://localhost:8080/auth/register?recaptchaToken=${recaptchaToken}`, 
+        {
         firstName: firstName,
         lastName: lastName,
         username: username,
         email: email,
         password: password,
-        householdId: householdId
+        householdId: householdId,
     }, {
         withCredentials: true
     })
@@ -85,7 +90,11 @@ export async function registerNormalUser(firstName: string, lastName: string, us
         .catch((error) => {
             if (error.status === 409) {
                 let instance = $toast.error("Brukernavn eller epost allrede i bruk. Vennligst prøv noe annet.")
-            } else {
+            } else if (error.status === 422) {
+                let instance = $toast.error("Recaptcha verifisering feilet. Vennligst ikke vær en robot.")
+            }else if (error.status === 400) {
+                let instance = $toast.error("Invalid recaptcha")
+            }else {
                 let instance = $toast.error("Noe uventet har oppstått. Vennligst vent og prøv igjen senere.")
             }
         });
@@ -106,9 +115,17 @@ export async function refreshToken() {
         });
 }
 
-export function logOutUser() {
+export async function logOutUser() {
     const userStore = useUserStore()
 
-    userStore.logout()
-    router.push("/")
+    await axios.post("http://localhost:8080/auth/log-out", {}, {withCredentials: true})
+        .then(() => {
+            userStore.logout()
+            router.push("/")
+        })
+        .catch(() => {
+            let instance = $toast.error('Fikk ikke til å logge ut. Prøv igjen.')
+        })
+
+
 }

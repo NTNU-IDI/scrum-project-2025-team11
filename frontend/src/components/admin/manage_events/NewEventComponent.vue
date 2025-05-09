@@ -5,20 +5,26 @@ import { validateLatitude, validateLongitude, validatePointDescription, validate
 import { useEventStore } from '@/stores/eventStore';
 import { severityLevels } from '@/utils/values';
 
+const props = defineProps<{
+  lat: number | null;
+  lng: number | null;
+}>();
+
 // Props
 const name = ref('');
 const severity = ref();
 const radius = ref();
-const latitude = ref();
-const longitude = ref();
+const latitude = ref(props.lat ?? '');
+const longitude = ref(props.lng ?? '');
 const description = ref('');
 const startTime = ref();
 const endTime = ref();
-const selectedIcon = ref('none');
+const selectedIcon = 'none';
 const emit = defineEmits(['hide-new-event-box', 'new-event-success']);
 const icons = eventIcons;
 const eventStore = useEventStore();
 const errorMsg = ref('');
+const response = ref('');
 
 const validateEvent = () => {
     errorMsg.value = '';
@@ -34,11 +40,11 @@ const validateEvent = () => {
         errorMsg.value = ('Radius må fylles ut');
         return false;
     }
-    if (!validateLatitude(latitude.value)) {
+    if (!validateLatitude(Number(latitude.value))) {
         errorMsg.value = ('Lengdegrad må fylles ut');
         return false;
     }
-    if (!validateLongitude(longitude.value)) {
+    if (!validateLongitude(Number(longitude.value))) {
         errorMsg.value = ('Breddegrad må fylles ut');
         return false;
     }
@@ -58,35 +64,55 @@ const validateEvent = () => {
 }
 
 // Add event 
-const addEvent = () => {
+const addEvent = async () => {
     if (!validateEvent()) {
         return;
     }
     if (endTime.value) {
-        eventStore.save({
+        await eventStore.save({
             name: name.value,
             description: description.value,
-            iconType: selectedIcon.value,
+            iconType: selectedIcon,
             startTime: startTime.value + ':00',
             endTime: endTime.value + ':00',
-            latitude: latitude.value,
-            longitude: longitude.value,
+            latitude: Number(latitude.value),
+            longitude: Number(longitude.value),
             severity: severity.value,
             radius: radius.value,
+        }).catch((error) => {
+            response.value = error;
+            $toast.error('Feil ved opprettelse av bruker!' + error, {
+                duration: 3000,
+                position: 'top-right'
+            });
         });
     } else {
         eventStore.save({
             name: name.value,
             description: description.value,
-            iconType: selectedIcon.value,
+            iconType: selectedIcon,
             startTime: startTime.value + ':00',
-            latitude: latitude.value,
-            longitude: longitude.value,
+            latitude: Number(latitude.value),
+            longitude: Number(longitude.value),
             severity: severity.value,
             radius: radius.value,
+        }).catch((error) => {
+            response.value = error;
+            $toast.error('Feil ved opprettelse av bruker!' + error, {
+                duration: 3000,
+                position: 'top-right'
+            });
         });
     }
-    emit('new-event-success');
+    if (response.value) {
+        $toast.error('Feil ved opprettelse av hendelse!' + response.value, {
+            duration: 3000,
+            position: 'top-right'
+        });
+    } else {
+        emit('new-event-success');
+    }
+    
     
 }
 
@@ -116,8 +142,8 @@ const addEvent = () => {
 
             <!-- Coordinates -->
              <div class="double-label-container">
-                <label for="coordinate-input">*Lengdegrad</label>
                 <label for="coordinate-input">*Breddegrad</label>
+                <label for="coordinate-input">*Lengdegrad</label>
             </div>
             <div class="double-input-container">
                 <input type="text" class="edit-input" id="coordinate-input" placeholder="f.eks 62.1008" v-model="latitude" />
@@ -132,14 +158,6 @@ const addEvent = () => {
             <label for="end-input">Eventuell Sluttdato</label>
             <input type="datetime-local" class="edit-input" id="end-input" v-model="endTime" />       
             
-            
-            <!-- Icon type -->
-            <label for="icon-select">*Velg ikon</label>
-            <select id="icon-select" v-model="selectedIcon" class="edit-input">
-                <option v-for="(icon, index) in icons" :key="index" :value="icon">
-                  {{ icon }}
-                </option>
-            </select>
         </div>
 
         <div class="button-container">
@@ -150,7 +168,7 @@ const addEvent = () => {
 </template>
 <style scoped>
 .grey-container {
-   height:41rem;
+   height:35rem;
    margin-top: 4.75rem;
 }
 

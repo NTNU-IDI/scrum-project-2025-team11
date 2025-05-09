@@ -12,6 +12,18 @@ import java.util.List;
  */
 @Repository
 public interface HouseholdItemRepository extends JpaRepository<HouseholdItem, HouseholdItemId> {
+    /**
+     * Finds all household items associated with a specific household ID.
+     * @param householdId the ID of the household to search for
+     * @return a list of HouseholdItem objects associated with the specified household ID
+     */
     List<HouseholdItem> findByHouseholdId(Integer householdId);
+
+    /**
+     * Finds a specific household item by its household ID and item ID.
+     * @param householdId the ID of the household
+     * @param itemId the ID of the item
+     * @return a list of HouseholdItem objects matching the specified household ID and item ID
+     */
     List<HouseholdItem> findByHouseholdIdAndItemId(Integer householdId, Integer itemId);
 }

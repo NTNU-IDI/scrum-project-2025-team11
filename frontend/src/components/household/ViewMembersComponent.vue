@@ -92,28 +92,29 @@ onMounted( async () => {
         height: 5rem;
         padding: 0 0.5rem 0 0.5rem ;
         scrollbar-width: thin;
+        width: 30rem;
     }
 
     .article-card {
         background-color: var(--grey);
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         border: none;
-        min-width: 8rem;
+        min-width: 8vw;
         max-width: 15rem;
         width: auto;
     }
 
     .button-container {
         margin-left: auto; 
-        margin-right: -0.4rem;
+        margin-right: -2.7rem;
         margin-top: 4.5rem;
         align-self: flex-start;
         height: 8rem;
     }
 
     .dark-button {
-        height: 3.5rem;
-        width: 6.5rem;
+        height: 4vw;
+        width: 11vw;
     }
 
     .dark-button:disabled {
@@ -133,5 +134,15 @@ onMounted( async () => {
         .button-container {
           margin: 0px !important;
         }
-      }
+
+        .info-container {
+          flex-direction: column !important;
+          gap: 0px !important;
+        }
+
+        .dark-button {
+          width: 100% !important;
+          height: 3rem !important;
+        }
+    }
 </style>

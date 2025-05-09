@@ -7,8 +7,22 @@ import no.ntnu.idatt2106.krisefikser.model.Address;
 import no.ntnu.idatt2106.krisefikser.model.Household;
 import no.ntnu.idatt2106.krisefikser.model.User;
 
+/**
+ * Utility class for mapping User entities to UserResponseDTOs.
+ * <p>
+ * Assembles user profile information along with associated household and address data
+ * into a transport-friendly DTO structure.
+ */
 public class UserMapper {
 
+    /**
+     * Converts a User entity into a UserResponseDTO.
+     * <p>
+     * Includes user credentials, role, and linked household details.
+     *
+     * @param user the User entity to convert
+     * @return a populated UserResponseDTO with user and household fields
+     */
     public static UserResponseDTO toResponseDTO(User user) {
         UserResponseDTO dto = new UserResponseDTO();
         dto.setId(user.getId());
@@ -40,5 +54,4 @@ public class UserMapper {
         }
         return dto;
     }
-    
 }

@@ -76,7 +76,7 @@ const deleteUser = async (id: number) => {
 }
 
 .grey-container {
-    width: 60rem;
+    width: 60vw;
     height: auto;
 }
 
@@ -117,21 +117,46 @@ h1 {
     padding-left: 1.5rem;
 }
 
+.delete-button:hover {
+    background-color: transparent;
+}
+
 #id-header, #id {
     width: 2rem;
     justify-content: center; 
     align-items: center;
 }
 #username-header, #username, #name-header, #name {
-    width: 15rem;
+    width: 15vw;
 }
 
 #email-header, #email {
-    width: 20rem;
+    width: 20vw;
 }
 #delete-header, #delete {
     width: 2rem;
     justify-content: center; 
     align-items: center;
+}
+
+@media(max-width: 480px) {
+    .grey-container {
+        width: 100vw;
+        width: 100%;
+        margin: 0;
+        overflow-y: hidden;
+    }
+    .article-card {
+        font-size: x-small;
+    }
+
+    #id, #id-header {
+        min-width: 1rem;
+    }
+
+    #name, #name-header, #username, #username-header, #email, #email-header {
+        min-width: 9rem;
+    }
+    
 }
 </style>

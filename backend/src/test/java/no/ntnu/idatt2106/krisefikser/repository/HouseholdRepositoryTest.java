@@ -2,10 +2,13 @@ package no.ntnu.idatt2106.krisefikser.repository;
 
 import no.ntnu.idatt2106.krisefikser.model.Address;
 import no.ntnu.idatt2106.krisefikser.model.Household;
+import no.ntnu.idatt2106.krisefikser.model.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.transaction.annotation.Transactional;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +20,9 @@ class HouseholdRepositoryTest {
 
     @Autowired
     private HouseholdRepository householdRepository;
+
+    @Autowired
+    private EntityManager em;
 
     @Autowired
     private AddressRepository addressRepository; // <-- You'll need this too
@@ -109,5 +115,38 @@ class HouseholdRepositoryTest {
         Optional<Household> deleted = householdRepository.findById(savedHousehold.getId());
 
         assertThat(deleted).isNotPresent();
+    }
+
+    @Test
+    @Transactional
+    void deleteOrphanHouseholds_onlyRemovesUnreferenced() {
+        // GIVEN a household with and one without users
+        Household keep = new Household();
+        keep.setName("Keep");
+        em.persist(keep);
+
+        Household orphan = new Household();
+        orphan.setName("Orphan");
+        em.persist(orphan);
+
+        User u = new User();
+        u.setEmail("a@b.com");
+        u.setUsername("user");
+        u.setFirstName("F");
+        u.setLastName("L");
+        u.setPassword("pw");
+        u.setHousehold(keep);
+        em.persist(u);
+
+        em.flush();       // assign IDs & store rows
+        em.clear();       // ensure repo.findById sees real DB
+
+        // WHEN
+        int deleted = householdRepository.deleteOrphanHouseholds();
+
+        // THEN only the orphan is removed
+        assertThat(deleted).isEqualTo(1);
+        assertThat(householdRepository.findById(keep.getId())).isPresent();
+        assertThat(householdRepository.findById(orphan.getId())).isEmpty();
     }
 }

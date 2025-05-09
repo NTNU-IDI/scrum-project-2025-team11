@@ -36,7 +36,7 @@ const isEditMode = ref(false);
  * @property {Array} list
  * @default []
  */
-const list = ref<{ id: number; name: string; quantity: number; unit: string; acquiredDate: string }[]>([]);
+const list = ref<{ id: number; name: string; quantity: number; unit: string; acquiredDate: string; expirationDate: string }[]>([]);
 
 /**
  * Function to load the inventory items
@@ -63,15 +63,19 @@ onMounted( async () => {
  * @returns {Promise<void>}
  */
 watch(() => inventoryStore.inventory, async (newItems) => {
-    const grouped: Record<number, { quantity: number; unit: string }> = {};
+    const grouped: Record<number, { quantity: number; unit: string; expirationDate: Date }> = {};
   
     for (const item of newItems) {
         if (grouped[item.itemId]) {
             grouped[item.itemId].quantity += item.quantity;
+            if(new Date(item.expirationDate) < new Date(grouped[item.itemId].expirationDate)) {
+                grouped[item.itemId].expirationDate = new Date(item.expirationDate);
+            }
         } else {
             grouped[item.itemId] = {
                 quantity: item.quantity,
-                unit: item.unit
+                unit: item.unit,
+                expirationDate: new Date(item.expirationDate)
             };
         }
     }
@@ -86,7 +90,8 @@ watch(() => inventoryStore.inventory, async (newItems) => {
         name: itemNames[index].name,
         quantity: grouped[id].quantity,
         unit: grouped[id].unit,
-        acquiredDate: newItems.find(item => item.itemId === id)?.acquiredDate || ''
+        acquiredDate: newItems.find(item => item.itemId === id)?.acquiredDate || '',
+        expirationDate: grouped[id].expirationDate
     }));
 }, { immediate: true });
 
@@ -122,18 +127,29 @@ const deleteItem =  async (itemId: number) => {
     for (const item of matchingItems) {
         await inventoryStore.deleteItem(itemId, item.acquiredDate);
         if(!inventoryStore.inventory.map(item => item.itemId).includes(itemId)) {
-            $toast.success('Vare er slettet fra lageret', {
-            duration: 3000,
-            position: 'top-right'
-        });
-        } else {
-            $toast.error('Feil ved sletting av vare', {
-            duration: 3000,
-            position: 'top-right'
-        });
+                $toast.success('Vare er slettet fra lageret', {
+                duration: 3000,
+                position: 'top-right'
+            });
         }
+        
     }
     await loadInventory(); 
+}
+
+const checkExpirationDate = (expirationDate: string) => {
+    const today = new Date();
+    const expiration = new Date(expirationDate);
+    today.setHours(0, 0, 0, 0);
+    expiration.setHours(0, 0, 0, 0);
+
+    if (expiration < today) {
+        return 2;
+    } else if ((expiration.getTime() - today.getTime()) < (7 * 24 * 60 * 60 * 1000)) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 </script>
 <template>
@@ -146,6 +162,12 @@ const deleteItem =  async (itemId: number) => {
                 <div class="quantity">{{ item.quantity }} {{ item.unit }}</div>
                 <div class="info">
                     <h2>{{ item.name }}</h2>
+                    <div v-if="checkExpirationDate(item.expirationDate) === 2">
+                        <i class="fa fa-exclamation-triangle"></i>
+                    </div>
+                    <div v-else-if="checkExpirationDate(item.expirationDate) === 1">
+                        <i class="fa fa-hourglass-end"></i>
+                    </div>
                 </div>
             </div>
         </div>
@@ -157,7 +179,7 @@ const deleteItem =  async (itemId: number) => {
 </template>
 <style scoped>
     .grey-container {
-        width: 500px;
+        width: 35vw;
     }
 
     .quantity {
@@ -166,8 +188,8 @@ const deleteItem =  async (itemId: number) => {
     }
 
     .dark-button {
-        height: 5rem;
         width: 9rem;
+        height: 6vw;
     }
     .dark-button.active {
         background-color: var(--good-green);
@@ -187,13 +209,19 @@ const deleteItem =  async (itemId: number) => {
         background-color: transparent;
     }
 
+    .info {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+    }
+
     @media (max-width: 480px) {
         .grey-container {
             width: 100%;
         }
         .dark-button {
-            width: 5;
-            height: 3rem;
+            width: 25% !important;
+            height: 3rem !important;
         }
     }
 </style>

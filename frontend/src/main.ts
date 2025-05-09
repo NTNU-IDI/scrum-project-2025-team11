@@ -6,12 +6,15 @@ import ToastPlugin from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-bootstrap.css';
 import {useToast} from "vue-toast-notification";
 import {refreshToken} from "@/api/AuthService.ts";
+import {VueReCaptcha} from "vue-recaptcha-v3";
 
 import App from "./App.vue";
 import "./assets/tailwind.css";
 import "./assets/base.css"
 import "./assets/main.css"
 import router from "./router/index.ts";
+import LogInComponent from "./components/LogInComponent.vue";
+import RegisterComponent from "./components/RegisterComponent.vue";
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -22,6 +25,16 @@ pinia.use(piniaPluginPersistedState)
 app.use(pinia);
 app.use(ToastPlugin);
 app.use(router);
+app.use(VueReCaptcha, {
+    siteKey: import.meta.env.VITE_RECAPTCHA_SITE_KEY,
+    loaderOptions: {
+        autoHideBadge: false,
+        explicitRenderParameters: {
+            badge: "bottomright",
+            theme: "light",
+        },
+    },
+});
 app.mount("#app");
 
 

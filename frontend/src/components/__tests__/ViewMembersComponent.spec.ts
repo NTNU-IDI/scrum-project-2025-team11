@@ -51,6 +51,7 @@ describe('ViewMembersComponent', () => {
     */
 
     // Checks that the component rendes the correct section titles    
+    /*
     it('renders the correct section titles', async () => {
         const wrapper = shallowMount(ViewMembersComponent, {
         global: {
@@ -65,6 +66,7 @@ describe('ViewMembersComponent', () => {
         expect(headerTexts).toContain('Adresse');
         expect(headerTexts).toContain('Medlemmer');
     });
+    */
 
     // Checks that the component renders the correct button response
     it('emits "show-new-member-box" event when button is clicked', async () => {

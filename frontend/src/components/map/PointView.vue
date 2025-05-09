@@ -1,5 +1,13 @@
 <template>
-  <div class="point-card">
+  <div v-if="props.isNavigating">
+    <div class="point-buttons">
+      <button class="delete-button small-button" @click="stopNavigation">
+        Stopp navigasjon
+      </button>
+    </div>
+  </div>
+
+  <div v-else class="point-card">
     <span class="close-icon" @click="$emit('close')">×</span>
 
       <!-- View mode (for registered and non-registered users) -->
@@ -27,7 +35,7 @@
 
           <div class="point-detail">
             <strong>Koordinater:</strong>
-            <div>{{ pointData.latitude }}, {{ pointData.longitude }}</div>
+            <div>{{ pointData.latitude.toFixed(7) }}, {{ pointData.longitude.toFixed(7) }}</div>
           </div>
 
           <div class="point-detail" v-if="address && !addressError">
@@ -40,8 +48,7 @@
           <!-- Navigation button -->
            <div class="point-buttons">
             <button v-if="!props.isNavigating"class="good-button small-button" @click="navigateToPoint">Naviger til dette punktet</button>
-            <button v-if="props.isNavigating" class="delete-button small-button" @click="stopNavigation">Stopp navigasjon</button>
-            <button v-if="showNextButton && !props.isNavigating" class="dark-button small-button" @click="nextShelter">Neste tilfluktsrom</button>
+            <button v-if="showNextButton && !props.isNavigating" class="map-button" @click="nextShelter">Neste tilfluktsrom</button>
            </div>
         </div>
       </div>
@@ -80,9 +87,9 @@
           <!-- Coordinates -->
           <div v-if="inputMethod === 'coordinates'" class="coordinates-input">
             <label class="point-label">Breddegrad</label>
-            <input class="point-input" v-model="pointData.latitude" type="number" placeholder="F.eks. 63,41" />
+            <input class="point-input" v-model="pointData.latitude" @change="clampLatitude" type="number" step="0.0001" min="-90" max="90" placeholder="F.eks. 63,41" />
             <label class="point-label">Lengdegrad</label>
-            <input class="point-input" v-model="pointData.longitude" type="number" placeholder="F.eks. 10,40" />
+            <input class="point-input" v-model="pointData.longitude" @change="clampLongitude" type="number" step="0.0001" min="-180" max="180" placeholder="F.eks. 10,40" />
           </div>
 
           <!-- Address -->
@@ -97,18 +104,17 @@
 
           <!-- Create mode buttons -->
           <div v-if="!isEdit" class="point buttons create-buttons">
-            <button class="good-button small-button" @click="createPoint" :disabled="hasValidationError">Lag nytt punkt</button>
+            <button class="good-button small-button" @click="createPoint">Lag nytt punkt</button>
           </div>
           <!-- Edit modebuttons -->
           <div v-else class="point-buttons edit-buttons">
-            <button v-if="isEdit" class="good-button small-button" @click="savePoint" :disabled="hasValidationError">Lagre punkt</button>
+            <button v-if="isEdit" class="good-button small-button" @click="savePoint">Lagre punkt</button>
             <button v-if="isEdit" class="delete-button small-button" @click="deletePoint">Slett</button>
           </div>
         </div>
       </div>
   </div>
 </template>
-
 
 <script lang="ts" setup>
 import type { PointOfInterest } from "@/types/PointOfInterest";
@@ -121,6 +127,10 @@ import {
   validateLatitude,
   validateLongitude
 } from '@/utils/validationService';
+import {
+  resolveAddressFromText,
+  resolveAddressFromCoords
+} from '@/utils/geoService';
 
 const pointStore = usePointStore();
 const isEdit = computed(() => props.mode === 'edit');
@@ -178,72 +188,68 @@ watch(() => [pointData.value.latitude, pointData.value.longitude], ([newLat, new
   }
 }, { deep: true });
 
-const hasValidationError = computed(() => {
+const validateForm = () => {
+  validationError.value = '';
+
   if (!validatePointName(pointData.value.name)) {
-    validationError.value = "Ugyldig navn. Bruk kun bokstaver, tall og noen skilletegn.";
-    return true;
+    validationError.value = "Navnet kan ikke være tomt, og kan kun inneholde bokstaver og noen spesielle tegn.";
+    return false;
   }
   if (!validateIconType(pointData.value.iconType)) {
     validationError.value = "Velg en gyldig type for punktet.";
-    return true;
+    return false;
   }
   if (!validatePointDescription(pointData.value.description)) {
-    validationError.value = "Beskrivelsen må være på minst 5 tegn.";
-    return true;
+    validationError.value = "Beskrivelsen må være på minst 5 tegn, og max 100 tegn.";
+    return false;
   }
   if (!validateLatitude(pointData.value.latitude)) {
-    validationError.value = "Breddegrad må være et tall mellom -90 og 90.";
-    return true;
+    validationError.value = "Breddegrad må være et tall mellom -90 og 90";
+    return false;
   }
   if (!validateLongitude(pointData.value.longitude)) {
     validationError.value = "Lengdegrad må være et tall mellom -180 og 180.";
-    return true;
+    return false;
   }
-
-  validationError.value = '';
-  return false;
-});
+  return true;
+};
 
 async function resolveAddress() {
   if (!address.value.trim()) return;
 
   try {
-    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address.value)}`);
-    const data = await response.json();
+    const result = await resolveAddressFromText(address.value);
 
-    if (data.length > 0) {
-      const newLat = parseFloat(data[0].lat);
-      const newLon = parseFloat(data[0].lon);
-
-      pointData.value.latitude = newLat;
-      pointData.value.longitude = newLon;
+    if (result) {
+      pointData.value.latitude = result.lat;
+      pointData.value.longitude = result.lon;
       addressError.value = '';
-      
-      // Emit event with new coordinates
-      emit('coordinates-updated', { 
-        latitude: newLat,
-        longitude: newLon
+
+      emit('coordinates-updated', {
+        latitude: result.lat,
+        longitude: result.lon
       });
     } else {
       addressError.value = 'Fant ingen koordinater for adressen.';
     }
-  } catch (err) {
-    addressError.value = 'En feil skjedde ved oppslag av adresse.';
+  } catch (err: any) {
+    addressError.value = err.message;
   }
 }
 
 async function resolveCoords(lat: number, lon: number) {
   try {
-    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
-    const data = await response.json();
-    if (data?.display_name) {
-      address.value = data.display_name;
+    const resolvedAddress = await resolveAddressFromCoords(lat, lon);
+
+    if (resolvedAddress) {
+      address.value = resolvedAddress;
+      addressError.value = '';
     } else {
       address.value = '';
       addressError.value = 'Fant ikke adresse for koordinatene.';
     }
-  } catch (err) {
-    addressError.value = 'Feil ved oppslag av adresse.';
+  } catch (err: any) {
+    addressError.value = err.message;
   }
 }
 
@@ -262,23 +268,35 @@ function stopNavigation() {
   emit('stop-navigation');
 }
 
+function clampLatitude() {
+  if (pointData.value.latitude > 90) pointData.value.latitude = 90;
+  if (pointData.value.latitude < -90) pointData.value.latitude = -90;
+}
+
+function clampLongitude() {
+  if (pointData.value.longitude > 180) pointData.value.longitude = 180;
+  if (pointData.value.longitude < -180) pointData.value.longitude = -180;
+}
+
 const createPoint = async () => {
+  if (!validateForm()) return;
   try {
     await pointStore.createPoint(pointData.value);
     emit('close-point-view');
 
   } catch (error) {
-    throw error;
+    validationError.value = `Something went wrong: ${error}`;
   }
 };
 
 const savePoint = async () => {
+  if (!validateForm()) return;
   try {
     await pointStore.updatePointById(pointData.value);
     emit('close-point-view');
 
   } catch (error) {
-    throw error;
+    validationError.value = `Something went wrong: ${error}`;
   }
 };
 
@@ -291,7 +309,7 @@ const deletePoint = async () => {
       emit('close-point-view');
 
     } catch (error) {
-      throw error;
+      validationError.value = `Something went wrong: ${error}`;
     }
   }
 };
@@ -299,60 +317,15 @@ const deletePoint = async () => {
 </script>
 
 <style scoped>
-.point-card {
-  position: relative;
-  background: var(--white);
-  border-radius: 10px;
-  width: 220px;
-  display: flex;
-  flex-direction: column;
-  max-height: 100%;
-  overflow: hidden;
-}
-
-.point-card-content {
-  padding: 1.2rem;
-  text-align: left;
-  flex: 1;
-  overflow: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-  scrollbar-color: var(--light-gray) var(--white);
-}
-
 .point-label {
   display: block;
   font-size: var(--font-size-xsmall);
 }
 
-
 .point-buttons {
   display: flex;
   flex-direction: column;
   gap: 5px;
-}
-
-.close-icon {
-  position: absolute;
-  top: 5px;
-  right: 15px;
-  font-size: 24px;
-  color: black;
-  cursor: pointer;
-  user-select: none;
-}
-
-.close-icon:hover {
-  color: var(--bad-red);
-}
-
-.point-detail-container {
-  padding-top: 7px;
-}
-
-.point-detail {
-  margin-bottom: 10px;
-  font-size: var(--font-size-small);
 }
 
 .point-input {

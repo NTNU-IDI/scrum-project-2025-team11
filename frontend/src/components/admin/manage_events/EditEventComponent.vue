@@ -27,7 +27,6 @@ const localEvent = ref({
 });
 const isEventDirty = ref(false);
 const selectedIcon = ref('none');
-const icons = eventIcons;
 const errorMsg = ref('');
 
 // Load events from store
@@ -166,9 +165,11 @@ const deleteEvent = async () => {
     <div class="header-box-container">
         <h1 class="medium-header">Rediger hendelse</h1>
         <div class="grey-container">
-            <h2 class="small-header">{{ localEvent.name }}</h2>
-            <button class="cancel-button" @click="$emit('hide-edit-box')">X</button>
-            
+            <div class="header-x-container">
+                <h2 class="small-header">{{ localEvent.name }}</h2>
+                <button class="cancel-button" @click="$emit('hide-edit-box')">X</button>
+            </div>
+          
                 <!-- Severity and radius -->
                 <div class="double-label-container">
                     <label for="severity-input">Krisenivå</label>
@@ -182,7 +183,10 @@ const deleteEvent = async () => {
                 </div>
 
                 <!-- Coordinates -->
-                <label for="coordinate-input">Koordinater</label>
+                <div class="double-label-container">
+                    <label for="severity-input">Lengdegrad</label>
+                    <label for="radius-input">Breddegrad</label>
+                </div>
                 <div class="double-input-container">
                     <input type="text" class="edit-input" id="coordinate-input" @input="isEventDirty = true" v-model="localEvent.latitude" />
                     <input type="text" class="edit-input" id="coordinate-input" @input="isEventDirty = true" v-model="localEvent.longitude" />
@@ -196,14 +200,6 @@ const deleteEvent = async () => {
                 <label for="end-input">Eventuell sluttdato</label>
                 <input type="datetime-local" class="edit-input" id="end-input" @input="isEventDirty = true" v-model="localEvent.endTime" />
                 
-                <!-- Icon type -->
-                <select id="icon-select" v-model="selectedIcon" class="edit-input">
-                    <option disabled value="">Velg ikon</option>
-                    <option v-for="(icon, index) in icons" :key="index" :value="icon">
-                      {{ icon }}
-                    </option>
-                </select>
-                
             <div class="button-container">
                 <button class="dark-button" id="delete" @click="deleteEvent()">Slett hendelse</button>
                 <button class="dark-button" id="save" @click="updateEvent()" :disabled="!isEventDirty">Lagre endringer</button>
@@ -216,7 +212,16 @@ const deleteEvent = async () => {
 <style scoped>
     .grey-container {
         background-color: var(--light-blue);
+        width: 25vw;
         height: auto;
+        overflow-y: hidden;
+    }
+
+    .header-x-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        width: 32vw;
     }
 
     .page-container {
@@ -231,6 +236,7 @@ const deleteEvent = async () => {
 
     .small-header {
         color: white;
+        width: 30rem;
     }
 
     label {
@@ -280,9 +286,6 @@ const deleteEvent = async () => {
     }
 
     .cancel-button {
-        position: absolute;
-        top: 25rem;
-        right: -5rem;
         color: white;
         background-color: transparent;
         font-weight: bold;
@@ -306,5 +309,16 @@ const deleteEvent = async () => {
         color: white;
         margin: 0;
         padding: 0;
+    }
+
+    @media (max-width: 480px) {
+        .cancel-button {
+            margin-top: -3rem;
+      
+        }
+
+        .dark-button {
+            width: auto;
+        }
     }
 </style>

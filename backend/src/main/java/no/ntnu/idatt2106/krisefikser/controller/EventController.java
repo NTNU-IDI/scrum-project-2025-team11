@@ -2,12 +2,14 @@ package no.ntnu.idatt2106.krisefikser.controller;
 
 import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.media.*;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,6 +21,12 @@ import no.ntnu.idatt2106.krisefikser.exceptionhandler.ResourceNotFoundException;
 import no.ntnu.idatt2106.krisefikser.repository.EventRepository;
 import no.ntnu.idatt2106.krisefikser.service.EventService;
 
+
+/**
+ * Controller class for managing event-related operations in the system.
+ * This class is responsible for handling HTTP requests related to events, such as creating, updating, deleting, and retrieving event information.
+ * It interacts with the EventService to perform the necessary operations and return appropriate responses.
+ */
 @RestController
 @RequestMapping("/api/events")
 @CrossOrigin(origins = "*")
@@ -249,13 +257,14 @@ public class EventController {
   @Operation(
     summary = "Save a new event", 
     description = "Save a new event to the database"
-    //,security = @SecurityRequirement(name = "bearer-key")
   )
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "Event saved successfully", 
                   content = @Content(mediaType = "application/json", schema = @Schema(implementation = EventResponseDTO.class))), 
     @ApiResponse(responseCode = "400", description = "Invalid event data")
   })
+  @SecurityRequirement(name = "jwtCookieAuth")
+  @PreAuthorize("hasRole('admin')")
   @PostMapping
   public ResponseEntity<EventResponseDTO> saveEvent(
     @Parameter (description = "the event to save", required = true)
@@ -280,6 +289,8 @@ public class EventController {
                   content = @Content(mediaType = "application/json", schema = @Schema(implementation = EventResponseDTO.class))), 
     @ApiResponse(responseCode = "404", description = "Event not found")
   })
+  @SecurityRequirement(name = "jwtCookieAuth")
+  @PreAuthorize("hasRole('admin')")
   @PutMapping("/{id}")
   public ResponseEntity<EventResponseDTO> updateEvent(
     @Parameter (description = "the ID of the event to update", required = true, example = "1")
@@ -297,12 +308,13 @@ public class EventController {
   @Operation(
     summary = "Delete an event", 
     description = "Delete an event from the database by its ID"
-    //,security = @SecurityRequirement
   )
   @ApiResponses(value = {
     @ApiResponse(responseCode = "204", description = "Event deleted successfully"), 
     @ApiResponse(responseCode = "404", description = "Event not found")
   })
+  @SecurityRequirement(name = "jwtCookieAuth")
+  @PreAuthorize("hasRole('admin')")
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteEvent(
     @Parameter (description = "the ID of the event to delete", required = true, example = "1")

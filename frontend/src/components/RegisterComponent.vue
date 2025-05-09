@@ -3,6 +3,9 @@ import {ref, watch, onMounted} from 'vue'
 import axios from 'axios'
 import {validateFirstName, validateLastName, validateEmail, validateUsername, validateHouseholdName, validatePassword} from "@/utils/validationService.ts";
 import {registerNormalUser, login} from "@/api/AuthService.ts";
+import { useReCaptcha } from 'vue-recaptcha-v3';
+
+const { executeRecaptcha } = useReCaptcha() || {};
 
 //Input-fields
 const firstName = ref('')
@@ -26,6 +29,8 @@ const householdChoice = ref("new")
 const hasChosenNewHousehold = ref(true);
 //References an error-message-<p>
 const errorMessage = ref('');
+
+const recaptchaToken = ref('');
 
 function validateFields() {
   errorMessage.value = ""
@@ -82,7 +87,11 @@ function validateFields() {
 
 async function attemptRegistration() {
   errorMessage.value = ""
+
+  recaptchaToken.value = await executeRecaptcha('register');
+
   if (validateFields()) {
+    console.log("All fields are valid")
     if(householdChoice.value === "new") {
       const location = await getLocationDataFromAdressAndPostalCode(address.value, postalCode.value)
       if (location === undefined) {
@@ -154,7 +163,7 @@ async function getHhIdFromInviteCodeAndRegister() {
 }
 
 async function createNewUser(hhID: number) {
-  registerNormalUser(firstName.value, lastName.value, username.value, email.value, password.value, hhID)
+  registerNormalUser(firstName.value, lastName.value, username.value, email.value, password.value, hhID, recaptchaToken.value)
 }
 
 async function getLocationDataFromAdressAndPostalCode(address: string, postalCode: string) {
@@ -175,7 +184,7 @@ function changePasswordVisibility() {
   if(showPassword.value === false) {
     passwordInputType.value = 'password'
   } else {
-    passwordInputType.value = 'type'
+    passwordInputType.value = 'text'
   }
 }
 
