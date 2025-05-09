@@ -12,7 +12,7 @@ describe ('NewMemberComponent', () => {
         const pinia = createPinia();
         setActivePinia(pinia);
         householdStore = useHouseholdStore();
-        vi.spyOn(householdStore, 'setMemberCount');
+        householdStore.inviteMember = vi.fn();
         vi.spyOn(window, 'alert').mockImplementation(() => {});
         vi.clearAllMocks();
     });
@@ -30,8 +30,8 @@ describe ('NewMemberComponent', () => {
         expect(wrapper.find('#invite-button').exists()).toBe(true); 
       });
     
-    // Checks that the component renders an error message and no member is added if email is invalid 
-    it('shows error and does not call addMember if first name is invalid', async () => {
+    // Checks that the component renders an error message and invitation is sent if email is invalid 
+    it('shows error and does not call inviteMember if first name is invalid', async () => {
         vi.spyOn(validationService, 'validateEmail').mockReturnValue(false);
 
         const wrapper = shallowMount(NewMemberComponent, {
@@ -41,19 +41,19 @@ describe ('NewMemberComponent', () => {
         });
     
         await wrapper.find('input').setValue('invalid-email');
-        window.alert = vi.fn(); 
+        await wrapper.find('#invite-button').trigger('click');
     
-        const addButton = wrapper.findAll('button.dark-button')[0];
-        await addButton.trigger('click');
-    
-        expect(window.alert).toHaveBeenCalledWith('Vennligst skriv inn en gyldig e-postadresse');
-        expect(householdStore.setMemberCount).not.toHaveBeenCalled();
+        const errorMsg = wrapper.find('.error-message');
+        expect(errorMsg.exists()).toBe(true);
+        expect(errorMsg.text()).toBe('Vennligst skriv inn en gyldig e-postadresse');
+        expect(householdStore.inviteMember).not.toHaveBeenCalled();
     });
     
     // Checks that new member box is hidden if email is valid
     it('emits "hide-new-member-box" if email is valid', async () => {
         vi.spyOn(validationService, 'validateEmail').mockReturnValue(true);
-    
+        householdStore.inviteMember = vi.fn().mockResolvedValueOnce(undefined);
+
         const wrapper = shallowMount(NewMemberComponent, {
             global: {
                 plugins: [createTestingPinia({ createSpy: vi.fn })],
@@ -63,7 +63,7 @@ describe ('NewMemberComponent', () => {
         await wrapper.find('input').setValue('valid@email.com');
         await wrapper.find('#invite-button').trigger('click');
     
-        expect(wrapper.emitted()).toHaveProperty('hide-new-member-box');
+        expect(wrapper.emitted()).toHaveProperty('invite-success');
     });
     
     // Checks that new member box is hidden when cancel button is clicked

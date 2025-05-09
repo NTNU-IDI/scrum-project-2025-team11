@@ -131,7 +131,7 @@ const updateItems = async () => {
             };
             await inventoryStore.updateItem(updatedItem)
             .then(() => {
-                $toast.success(`${item.itemName} er oppdatert`, {
+                $toast.success(`Vare er oppdatert`, {
                     duration: 3000,
                     position: 'top-right'
                 });
@@ -222,7 +222,7 @@ const deleteItem = async (item: EditableItem) => {
     .grey-container {
         background-color: var(--light-blue);
         margin-bottom: 4.1rem;
-        width: 500px;
+        width: 35vw;
     }
 
     .small-header {
