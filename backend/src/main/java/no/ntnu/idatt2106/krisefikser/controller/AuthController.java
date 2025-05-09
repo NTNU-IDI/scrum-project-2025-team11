@@ -11,14 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-  import lombok.RequiredArgsConstructor;
-  import org.springframework.http.HttpStatus;
-  import org.springframework.http.ResponseEntity;
-  import org.springframework.security.crypto.password.PasswordEncoder;
-  import org.springframework.web.bind.annotation.PostMapping;
-  import org.springframework.web.bind.annotation.RequestBody;
-  import org.springframework.web.bind.annotation.RequestMapping;
-  import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -45,31 +37,6 @@ import no.ntnu.idatt2106.krisefikser.service.HouseholdService;
 import no.ntnu.idatt2106.krisefikser.service.RefreshTokenService;
 import no.ntnu.idatt2106.krisefikser.service.TwoFactorCodeService;
 import no.ntnu.idatt2106.krisefikser.service.UserService;
-  import io.swagger.v3.oas.annotations.Operation;
-  import io.swagger.v3.oas.annotations.Parameter;
-  import io.swagger.v3.oas.annotations.media.Content;
-  import io.swagger.v3.oas.annotations.media.Schema;
-  import io.swagger.v3.oas.annotations.responses.ApiResponse;
-  import io.swagger.v3.oas.annotations.responses.ApiResponses;
-  import jakarta.servlet.http.Cookie;
-  import jakarta.servlet.http.HttpServletRequest;
-  import jakarta.servlet.http.HttpServletResponse;
-  import jakarta.validation.Valid;
-  import no.ntnu.idatt2106.krisefikser.dto.AddressRequestDTO;
-  import no.ntnu.idatt2106.krisefikser.dto.ConfirmAuthenticationRequest;
-  import no.ntnu.idatt2106.krisefikser.dto.HouseholdRequestDTO;
-  import no.ntnu.idatt2106.krisefikser.dto.HouseholdResponseDTO;
-  import no.ntnu.idatt2106.krisefikser.dto.LoginRequest;
-  import no.ntnu.idatt2106.krisefikser.dto.UserRequestDTO;
-  import no.ntnu.idatt2106.krisefikser.dto.UserResponseDTO;
-  import no.ntnu.idatt2106.krisefikser.model.User;
-  import no.ntnu.idatt2106.krisefikser.model.User.Role;
-  import no.ntnu.idatt2106.krisefikser.security.JwtUtil;
-  import no.ntnu.idatt2106.krisefikser.service.AddressService;
-  import no.ntnu.idatt2106.krisefikser.service.HouseholdService;
-  import no.ntnu.idatt2106.krisefikser.service.RefreshTokenService;
-  import no.ntnu.idatt2106.krisefikser.service.TwoFactorCodeService;
-  import no.ntnu.idatt2106.krisefikser.service.UserService;
 
 /**
  * Controller class for handling authentication-related operations.
