@@ -28,7 +28,7 @@ app.use(router);
 app.use(VueReCaptcha, {
     siteKey: import.meta.env.VITE_RECAPTCHA_SITE_KEY,
     loaderOptions: {
-        autoHideBadge: true,
+        autoHideBadge: false,
         explicitRenderParameters: {
             badge: "bottomright",
             theme: "light",
