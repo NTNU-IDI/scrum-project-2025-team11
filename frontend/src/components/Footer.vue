@@ -3,12 +3,15 @@
     <div class="footer-content">
       <h2>Andre tjenester</h2>
       <nav class="footer-links" aria-label="Nyttige lenker">
-        <a href="/personvern"><i class="fa fa-lock" aria-hidden="true"></i> Personvern</a> <!--
-        <a href="/userhome">User home (for testing)</a>
-        <a href="/admin">Admin (for testing)</a>
-        <a href="/superadmin">Superadmin (for testing)</a> -->
-        <br>
-        <br>
+        <router-link to="/personvern"><i class="fa fa-shield" aria-hidden="true"></i> Personvern</router-link>
+
+        <!--
+        <router-link to="/userhome">User home (for testing)</router-link>
+        <router-link to="/admin">Admin (for testing)</router-link>
+        <router-link to="/superadmin">Superadmin (for testing)</router-link>
+        -->
+        <br />
+        <br />
       </nav>
     </div>
   </footer>

@@ -27,7 +27,7 @@
         <br><p><i class="fa fa-check-square" aria-hidden="true"></i> Finne helsetjenester og medisinsk hjelp.</p>
         <br><p><i class="fa fa-check-square" aria-hidden="true"></i> Finne møtesteder under en krise.</p>
         <br><p><i class="fa fa-check-square" aria-hidden="true"></i> Finne tilfluktsrom i nærheten.</p>
-        <br><a href="/map" class="button login"><i class="fa fa-map" aria-hidden="true"></i> Til kartet</a> 
+        <router-link to="/map" class="button login"><i class="fa fa-map" aria-hidden="true"></i> Til kartet</router-link>
       </div>
 
       <div class="box info">
@@ -36,7 +36,7 @@
         <br><p><i class="fa fa-check-square"></i> Se oversikt over medlemmene i husstanden din.</p>
         <br><p><i class="fa fa-check-square"></i> Sjekk om du har nok forsyninger til en krise.</p>
         <br><p><i class="fa fa-check-square"></i> Invitere andre inn i husstanden din.</p>
-        <br><a href="/household" class="button login"><i class="fa fa-gear"></i> Til Husstand og Beredskapslager</a> 
+        <br><router-link to="/household" class="button login"><i class="fa fa-gear" aria-hidden="true"></i> Til Husstand og Beredskapslager</router-link>      
       </div>
 
     </div>
