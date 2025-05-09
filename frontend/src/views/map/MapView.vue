@@ -8,12 +8,12 @@
       <div class="corner-container" :class="{ 'crisis-mode': showCrisisAlert }">
         <IconsOverview ref="iconsOverviewRef"/>
         <EventsOverview />
-        <button v-if="!isEditMode && showNearestShelterButton" class="dark-button small-button" @click="findNearestShelter">
-          Finn 3 nærmeste tilflukstrom
-        </button>  
-        <button v-if="role === 'admin'" id="editToggle" @click="toggleEditMode" :class="{ 'delete-button small-button': isEditMode, 'dark-button small-button': !isEditMode }">
-          {{ isEditMode ? 'Avslutt redigering' : 'Redigeringsmodus' }}
-        </button>   
+          <button v-if="!isEditMode && showNearestShelterButton" class="map-button-no-hover" @click="findNearestShelter">
+            Finn 3 nærmeste tilflukstrom
+          </button>  
+          <button v-if="role === 'admin'" id="editToggle" @click="toggleEditMode" :class="{ 'delete-button small-button-map': isEditMode, 'map-button-no-hover': !isEditMode }">
+            {{ isEditMode ? 'Avslutt redigering' : 'Redigeringsmodus' }}
+          </button>
         <SelectType 
           v-if="showSelectType"
           @add-point="handleAddPoint"

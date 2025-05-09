@@ -5,8 +5,8 @@
     <div class="point-card-content">
       <p class="title-map">Bestem type:</p>
       <div class="button-container">
-        <button @click="$emit('add-point')" class="small-button dark-button">Legg til punkt</button>
-        <button @click="$emit('add-event')" class="small-button dark-button">Legg til hendelse</button>
+        <button @click="$emit('add-point')" class="map-button">Legg til punkt</button>
+        <button @click="$emit('add-event')" class="map-button">Legg til hendelse</button>
       </div>
     </div>
   </div>
@@ -18,5 +18,8 @@
   flex-direction: column;
   gap: 5px;
   margin-top: 10px;
+}
+
+@media (max-width: 480px) {
 }
 </style>

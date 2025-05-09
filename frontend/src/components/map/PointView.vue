@@ -41,7 +41,7 @@
            <div class="point-buttons">
             <button v-if="!props.isNavigating"class="good-button small-button" @click="navigateToPoint">Naviger til dette punktet</button>
             <button v-if="props.isNavigating" class="delete-button small-button" @click="stopNavigation">Stopp navigasjon</button>
-            <button v-if="showNextButton && !props.isNavigating" class="dark-button small-button" @click="nextShelter">Neste tilfluktsrom</button>
+            <button v-if="showNextButton && !props.isNavigating" class="map-button" @click="nextShelter">Neste tilfluktsrom</button>
            </div>
         </div>
       </div>

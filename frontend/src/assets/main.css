@@ -126,6 +126,14 @@ button:disabled:hover {
   font-size: var(--font-size-small);
 }
 
+.small-button-map {
+  flex-shrink: 0;
+  min-width: 150px;
+  box-sizing: border-box;
+  width: 100%;
+  font-size: var(--font-size-small);
+}
+
 .good-button {
   background-color: var(--good-green);
 }
@@ -316,6 +324,39 @@ button:disabled:hover {
   flex: 1;
   width: 100%;
   z-index: 0;
+}
+
+.map-button {
+  background-color: var(--dark-blue);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: var(--font-size-small);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.map-button:hover {
+  background-color: var(--light-blue);
+  color: var(--white);
+}
+
+.map-button-no-hover {
+  font-size: var(--font-size-small);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  background-color: var(--dark-blue);
+  color: var(--white);
+  border: none;
+}
+
+.map-button-no-hover:hover {
+  background-color: var(--light-blue);
+  color: var(--white);
+  transform: none;
 }
 
 .crisis-alert p {
@@ -641,6 +682,15 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .dark-button {
     width: 5rem;
     height: 3rem;
+  }
+
+  .map-overview-box {
+    background: var(--white);
+    padding: 0.5rem 0.9rem 0.5rem 0.9rem;
+    border-radius: 10px;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
   }
 }
 
