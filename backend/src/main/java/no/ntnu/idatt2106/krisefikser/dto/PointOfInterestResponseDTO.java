@@ -6,6 +6,9 @@ import no.ntnu.idatt2106.krisefikser.model.Enums;
 
 @Data
 
+/**
+ * DTO for returning point of interest data.
+ */
 public class PointOfInterestResponseDTO {
     @Schema(description = "Unique identifier", example = "1")
     private int id;

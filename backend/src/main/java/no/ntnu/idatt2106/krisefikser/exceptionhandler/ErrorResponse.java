@@ -5,6 +5,10 @@ import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+/**
+ * Error response class for handling error responses in the application.
+ * This class is used to structure the error response sent to the client.
+ */
 @Data
 @AllArgsConstructor
 public class ErrorResponse {

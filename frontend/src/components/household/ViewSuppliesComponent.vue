@@ -157,7 +157,7 @@ const deleteItem =  async (itemId: number) => {
 </template>
 <style scoped>
     .grey-container {
-        width: 500px;
+        width: 35vw;
     }
 
     .quantity {
@@ -166,8 +166,8 @@ const deleteItem =  async (itemId: number) => {
     }
 
     .dark-button {
-        height: 5rem;
         width: 9rem;
+        height: 6vw;
     }
     .dark-button.active {
         background-color: var(--good-green);
@@ -192,8 +192,8 @@ const deleteItem =  async (itemId: number) => {
             width: 100%;
         }
         .dark-button {
-            width: 5;
-            height: 3rem;
+            width: 25% !important;
+            height: 3rem !important;
         }
     }
 </style>

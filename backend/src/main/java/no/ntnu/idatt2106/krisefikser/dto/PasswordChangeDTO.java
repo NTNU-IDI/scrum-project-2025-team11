@@ -4,6 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.Getter;
 
+/**
+ * DTO for changing a user's password.
+ */
 @Data @Getter
 public class PasswordChangeDTO {
 

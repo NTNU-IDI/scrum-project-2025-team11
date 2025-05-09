@@ -4,6 +4,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+/**
+ * DTO for confirming two-factor authentication.
+ */
 @Data
 public class ConfirmAuthenticationRequest {
     @Valid

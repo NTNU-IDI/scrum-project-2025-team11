@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * DTO for returning user data.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

@@ -19,6 +19,12 @@ import no.ntnu.idatt2106.krisefikser.exceptionhandler.ResourceNotFoundException;
 import no.ntnu.idatt2106.krisefikser.repository.EventRepository;
 import no.ntnu.idatt2106.krisefikser.service.EventService;
 
+
+/**
+ * Controller class for managing event-related operations in the system.
+ * This class is responsible for handling HTTP requests related to events, such as creating, updating, deleting, and retrieving event information.
+ * It interacts with the EventService to perform the necessary operations and return appropriate responses.
+ */
 @RestController
 @RequestMapping("/api/events")
 @CrossOrigin(origins = "*")

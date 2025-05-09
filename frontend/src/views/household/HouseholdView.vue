@@ -95,10 +95,10 @@ const inviteSuccess = () => {
 	.page-container {
 		display: flex;
 		flex-direction: column;
-		gap: 2rem;
+		gap: 2vw;
 		padding: 1rem;
     	margin-right: 0px;
-		margin: 0 3rem 0 3rem ;
+		margin: 0 3vw 0 3vw ;
 	}
 
 	h1 {
@@ -110,7 +110,7 @@ const inviteSuccess = () => {
 		display: flex;
 		flex-direction: row;
 		min-height: 50vh;
-		gap: 2rem;
+		gap: 2vw;
 		padding: 1rem;
 	
 	}
@@ -131,7 +131,7 @@ const inviteSuccess = () => {
         display: flex;
         align-items: center; 
         justify-content: center; 
-        width: 6.5rem; 
+        width: 6.vm; 
         height: 3.5rem; 
         margin-left: 0px;
         margin-top: 4.75rem;

@@ -37,7 +37,7 @@ const closeNewEventBox = () => {
     eventStore.clearCoordinates();
 };
 watch(() => eventStore.chosenEvent, (newEvent) => {
-    if (newEvent && newEvent.id !==  undefined) {
+    if (newEvent && newEvent.id !==  0 && newEvent.id !== undefined) {
         showSingleEventBox.value = true;
     } else {
         showSingleEventBox.value = false;
@@ -94,5 +94,22 @@ p {
     width: 12rem;
     background-color: var(--orange);
     margin-left: auto;
+}
+
+@media (max-width: 480px) {
+    .page-container {
+        flex-direction: column;
+    }
+    
+    .modal-overlay {
+        overflow-x: hidden;
+        top: 0;
+    }
+
+    .dark-button {
+        align-self: flex-start;
+        margin-top: 1rem; 
+        margin-left: -1rem; 
+    }
 }
 </style>
