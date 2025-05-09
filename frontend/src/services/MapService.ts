@@ -9,6 +9,7 @@ import { useToast } from "vue-toast-notification";
 
 const $toast = useToast();
 let userPositionMarker: L.Marker | null = null;
+let storedPosition: { lat: number; lon: number } | null = null;
 
 export const userIcon = L.icon({
   iconUrl: userMarkerIcon,
@@ -98,16 +99,47 @@ export function removeUserPositionMarker(map: L.Map) {
   }
 }
 
-export function hasUserLocation(lat: number, lon: number) {
-  if (lat === null || lon === null) {
-    $toast.clear();
-    $toast.warning(
-      "Posisjon din er ikke tilgjengelig. Gi tilgang til posisjon for å finne nærmeste tilfkuktsrom.",
-      { duration: 7000 }
+function storeUserPosition(lat: number, lon: number) {
+  storedPosition = { lat, lon };
+}
+
+function getStoredUserPosition() {
+  return storedPosition;
+}
+
+export function hasUserLocation(): boolean {
+  return storedPosition !== null;
+}
+
+export function getUserPosition(
+  map: L.Map,
+  callback?: (lat: number, lon: number) => void,
+  force: boolean = false
+): Promise<{ lat: number; lon: number } | null> {
+  return new Promise((resolve) => {
+    if (!force && hasUserLocation()) {
+      const position = getStoredUserPosition();
+      if (position) {
+        callback?.(position.lat, position.lon);
+        resolve(position);
+        return;
+      }
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        setUserPositionMarker(map, lat, lon);
+        storeUserPosition(lat, lon);
+        callback?.(lat, lon);
+        resolve({ lat, lon });
+      },
+      (err) => {
+        resolve(null);
+      }
     );
-    return false;
-  }
-  return true;
+  });
 }
 
 export function createRoutingControl(
@@ -135,6 +167,7 @@ export function createRoutingControl(
     },
     draggableWaypoints: false,
   } as any).addTo(map);
+  map.setView([startLat, startLon], 15);
   return routingControl;
 }
 

@@ -57,7 +57,7 @@ import { useUserStore } from "@/stores/userStore.ts";
 import type { PointOfInterest } from "@/types/PointOfInterest";
 import type { EventResponseDTO } from "@/types/Event";
 import { isUserInCrisisArea } from '@/utils/geoService';
-import { addMarkersToMap, addEventsToMap, clearEventLayers, createRoutingControl, clearRoutingControl, setUserPositionMarker, hasUserLocation } from '@/services/MapService'; 
+import { addMarkersToMap, addEventsToMap, clearEventLayers, createRoutingControl, clearRoutingControl, getUserPosition, setUserPositionMarker } from '@/services/MapService'; 
 import { storeToRefs } from "pinia";
 import { onUnmounted, onMounted, ref, watch } from 'vue';
 import { useEventStore } from '@/stores/eventStore'; 
@@ -127,9 +127,12 @@ onMounted(async () => {
   });
 
   // Get user location and set marker
-  getUserPosition((lat, lon) => {
+  const position = await getUserPosition(map);
+  if (position) {
+    userLat = position.lat;
+    userLon = position.lon;
     checkIfInCrisisArea();
-  });
+  }
 });
 
 onUnmounted(() => {
@@ -234,40 +237,6 @@ function updateMarkerPosition(coords: { latitude: number, longitude: number }) {
   selectedPoint.value.longitude = coords.longitude;
 }
 
-function getUserPosition(
-  callback: (lat: number, lon: number) => void, 
-  force: boolean = false) {
-
-  if (!navigator.geolocation) {
-    $toast.warning("Nettleseren støtter ikke posisjonstjenester.", { duration: 5000 });
-    return;
-  }
-
-  if (userLocationFetched.value && !force && userLat !== null && userLon !== null) {
-    callback(userLat, userLon);
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      userLat = pos.coords.latitude;
-      userLon = pos.coords.longitude;
-      userLocationFetched.value = true;
-      userMarker = setUserPositionMarker(map, userLat, userLon);
-      map.setView([userLat, userLon], 13);
-      callback(userLat, userLon);
-    },
-    (err) => {
-      $toast.clear();
-      $toast.warning(
-        "Vi har ikke tilgang til posisjonen din. Tillat posisjonstjenester i nettleseren for navigasjon og finne nærmeste tilfluktsrom.",
-        { duration: 7000 }
-      );
-      showNearestShelterButton.value = true;
-    }
-  );
-}
-
 function checkIfInCrisisArea() {
 if (userLat !== null && userLon !== null) {
   if (!isEditMode.value) {
@@ -289,12 +258,17 @@ function closeEventView() {
   showEventView.value = false;
 }
 
-function handleNavigation(coords: { latitude: number, longitude: number }) {
-  getUserPosition((userLat, userLon) => {
-    clearRouting();
+async function handleNavigation(coords: { latitude: number, longitude: number }) {
+  clearRouting();
+  const position = await getUserPosition(map);
+  if (position) {
+    userLat = position.lat;
+    userLon = position.lon;
     window.routingControl = createRoutingControl(map, userLat, userLon, coords.latitude, coords.longitude);
     isNavigating.value = true;
-  }, true);
+  } else {
+    handleNoPosition();
+  }
 }
 
 function clearRouting() {
@@ -303,17 +277,31 @@ function clearRouting() {
   window.routingControl = null;
   isNavigating.value = false;
   showNearestShelterButton.value = true;
+  if (userLat !== null && userLon !== null) {
+    setUserPositionMarker(map, userLat, userLon);
+  }
 }
 
 async function findNearestShelter() {
   isEditMode.value = false;
   showNearestShelterButton.value = false;
 
-  getUserPosition(
-    async (lat, lon) => {
-      await locateAndShowShelters(lat, lon);
-    },
-    true
+  const position = await getUserPosition(map);
+  if (position) {
+    userLat = position.lat;
+    userLon = position.lon;
+    await locateAndShowShelters(position.lat, position.lon);
+  } else {
+    handleNoPosition();
+    showNearestShelterButton.value = true;
+  }
+}
+
+function handleNoPosition() {
+  $toast.clear();
+  $toast.warning(
+    "Vi har ikke tilgang til posisjonen din. Tillat posisjonstjenester i nettleseren for navigasjon og finne nærmeste tilfluktsrom.",
+    { duration: 7000 }
   );
 }
 
@@ -334,7 +322,7 @@ async function locateAndShowShelters(lat: number, lon: number) {
   viewingNearest.value = true;
   
   const firstShelter = nearestShelters.value[0];
-  map.setView([firstShelter.latitude, firstShelter.longitude], 15); // <-- Focus before opening view
+  map.setView([firstShelter.latitude, firstShelter.longitude], 15);
   showPointView('view', firstShelter, true, true);
 }
 
