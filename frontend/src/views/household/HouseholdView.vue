@@ -74,7 +74,11 @@ const inviteSuccess = () => {
 			<div class="items-column">
 			<ViewSingleItemComponent />
 			</div>
-			<button class="dark-button" id="add-button" @click="toggleNewItemBox">+ Ny vare</button> 
+			<div class="icon-button-container">
+				<button class="dark-button" id="add-button" @click="toggleNewItemBox">+ Ny vare</button> 
+				<p><i class="fa fa-exclamation-triangle"></i> Gått ut på dato</p>
+				<p><i class="fa fa-hourglass-end"></i> Går ut om under en uke</p>
+			</div>
 
 			<div class="modal-overlay" v-if="isItemBoxVisible" @click.self="isItemBoxVisible = false">
 				<NewItemComponent  
@@ -83,6 +87,8 @@ const inviteSuccess = () => {
 				@new-item-success="newItemSuccess"
 				/>
 			</div>
+
+
 		</div>
 
 		
