@@ -11,7 +11,7 @@
         <button v-if="!isEditMode && showNearestShelterButton" class="dark-button small-button" @click="findNearestShelter">
           Finn 3 nærmeste tilflukstrom
         </button>  
-        <button id="editToggle" @click="toggleEditMode" :class="{ 'delete-button small-button': isEditMode, 'dark-button small-button': !isEditMode }">
+        <button v-if="role === 'admin'" id="editToggle" @click="toggleEditMode" :class="{ 'delete-button small-button': isEditMode, 'dark-button small-button': !isEditMode }">
           {{ isEditMode ? 'Avslutt redigering' : 'Redigeringsmodus' }}
         </button>   
         <SelectType 
@@ -165,6 +165,7 @@ const mapClickHandler = (e: L.LeafletMouseEvent) => {
       longitude: lng
     };
     if (!showPointForm.value) {
+      createTempMarker(lat, lng);
       showSelectType.value = true;
     }
   }
@@ -289,24 +290,35 @@ function clearRouting() {
 async function findNearestShelter() {
   isEditMode.value = false;
   showNearestShelterButton.value = false;
-  getUserPosition(() => {}, true);
+
+  if (!userLat || !userLon) {
+    getUserPosition(async () => {
+      await locateAndShowShelters(userLat!, userLon!);
+    }, true);
+  } else {
+    await locateAndShowShelters(userLat, userLon);
+  }
+}
+
+async function locateAndShowShelters(lat: number, lon: number) {
   if (!pointStore.selectedIcons.includes('shelter')) {
     iconsOverviewRef.value?.forceIncludeShelter();
     pointStore.updateSelectedIcons([...pointStore.selectedIcons, 'shelter']);
     await pointStore.fetchPointsByIconTypes(pointStore.selectedIcons);
   }
-  const center = map.getCenter();
-  const lat = center.lat;
-  const lon = center.lng;
-  nearestShelters.value = await pointStore.fetchNearestShelters(lat, lon);
 
+  nearestShelters.value = await pointStore.fetchNearestShelters(lat, lon);
   if (nearestShelters.value.length === 0) {
     $toast.warning('Ingen tilfluktsrom funnet i nærheten.', { duration: 5000 });
     return;
   }
+
   currentShelterIndex.value = 0;
   viewingNearest.value = true;
-  showPointView('view', nearestShelters.value[currentShelterIndex.value], true, true);
+  
+  const firstShelter = nearestShelters.value[0];
+  map.setView([firstShelter.latitude, firstShelter.longitude], 15); // <-- Focus before opening view
+  showPointView('view', firstShelter, true, true);
 }
 
 function handleNextShelter() {
