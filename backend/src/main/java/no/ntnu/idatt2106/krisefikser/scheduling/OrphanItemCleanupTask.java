@@ -6,6 +6,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Scheduled task for cleaning up orphan items.
+ * This task runs every day at 02:05 in the Europe/Oslo timezone.
+ * It deletes any items that are not referenced by any household items.
+ * The task is marked as transactional to ensure that the database operations are performed atomically.
+ * The task is also marked with @Component to allow Spring to manage it as a bean.
+ */
 @Component
 public class OrphanItemCleanupTask {
 
