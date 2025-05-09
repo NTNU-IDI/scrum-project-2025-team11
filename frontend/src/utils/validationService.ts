@@ -17,7 +17,7 @@ const householdNameRegex = /^[æøåÆØÅa-zA-Z\s\-]+$/;
 
 // Regexes for validating icons (interest points)
 const pointNameRegex = /^[æøåÆØÅa-zA-Z0-9_ ]+$/;
-const pointDescriptionRegex = /^[æøåÆØÅa-zA-Z0-9_ ]+$/;
+const pointDescriptionRegex = /^.{5,100}$/;
 const iconTypeRegex =
   /^(shelter|assembly_point|medical|normal|none|point|danger)$/; // One of these
 const coordinateRegex = /^-?\d+(\.\d+)?$/; // Integer or decimal
@@ -95,8 +95,8 @@ export function validateIconType(type: string): boolean {
 export function validateLatitude(lat: number): boolean {
   if (!lat) return false;
 
-  const decimalPlacesRegex = /^-?\d+(\.\d{1,7})?$/; 
-  if(!decimalPlacesRegex.test(lat.toString())) return false;
+  const decimalPlacesRegex = /^-?\d+(\.\d{1,7})?$/;
+  if (!decimalPlacesRegex.test(lat.toString())) return false;
 
   return coordinateRegex.test(lat.toString()) && lat >= -90 && lat <= 90;
 }
@@ -105,8 +105,8 @@ export function validateLatitude(lat: number): boolean {
 export function validateLongitude(lon: number): boolean {
   if (!lon) return false;
 
-  const decimalPlacesRegex = /^-?\d+(\.\d{1,7})?$/; 
-  if(!decimalPlacesRegex.test(lon.toString())) return false;
+  const decimalPlacesRegex = /^-?\d+(\.\d{1,7})?$/;
+  if (!decimalPlacesRegex.test(lon.toString())) return false;
 
   return coordinateRegex.test(lon.toString()) && lon >= -180 && lon <= 180;
 }

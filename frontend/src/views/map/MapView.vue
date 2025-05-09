@@ -159,7 +159,8 @@ function showPointView(mode: 'view' | 'edit' | 'create', point: PointOfInterest,
 
 const mapClickHandler = (e: L.LeafletMouseEvent) => {
   if (role.value === 'admin' && isEditMode.value) {
-    const { lat, lng } = e.latlng;
+    const lat = parseFloat(e.latlng.lat.toFixed(7));
+    const lng = parseFloat(e.latlng.lng.toFixed(7));
     selectedPoint.value = {
       id: 0,
       name: '',
