@@ -767,7 +767,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   }
 
   .button {
-    width: 100%;
+    width: 75%;
     max-width: 280px;
     font-size: 1rem;
   }
