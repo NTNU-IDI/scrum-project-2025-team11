@@ -89,7 +89,6 @@ async function attemptRegistration() {
   errorMessage.value = ""
 
   recaptchaToken.value = await executeRecaptcha('register');
-  console.log(recaptchaToken.value);
 
   if (validateFields()) {
     console.log("All fields are valid")

@@ -16,7 +16,6 @@ async function attemptLogin() {
   errorMessage.value = ''
 
   recaptchaToken.value = await executeRecaptcha('login');
-  console.log(recaptchaToken.value);
 
   if (simpleValidation()) {
     login(username.value, password.value, recaptchaToken.value)
