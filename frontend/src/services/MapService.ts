@@ -5,7 +5,9 @@ import type { PointOfInterest } from "@/types/PointOfInterest";
 import type { EventResponseDTO } from "@/types/Event";
 import { getEventColor } from "@/utils/geoService";
 import { type Ref } from "vue";
+import { useToast } from "vue-toast-notification";
 
+const $toast = useToast();
 let userPositionMarker: L.Marker | null = null;
 
 export const userIcon = L.icon({
@@ -94,6 +96,18 @@ export function removeUserPositionMarker(map: L.Map) {
     map.removeLayer(userPositionMarker);
     userPositionMarker = null;
   }
+}
+
+export function hasUserLocation(lat: number, lon: number) {
+  if (lat === null || lon === null) {
+    $toast.clear();
+    $toast.warning(
+      "Posisjon din er ikke tilgjengelig. Gi tilgang til posisjon for å finne nærmeste tilfkuktsrom.",
+      { duration: 7000 }
+    );
+    return false;
+  }
+  return true;
 }
 
 export function createRoutingControl(

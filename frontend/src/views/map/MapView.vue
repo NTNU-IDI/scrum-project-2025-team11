@@ -57,7 +57,7 @@ import { useUserStore } from "@/stores/userStore.ts";
 import type { PointOfInterest } from "@/types/PointOfInterest";
 import type { EventResponseDTO } from "@/types/Event";
 import { isUserInCrisisArea } from '@/utils/geoService';
-import { addMarkersToMap, addEventsToMap, clearEventLayers, createRoutingControl, clearRoutingControl, setUserPositionMarker } from '@/services/MapService'; 
+import { addMarkersToMap, addEventsToMap, clearEventLayers, createRoutingControl, clearRoutingControl, setUserPositionMarker, hasUserLocation } from '@/services/MapService'; 
 import { storeToRefs } from "pinia";
 import { onUnmounted, onMounted, ref, watch } from 'vue';
 import { useEventStore } from '@/stores/eventStore'; 
@@ -234,19 +234,37 @@ function updateMarkerPosition(coords: { latitude: number, longitude: number }) {
   selectedPoint.value.longitude = coords.longitude;
 }
 
-function getUserPosition(callback: (lat: number, lon: number) => void, force: boolean = false) {
-  if (!navigator.geolocation || (userLocationFetched.value && !force)) return;
+function getUserPosition(
+  callback: (lat: number, lon: number) => void, 
+  force: boolean = false) {
+
+  if (!navigator.geolocation) {
+    $toast.warning("Nettleseren støtter ikke posisjonstjenester.", { duration: 5000 });
+    return;
+  }
+
+  if (userLocationFetched.value && !force && userLat !== null && userLon !== null) {
+    callback(userLat, userLon);
+    return;
+  }
 
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       userLat = pos.coords.latitude;
       userLon = pos.coords.longitude;
       userLocationFetched.value = true;
-      callback(userLat, userLon);
       userMarker = setUserPositionMarker(map, userLat, userLon);
       map.setView([userLat, userLon], 13);
+      callback(userLat, userLon);
     },
-    (err) => console.error("Error getting location: ", err)
+    (err) => {
+      $toast.clear();
+      $toast.warning(
+        "Vi har ikke tilgang til posisjonen din. Tillat posisjonstjenester i nettleseren for navigasjon og finne nærmeste tilfluktsrom.",
+        { duration: 7000 }
+      );
+      showNearestShelterButton.value = true;
+    }
   );
 }
 
@@ -291,13 +309,12 @@ async function findNearestShelter() {
   isEditMode.value = false;
   showNearestShelterButton.value = false;
 
-  if (!userLat || !userLon) {
-    getUserPosition(async () => {
-      await locateAndShowShelters(userLat!, userLon!);
-    }, true);
-  } else {
-    await locateAndShowShelters(userLat, userLon);
-  }
+  getUserPosition(
+    async (lat, lon) => {
+      await locateAndShowShelters(lat, lon);
+    },
+    true
+  );
 }
 
 async function locateAndShowShelters(lat: number, lon: number) {
@@ -345,6 +362,7 @@ function toggleEditMode() {
   } else {
     $toast.info('Redigeringsmodus deaktivert. Du er nå i visningsmodus.', { duration: 5000 });
     eventStore.startPollingActiveEvents();
+    showSelectType.value = false;
     removeTempMarker();
     addEventsToMap(map, activeEvents.value, eventLayers, handleEventClick);
   }
