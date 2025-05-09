@@ -104,11 +104,11 @@
 
           <!-- Create mode buttons -->
           <div v-if="!isEdit" class="point buttons create-buttons">
-            <button class="good-button small-button" @click="createPoint" :disabled="hasValidationError">Lag nytt punkt</button>
+            <button class="good-button small-button" @click="createPoint">Lag nytt punkt</button>
           </div>
           <!-- Edit modebuttons -->
           <div v-else class="point-buttons edit-buttons">
-            <button v-if="isEdit" class="good-button small-button" @click="savePoint" :disabled="hasValidationError">Lagre punkt</button>
+            <button v-if="isEdit" class="good-button small-button" @click="savePoint">Lagre punkt</button>
             <button v-if="isEdit" class="delete-button small-button" @click="deletePoint">Slett</button>
           </div>
         </div>
@@ -188,31 +188,31 @@ watch(() => [pointData.value.latitude, pointData.value.longitude], ([newLat, new
   }
 }, { deep: true });
 
-const hasValidationError = computed(() => {
+const validateForm = () => {
+  validationError.value = '';
+
   if (!validatePointName(pointData.value.name)) {
-    validationError.value = "Navnet kan ikke være tomt.";
-    return true;
+    validationError.value = "Navnet kan ikke være tomt, og kan kun inneholde bokstaver og noen spesielle tegn.";
+    return false;
   }
   if (!validateIconType(pointData.value.iconType)) {
     validationError.value = "Velg en gyldig type for punktet.";
-    return true;
+    return false;
   }
   if (!validatePointDescription(pointData.value.description)) {
     validationError.value = "Beskrivelsen må være på minst 5 tegn, og max 100 tegn.";
-    return true;
+    return false;
   }
   if (!validateLatitude(pointData.value.latitude)) {
     validationError.value = "Breddegrad må være et tall mellom -90 og 90";
-    return true;
+    return false;
   }
   if (!validateLongitude(pointData.value.longitude)) {
     validationError.value = "Lengdegrad må være et tall mellom -180 og 180.";
-    return true;
+    return false;
   }
-
-  validationError.value = '';
-  return false;
-});
+  return true;
+};
 
 async function resolveAddress() {
   if (!address.value.trim()) return;
@@ -279,22 +279,24 @@ function clampLongitude() {
 }
 
 const createPoint = async () => {
+  if (!validateForm()) return;
   try {
     await pointStore.createPoint(pointData.value);
     emit('close-point-view');
 
   } catch (error) {
-    throw error;
+    validationError.value = `Something went wrong: ${error}`;
   }
 };
 
 const savePoint = async () => {
+  if (!validateForm()) return;
   try {
     await pointStore.updatePointById(pointData.value);
     emit('close-point-view');
 
   } catch (error) {
-    throw error;
+    validationError.value = `Something went wrong: ${error}`;
   }
 };
 
@@ -307,7 +309,7 @@ const deletePoint = async () => {
       emit('close-point-view');
 
     } catch (error) {
-      throw error;
+      validationError.value = `Something went wrong: ${error}`;
     }
   }
 };
