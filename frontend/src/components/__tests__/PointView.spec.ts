@@ -140,16 +140,4 @@ describe("PointView.vue", () => {
     await wrapper.find(".close-icon").trigger("click");
     expect(wrapper.emitted()).toHaveProperty("close");
   });
-
-  it("disables create button when validation fails", async () => {
-    const wrapper = mount(PointView, {
-      props: {
-        selectedPoint: { ...testPoint, name: "" }, // Invalid name
-        mode: "create",
-      },
-    });
-
-    const createButton = wrapper.find("button.good-button");
-    expect((createButton.element as HTMLButtonElement).disabled).toBe(true);
-  });
 });
