@@ -165,6 +165,7 @@ const mapClickHandler = (e: L.LeafletMouseEvent) => {
       longitude: lng
     };
     if (!showPointForm.value) {
+      removeTempMarker();
       createTempMarker(lat, lng);
       showSelectType.value = true;
     }
