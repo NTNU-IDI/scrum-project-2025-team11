@@ -107,12 +107,22 @@ const addItem = async () => {
         errorMsg.value = 'Vennligst skriv inn en gyldig utløpsdato';
         return;
     }
-    
-    const newItemId = existingTypes.value.find(item => item.name === newName.value)?.id;
-    if (!newItemId) {
-        errorMsg.value = 'Vennligst velg en eksisterende vare eller opprett en ny';
+        // 1) Try to reuse an existing type
+    let type = existingTypes.value.find(i => i.name === newName.value);
+    // 2) If missing, create it
+    if (!type) {
+      try {
+        type = await ItemService.create({
+          name: newName.value,
+          description: ''
+        });
+        existingTypes.value.push(type);
+      } catch (e) {
+        errorMsg.value = 'Kunne ikke opprette ny vare-type.';
         return;
+      }
     }
+    const newItemId = type.id;
     const newHouseholdItem = {
         itemId: newItemId,
         name: newName.value,
@@ -196,19 +206,7 @@ const handleKeydown = (event: KeyboardEvent, name: string) => {
                     v-model="newName"
                     type="text"
                     id="type-input"
-                    @focus="showDropdown = true"
-                    @keydown="handleKeydown($event, newName)"
-                />                           
-                <ul v-if="showDropdown" class="dropdown-list">
-                    <li
-                        v-for="item in existingTypes"
-                        :key="item.id"
-                        @click="selectOption(item.name)"
-                        class="dropdown-item"
-                    >
-                        {{ item.name }}
-                    </li>
-                </ul>
+                />
             </div>
 
             <div class="quantity-container">
