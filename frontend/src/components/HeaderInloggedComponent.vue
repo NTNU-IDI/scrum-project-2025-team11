@@ -12,7 +12,7 @@
 
       <div class="header-right">
         <a href="/household" class="button other"><i class="fa fa-medkit"></i> Min beredskap</a> 
-        <a href="/" class="button logout" @click.prevent="logOutUser"><i class="fa fa-sign-out"></i> Logg ut</a>
+        <a href="/" class="button logout" @click.prevent="logOut"><i class="fa fa-sign-out"></i> Logg ut</a>
       </div>
     </div>
   </header>
@@ -24,5 +24,8 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const goToHome = () => {
   router.push('/')
+}
+async function logOut() {
+  await logOutUser()
 }
 </script>
