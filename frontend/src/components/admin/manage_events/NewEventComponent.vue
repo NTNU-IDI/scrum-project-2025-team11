@@ -19,7 +19,7 @@ const longitude = ref(props.lng ?? '');
 const description = ref('');
 const startTime = ref();
 const endTime = ref();
-const selectedIcon = ref('none');
+const selectedIcon = 'none';
 const emit = defineEmits(['hide-new-event-box', 'new-event-success']);
 const icons = eventIcons;
 const eventStore = useEventStore();
@@ -72,7 +72,7 @@ const addEvent = async () => {
         await eventStore.save({
             name: name.value,
             description: description.value,
-            iconType: selectedIcon.value,
+            iconType: selectedIcon,
             startTime: startTime.value + ':00',
             endTime: endTime.value + ':00',
             latitude: Number(latitude.value),
@@ -90,7 +90,7 @@ const addEvent = async () => {
         eventStore.save({
             name: name.value,
             description: description.value,
-            iconType: selectedIcon.value,
+            iconType: selectedIcon,
             startTime: startTime.value + ':00',
             latitude: Number(latitude.value),
             longitude: Number(longitude.value),
@@ -158,14 +158,6 @@ const addEvent = async () => {
             <label for="end-input">Eventuell Sluttdato</label>
             <input type="datetime-local" class="edit-input" id="end-input" v-model="endTime" />       
             
-            
-            <!-- Icon type -->
-            <label for="icon-select">*Velg ikon</label>
-            <select id="icon-select" v-model="selectedIcon" class="edit-input">
-                <option v-for="(icon, index) in icons" :key="index" :value="icon">
-                  {{ icon }}
-                </option>
-            </select>
         </div>
 
         <div class="button-container">
@@ -176,7 +168,7 @@ const addEvent = async () => {
 </template>
 <style scoped>
 .grey-container {
-   height:41rem;
+   height:35rem;
    margin-top: 4.75rem;
 }
 

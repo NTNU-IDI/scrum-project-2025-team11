@@ -13,7 +13,7 @@
             Merk at når du bekrefter en endring, vil disse vises for alle brukere.</p>
         </router-link>
         
-        <router-link to="/crisis" class="box registered">
+        <router-link to="/admin" class="box registered">
           <h3>Kartopplysninger og punkter</h3>
           <p>Her kan du administrere de ulike punktene/posisjonene på kartet ved å trykke på dem.</p>
         </router-link>

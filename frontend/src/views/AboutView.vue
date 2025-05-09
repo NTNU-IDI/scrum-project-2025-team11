@@ -8,7 +8,7 @@
       </div>
 
       <div class="grid-container">
-        <div class="box">
+        <div class="box info">
           <h3>Om utviklerne</h3>
           <p>Vi er et team på åtte studenter ved NTNU: An, August, Gabriel, Garv, Jonas, Madeleine, Matteus og Therese.
             <br>

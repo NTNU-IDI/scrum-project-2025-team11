@@ -27,7 +27,6 @@ const localEvent = ref({
 });
 const isEventDirty = ref(false);
 const selectedIcon = ref('none');
-const icons = eventIcons;
 const errorMsg = ref('');
 
 // Load events from store
@@ -200,14 +199,6 @@ const deleteEvent = async () => {
                 <input type="datetime-local" class="edit-input" id="start-input" @input="isEventDirty = true" v-model="localEvent.startTime" />
                 <label for="end-input">Eventuell sluttdato</label>
                 <input type="datetime-local" class="edit-input" id="end-input" @input="isEventDirty = true" v-model="localEvent.endTime" />
-                
-                <!-- Icon type -->
-                <select id="icon-select" v-model="selectedIcon" class="edit-input">
-                    <option disabled value="">Velg ikon</option>
-                    <option v-for="(icon, index) in icons" :key="index" :value="icon">
-                      {{ icon }}
-                    </option>
-                </select>
                 
             <div class="button-container">
                 <button class="dark-button" id="delete" @click="deleteEvent()">Slett hendelse</button>
