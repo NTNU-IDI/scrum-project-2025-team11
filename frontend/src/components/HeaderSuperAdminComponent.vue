@@ -19,21 +19,21 @@
   </header>
 </template>
   
-  <script lang="ts" setup>
-  import { ref } from 'vue'
-  import { useRouter } from 'vue-router'
-  import {logOutUser} from '../api/AuthService';
-  const router = useRouter()
-  const goToHome = () => {
-    router.push('/')
-  }
+<script lang="ts" setup>
+import { useRouter } from 'vue-router'
+import { ref } from 'vue'
+import {logOutUser} from '../api/AuthService';
 
-  async function logOut() {
-    await logOutUser()
-  }
+const router = useRouter()
+const goToHome = () => {
+  router.push('/')
+}
+
+async function logOut() {
+  await logOutUser()
+}
 const isMobileMenuOpen = ref(false)
 const toggleMobileMenu = () => isMobileMenuOpen.value = !isMobileMenuOpen.value
-
 </script>
   
   

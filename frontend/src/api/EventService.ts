@@ -22,13 +22,37 @@ export class EventService {
     }
 
     static async update(id: number, event: EventRequestDTO): Promise<EventResponseDTO> {
-        const response = await axios.put<EventResponseDTO>(`${ITEM_API_URL}/${id}`, event, {withCredentials: true});
-        return response.data;
+        try {
+            const response = await axios.put<EventResponseDTO>(`${ITEM_API_URL}/${id}`, event);
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                if (error.response.status === 404) {
+                    throw new Error('Fant ikke hendelse');
+                } else {
+                    throw new Error(`Server feil: ${error.response.status}`);
+                }
+            } else {
+                throw new Error('Nettverksfeil');
+            }
+        }
     }
 
     static async save(event: EventRequestDTO): Promise<EventResponseDTO> {
-        const response = await axios.post<EventResponseDTO>(ITEM_API_URL, event, {withCredentials: true});
-        return response.data;
+        try {
+            const response = await axios.post<EventResponseDTO>(ITEM_API_URL, event);
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                if (error.response.status === 400) {
+                    throw new Error('Ugyldig data');
+                } else {
+                    throw new Error(`Server feil: ${error.response.status}`);
+                }
+            } else {
+                throw new Error('Nettverksfeil');
+            }
+        }
     }
 
     static async delete(id: number): Promise<void> {
