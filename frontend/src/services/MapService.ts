@@ -38,7 +38,7 @@ export function addMarkersToMap(
     markers.push(marker);
 
     marker.on("click", () => {
-      if (role.value === "admin" && isEditMode) {
+      if (role.value === "admin" && isEditMode.value) {
         showPointView("edit", point, true);
       } else {
         showPointView("view", point, true);
