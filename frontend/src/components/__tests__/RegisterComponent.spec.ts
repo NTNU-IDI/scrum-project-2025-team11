@@ -77,6 +77,29 @@ describe('RegisterComponent', () => {
         expect(linkToLogin.attributes("to")).toBe("/login")
         expect(linkToLogin.text()).toBe("Logg inn her")
     })
+    it("shows password when checkbox is clicked", async () => {
+        const wrapper = mount(RegisterComponent);
+        await nextTick()
+
+        const cbPasswordVisibility = wrapper.find("#cbPassword")
+        const iptPassword = wrapper.find("#iptPassword")
+        const iptRepeatedPassword = wrapper.find("#iptRepeatedPassword")
+
+        expect(cbPasswordVisibility.exists()).toBe(true)
+        expect((cbPasswordVisibility.element as HTMLInputElement).checked).toBe(false)
+        expect(iptPassword.attributes("type")).toBe("password");
+        expect(iptRepeatedPassword.attributes("type")).toBe("password");
+
+        //Got help from ChatGPT to properly test checking a box, due to DOM events not updating vmodel
+        (cbPasswordVisibility.element as HTMLInputElement).checked = true;
+        await cbPasswordVisibility.trigger("change")
+        await nextTick()
+
+        expect((cbPasswordVisibility.element as HTMLInputElement).checked).toBe(true)
+        expect(iptPassword.attributes("type")).toBe("text")
+        expect(iptRepeatedPassword.attributes("type")).toBe("text")
+
+    });
     describe(' in case of ', () => {
         const wrapper = mount(RegisterComponent)
 

@@ -20,7 +20,7 @@ function simpleValidation() {
     errorMessage.value = "Vennlgist fyll ut brukernavn."
     return false
   } else if (password.value === '') {
-    errorMessage.value = "Vennligst full ut passord."
+    errorMessage.value = "Vennligst fyll ut passord."
     return false
   }
   return true
@@ -30,7 +30,7 @@ function changePasswordVisibility() {
   if(showPassword.value === false) {
     passwordInputType.value = 'password'
   } else {
-    passwordInputType.value = 'type'
+    passwordInputType.value = 'text'
   }
 }
 
@@ -41,8 +41,8 @@ function changePasswordVisibility() {
     <h1>Logg inn</h1>
     <form v-on:submit.prevent>
       <label>Brukernavn <span class="importantStar">*</span><input type="text" v-model="username"/></label>
-      <label>Passord <span class="importantStar">*</span><input :type="passwordInputType" v-model="password" /></label>
-      <label><input type="checkbox" id="cbPassword" v-model="showPassword" @change="changePasswordVisibility"> Vis passord</label>
+      <label>Passord <span class="importantStar">*</span><input :type="passwordInputType" v-model="password" id="iptPassword"/></label>
+      <label><input type="checkbox" id="cbPassword" v-model="showPassword"> Vis passord</label>
       <br> <br>
       <button class="good-button" type="submit" @click="attemptLogin">Logg inn</button>
     </form>
@@ -50,11 +50,11 @@ function changePasswordVisibility() {
 
     <p class="register-login-text">
       Har du ikke en bruker?
-      <router-link to="/register" class="link">Registrer deg her</router-link>
+      <router-link to="/register" class="link" id="linkToRegister">Registrer deg her</router-link>
     </p>
     <p class="register-login-text">
       Har du glemt passord?
-      <router-link to="/forgot" class="link">Tilbakestill passord</router-link>
+      <router-link to="/forgot" class="link" id="linkToForgot">Tilbakestill passord</router-link>
     </p>
   </div>
 </template>
