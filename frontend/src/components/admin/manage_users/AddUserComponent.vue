@@ -21,6 +21,7 @@ const password = ref('');
 const passwordRepeat = ref('');
 const email = ref('');
 const errorMsg = ref('');
+const emit = defineEmits(['hide-new-user-box', 'new-user-success']);
 
 const validInput = () => {
     if(!validateFirstName(firstName.value)){
@@ -80,6 +81,14 @@ const createUser = async () => {
                 position: 'top-right'
             });
         });
+        if(adminUserStore.errorMsg !== '') {
+            $toast.error(adminUserStore.errorMsg, {
+                duration: 3000,
+                position: 'top-right'
+            });
+        } else {
+            emit('new-user-success');
+        }
     }
 }
 
@@ -109,7 +118,7 @@ const areFieldsEmpty = computed(() => {
                 <label class="label" for="repeat-pass">*Gjenta passord</label>
                 <input type="password" class="user-input" id="repeat-pass" v-model="passwordRepeat"></input>
             </div>
-            <button class="dark-button" @click="() => {createUser; $emit('new-user-success');}" :disabled="areFieldsEmpty">+ Opprett adminbruker</button>
+            <button class="dark-button" @click="createUser" :disabled="areFieldsEmpty">+ Opprett adminbruker</button>
             <p class="error-message">{{ errorMsg }}</p>
         </div>
     </div>
@@ -127,6 +136,7 @@ const areFieldsEmpty = computed(() => {
     font-size: var(--font-size-large);
     margin-bottom: 0.5rem;
     background-color: transparent;
+    box-shadow: none;
 }
 
 h1 {
@@ -161,5 +171,12 @@ h1 {
     right: -10.5rem;
     color: var(--bad-red);
     background-color: transparent;
+}
+
+@media (max-width: 480px) {
+    .cancel-button {
+        top: 0.5rem;
+        right: -9.25rem;
+    }
 }
 </style>

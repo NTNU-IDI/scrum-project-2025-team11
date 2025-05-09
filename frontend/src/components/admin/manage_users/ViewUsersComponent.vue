@@ -28,19 +28,23 @@ watch(() => adminUserStore.adminUsers, async (newUsers) => {
     }));
 });
 
-const deleteUser = (id: number) => {
-   adminUserStore.deleteUser(id);
-   if(adminUserStore.adminUsers.map(user => user.id).includes(id)) {
-    $toast.error('Kunne ikke slette bruker', {
-        duration: 3000,
-        position: 'top-right'
-    });
-   } else {
-    $toast.success('Bruker slettet', {
-        duration: 3000,
-        position: 'top-right'
-    });
-   }
+const deleteUser = async (id: number) => {
+    if(confirm('Er du sikker på at du vil slette denne adminbrukeren?')) {
+        await adminUserStore.deleteUser(id);
+        if(adminUserStore.adminUsers.map(user => user.id).includes(id)) {
+            if(adminUserStore.errorMsg !== '') {
+                $toast.error(adminUserStore.errorMsg, {
+                    duration: 3000,
+                    position: 'top-right'
+                });
+            }
+        } else {
+            $toast.success('Bruker slettet', {
+                duration: 3000,
+                position: 'top-right'
+            });
+        }
+    }
 };
 </script>
 <template>
@@ -72,7 +76,7 @@ const deleteUser = (id: number) => {
 }
 
 .grey-container {
-    width: 60rem;
+    width: 60vw;
     height: auto;
 }
 
@@ -119,15 +123,36 @@ h1 {
     align-items: center;
 }
 #username-header, #username, #name-header, #name {
-    width: 15rem;
+    width: 15vw;
 }
 
 #email-header, #email {
-    width: 20rem;
+    width: 20vw;
 }
 #delete-header, #delete {
     width: 2rem;
     justify-content: center; 
     align-items: center;
+}
+
+@media(max-width: 480px) {
+    .grey-container {
+        width: 100vw;
+        width: 100%;
+        margin: 0;
+        overflow-y: hidden;
+    }
+    .article-card {
+        font-size: x-small;
+    }
+
+    #id, #id-header {
+        min-width: 1rem;
+    }
+
+    #name, #name-header, #username, #username-header, #email, #email-header {
+        min-width: 9rem;
+    }
+    
 }
 </style>

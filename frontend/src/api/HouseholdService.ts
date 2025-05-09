@@ -13,7 +13,6 @@ export class HouseholdService {
         return response.data;
     }
     
-
     static async getHouseholdInformation(): Promise<HouseholdResponseDTO> {
         const response = await axios.get<HouseholdResponseDTO>(`${HOUSEHOLS_API_URL}/me`, { withCredentials: true });
         return response.data;
@@ -28,4 +27,10 @@ export class HouseholdService {
         const response = await axios.put<HouseholdResponseDTO>(`${HOUSEHOLS_API_URL}/update`, data, { withCredentials: true });
         return response.data;
     }
+
+    static async inviteToHousehold(email: string): Promise<void> {
+        await axios.post(`${HOUSEHOLS_API_URL}/invite`, null, {params: {email: email}, withCredentials: true });
+    }
+
+    
 }

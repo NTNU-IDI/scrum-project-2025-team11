@@ -1,47 +1,60 @@
 import {defineStore} from 'pinia'
 import {HouseholdService} from '@/api/HouseholdService'
+import type {HouseholdUserDTO} from '@/types/Household'
 
 export const useHouseholdStore = defineStore('household', {
     state: () => ({
         id: null as number | null,
         name: '',
         memberCount: 0,
-        addressId: ''
+        members: [] as Array<HouseholdUserDTO>,
+        address: '',
+        errrMsg: '' 
     }),
     
     actions: {
         async fetchHousehold() {
             try {
-                const response = await HouseholdService.getHouseholdInformation()
+                await HouseholdService.getHouseholdInformation().then((response) => {
+                    this.id = response.id, 
+                    this.name = response.name 
+                    this.memberCount = response.memberCount
+                    this.members = response.members
+                    this.address = response.address.street
+                })
+                .catch((error) => {
+                    if(error.response.status === 404) {
+                        this.errrMsg = 'Household not found'
+                    }
+                });
                 
-                this.id = response.id, 
-                this.name = response.name 
-                this.memberCount = response.memberCount
-                this.addressId = response.address.id.toString() 
+                
+                
                 
             } catch (error) {
                 console.error('Error fetching household:', error)
             }
         },
+        async inviteMember(email: string) {
+            try {
+                await HouseholdService.inviteToHousehold(email);
+                this.errrMsg = '';  
+            } catch (error: any) {
+                if(error.response && error.response.data && error.response.data.error) {
+                    this.errrMsg = error.response.data.error;
+                } else {
+                    this.errrMsg = 'Error inviting member'
+                }
+            }
+        },
+
         clearHousehold() {
             this.id = null;
             this.name = '';
             this.memberCount = 0;
-            this.addressId = '';
+            this.members = [];
+            this.address = '';
+            this.errrMsg = '';
         },
-        async setMemberCount(count: number) {
-            this.memberCount = count;
-            try {
-                if (this.id === null) {
-                    throw new Error('Household ID is null')
-                }
-                await HouseholdService.update(this.id, {
-                    ...this,
-                    memberCount: count
-                })
-            } catch (error) {
-                console.error('Error updating household member count:', error)
-            }
-        }
     }
 })

@@ -15,5 +15,13 @@ export interface HouseholdResponseDTO {
     id: number;
     name: string;
     memberCount: number;
+    members: HouseholdUserDTO[];
     address: AddressResponseDTO;
+}
+
+export interface HouseholdUserDTO {
+    username: string;
+    firstName: string;
+    lastName: string;
+    email: string;
 }

@@ -61,8 +61,9 @@ describe('ViewMembersComponent', () => {
         const headers = wrapper.findAll('h1');
         const headerTexts = headers.map(h => h.text());
 
-        expect(headerTexts).toContain('Deg');
-        expect(headerTexts).toContain('Antall medlemmer');
+        expect(headerTexts).toContain('Navn');
+        expect(headerTexts).toContain('Adresse');
+        expect(headerTexts).toContain('Medlemmer');
     });
 
     // Checks that the component renders the correct button response

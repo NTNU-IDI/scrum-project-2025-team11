@@ -166,9 +166,11 @@ const deleteEvent = async () => {
     <div class="header-box-container">
         <h1 class="medium-header">Rediger hendelse</h1>
         <div class="grey-container">
-            <h2 class="small-header">{{ localEvent.name }}</h2>
-            <button class="cancel-button" @click="$emit('hide-edit-box')">X</button>
-            
+            <div class="header-box-container">
+                <h2 class="small-header">{{ localEvent.name }}</h2>
+                <button class="cancel-button" @click="$emit('hide-edit-box')">X</button>
+            </div>
+          
                 <!-- Severity and radius -->
                 <div class="double-label-container">
                     <label for="severity-input">Krisenivå</label>
@@ -216,7 +218,9 @@ const deleteEvent = async () => {
 <style scoped>
     .grey-container {
         background-color: var(--light-blue);
+        width: 25vw;
         height: auto;
+        overflow-y: hidden;
     }
 
     .page-container {
@@ -281,8 +285,8 @@ const deleteEvent = async () => {
 
     .cancel-button {
         position: absolute;
-        top: 25rem;
-        right: -5rem;
+        top: 23rem;
+        right: -6rem;
         color: white;
         background-color: transparent;
         font-weight: bold;
@@ -306,5 +310,16 @@ const deleteEvent = async () => {
         color: white;
         margin: 0;
         padding: 0;
+    }
+
+    @media (max-width: 480px) {
+        .cancel-button {
+            top: 47.5rem;
+            right: -6rem;
+        }
+
+        .dark-button {
+            width: auto;
+        }
     }
 </style>
