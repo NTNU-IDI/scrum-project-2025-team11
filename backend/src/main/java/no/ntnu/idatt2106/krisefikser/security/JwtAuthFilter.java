@@ -17,6 +17,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Filter that intercepts HTTP requests to authenticate users based on JWT tokens stored in cookies.
+ * <p>
+ * Extracts the JWT from the "jwtToken" cookie, validates it, and sets the authentication
+ * in the Spring Security context if valid. Handles expired or invalid tokens by sending
+ * appropriate HTTP error responses.
+ */
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
   private final JwtUtil jwtUtil;
