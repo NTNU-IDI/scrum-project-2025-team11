@@ -6,26 +6,26 @@ const ITEM_API_URL = 'http://localhost:8080/api/items';
 
 export class ItemService {
     static async findAll(): Promise<Item[]> {
-        const response = await axios.get<Item[]>(ITEM_API_URL);
+        const response = await axios.get<Item[]>(ITEM_API_URL, {withCredentials: true});
         return response.data;
     }
     
     static async findById(id: number): Promise<Item> {
-        const response = await axios.get<Item>(`${ITEM_API_URL}/${id}`);
+        const response = await axios.get<Item>(`${ITEM_API_URL}/${id}`, {withCredentials: true});
         return response.data;
     }
     
     static async create(item: Omit<Item, 'id'>): Promise<Item> {
-        const response = await axios.post<Item>(ITEM_API_URL, item);
+        const response = await axios.post<Item>(ITEM_API_URL, item, {withCredentials: true});
         return response.data;
     }
     
     static async update(id: number, item: Omit<Item, 'id'>): Promise<Item> {
-        const response = await axios.put<Item>(`${ITEM_API_URL}/${id}`, item);
+        const response = await axios.put<Item>(`${ITEM_API_URL}/${id}`, item, {withCredentials: true});
         return response.data;
     }
     
     static async delete(id: number): Promise<void> {
-        await axios.delete(`${ITEM_API_URL}/${id}`);
+        await axios.delete(`${ITEM_API_URL}/${id}`, {withCredentials: true});
     }
 }

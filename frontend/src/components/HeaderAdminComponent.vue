@@ -7,7 +7,7 @@
       </div>
 
       <div class="header-right">
-        <a href="/" class="button logout" @click.prevent="logOutUser"><i class="fa fa-sign-out"></i> Logg ut</a>
+        <a href="/" class="button logout" @click.prevent="logOut"><i class="fa fa-sign-out"></i> Logg ut</a>
       </div>
     </div>
   </header>
@@ -22,4 +22,8 @@ const goToHome = () => {
 }
 
 import {logOutUser} from '../api/AuthService';
+
+async function logOut() {
+  await logOutUser()
+}
 </script>

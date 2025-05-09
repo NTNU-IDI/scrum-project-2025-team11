@@ -175,7 +175,7 @@ function changePasswordVisibility() {
   if(showPassword.value === false) {
     passwordInputType.value = 'password'
   } else {
-    passwordInputType.value = 'type'
+    passwordInputType.value = 'text'
   }
 }
 
