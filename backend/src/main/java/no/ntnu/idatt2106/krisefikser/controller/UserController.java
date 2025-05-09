@@ -79,7 +79,7 @@ public class UserController {
         schema = @Schema(implementation = UserResponseDTO.class))),
         @ApiResponse(responseCode = "204", description = "No users found", content = @Content)
     })
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('super_admin')")
     @GetMapping("/all")
     public ResponseEntity<List<UserResponseDTO>> list() {
         List<UserResponseDTO> users = userService.findAll();
