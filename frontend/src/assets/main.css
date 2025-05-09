@@ -703,3 +703,115 @@ svg.leaflet-image-layer.leaflet-interactive path {
   color: var(--orange);
   font-weight: bolder;
 }
+
+@media (max-width: 768px) {
+  .header-container {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .header-left,
+  .header-right,
+  .nav-buttons {
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .logo {
+    height: 80px;
+    margin-bottom: 10px;
+  }
+
+  .button {
+    width: 90%;
+    max-width: 300px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 32px 16px;
+  }
+
+  .info-header {
+    margin: 20px 16px;
+  }
+
+  .info-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .info-header p {
+    font-size: 1.1rem;
+  }
+
+  .grid-container {
+    margin: 0 16px;
+    padding: 20px 0;
+    gap: 16px;
+  }
+
+  .box {
+    padding: 16px;
+  }
+
+  .box h3 {
+    font-size: 1.2rem;
+  }
+
+  .box p {
+    font-size: 0.95rem;
+  }
+
+  .button {
+    width: 100%;
+    max-width: 280px;
+    font-size: 1rem;
+  }
+}
+
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: white;
+  cursor: pointer;
+  margin-left: 45%;
+  margin-right: 5%;
+}
+
+.mobile-nav {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--dark-blue);
+  padding: 12px 16px;
+  gap: 12px;
+}
+
+/* Mobiltilpasning */
+@media (max-width: 768px) {
+  .header-container {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-buttons,
+  .header-right {
+    display: none;
+  }
+
+  .hamburger {
+    display: block;
+
+  }
+
+  .header-left {
+    flex-shrink: 0;
+  }
+}
+

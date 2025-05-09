@@ -64,6 +64,7 @@ import { useEventStore } from '@/stores/eventStore';
 import { useToast } from 'vue-toast-notification';
 import { useRouter } from 'vue-router'
 
+
 const router = useRouter()
 const $toast = useToast();
 const eventStore = useEventStore(); 
