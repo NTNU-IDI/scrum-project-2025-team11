@@ -20,7 +20,9 @@
 </template>
   
   <script lang="ts" setup>
+  import { ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import {logOutUser} from '../api/AuthService';
   const router = useRouter()
   const goToHome = () => {
     router.push('/')
@@ -32,8 +34,6 @@
 const isMobileMenuOpen = ref(false)
 const toggleMobileMenu = () => isMobileMenuOpen.value = !isMobileMenuOpen.value
 
-  
-  import {logOutUser} from '../api/AuthService';
-  </script>
+</script>
   
   
