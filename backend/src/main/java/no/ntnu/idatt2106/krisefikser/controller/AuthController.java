@@ -6,6 +6,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -264,6 +265,7 @@ public class AuthController {
     @ApiResponse(responseCode = "400", description = "Invalid registration information"),
     @ApiResponse(responseCode = "409", description = "Either the email or username already exist")
   })
+  @PreAuthorize("hasRole('super_admin')")
   @PostMapping("/register-admin")
   public ResponseEntity<?> registerAdmin(@RequestBody UserRequestDTO body) throws Exception {
     if (userService.emailExists(body.getEmail())) {

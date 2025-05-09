@@ -2,6 +2,7 @@ package no.ntnu.idatt2106.krisefikser.controller;
 
 import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -255,13 +256,13 @@ public class EventController {
   @Operation(
     summary = "Save a new event", 
     description = "Save a new event to the database"
-    //,security = @SecurityRequirement(name = "bearer-key")
   )
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "Event saved successfully", 
                   content = @Content(mediaType = "application/json", schema = @Schema(implementation = EventResponseDTO.class))), 
     @ApiResponse(responseCode = "400", description = "Invalid event data")
   })
+  @PreAuthorize("hasRole('admin')")
   @PostMapping
   public ResponseEntity<EventResponseDTO> saveEvent(
     @Parameter (description = "the event to save", required = true)
@@ -286,6 +287,7 @@ public class EventController {
                   content = @Content(mediaType = "application/json", schema = @Schema(implementation = EventResponseDTO.class))), 
     @ApiResponse(responseCode = "404", description = "Event not found")
   })
+  @PreAuthorize("hasRole('admin')")
   @PutMapping("/{id}")
   public ResponseEntity<EventResponseDTO> updateEvent(
     @Parameter (description = "the ID of the event to update", required = true, example = "1")
@@ -309,6 +311,7 @@ public class EventController {
     @ApiResponse(responseCode = "204", description = "Event deleted successfully"), 
     @ApiResponse(responseCode = "404", description = "Event not found")
   })
+  @PreAuthorize("hasRole('admin')")
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteEvent(
     @Parameter (description = "the ID of the event to delete", required = true, example = "1")
