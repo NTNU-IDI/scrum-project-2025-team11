@@ -283,6 +283,7 @@ function clearRouting() {
   removeTempMarker();
   window.routingControl = null;
   isNavigating.value = false;
+  showNearestShelterButton.value = true;
 }
 
 async function findNearestShelter() {
