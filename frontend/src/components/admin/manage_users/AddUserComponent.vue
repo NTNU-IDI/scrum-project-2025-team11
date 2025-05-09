@@ -136,6 +136,7 @@ const areFieldsEmpty = computed(() => {
     font-size: var(--font-size-large);
     margin-bottom: 0.5rem;
     background-color: transparent;
+    box-shadow: none;
 }
 
 h1 {
@@ -170,5 +171,12 @@ h1 {
     right: -10.5rem;
     color: var(--bad-red);
     background-color: transparent;
+}
+
+@media (max-width: 480px) {
+    .cancel-button {
+        top: 0.5rem;
+        right: -9.25rem;
+    }
 }
 </style>

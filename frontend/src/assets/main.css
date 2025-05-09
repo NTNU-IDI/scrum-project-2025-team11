@@ -300,7 +300,7 @@ button:disabled:hover {
 .main-content {
   flex: 1;
   padding: 48px 32px;
-  background-color: white;
+  /*background-color: white;*/
 }
 
 /* Info-seksjon */

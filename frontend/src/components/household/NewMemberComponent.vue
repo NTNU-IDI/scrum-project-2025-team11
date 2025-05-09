@@ -32,6 +32,7 @@ const sendInvitationLink = async () => {
 </script>
 <template>
     <div class="grey-container">
+        <p v-if="errorMsg" class="error-message">{{ errorMsg }}</p>
         <div class="header-container">
             <h1 class="medium-header">Inviter nytt medlem</h1>
             <button class="cancel-button" @click="$emit('hide-new-member-box')">X</button> 
@@ -49,7 +50,7 @@ const sendInvitationLink = async () => {
 <style scoped>
     .grey-container {
         width: 20rem;
-        height: 12rem;
+        height: auto;
     }
 
     .header-container {

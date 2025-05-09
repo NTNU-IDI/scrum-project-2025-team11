@@ -10,8 +10,9 @@
       </div>
 
       <div class="header-right">
-        <a href="/storage" class="button other"><i class="fa fa-medkit" aria-hidden="true"></i> Min beredskap</a> 
+        <a href="/household" class="button other"><i class="fa fa-medkit" aria-hidden="true"></i> Min beredskap</a> 
         <a href="/" class="button logout" @click.prevent="logOutUser"><i class="fa fa-sign-out" aria-hidden="true"></i> Logg ut</a>
+     
       </div>
 
       <button class="hamburger" @click="toggleMobileMenu"><i class="fa fa-bars" aria-hidden="true"></i> Meny</button>
