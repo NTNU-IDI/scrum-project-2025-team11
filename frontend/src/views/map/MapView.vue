@@ -268,7 +268,8 @@ async function handleNavigation(coords: { latitude: number, longitude: number })
     isNavigating.value = true;
   } else {
     handleNoPosition();
-  }
+    isNavigating.value = false;
+  } 
 }
 
 function clearRouting() {
@@ -284,13 +285,13 @@ function clearRouting() {
 
 async function findNearestShelter() {
   isEditMode.value = false;
-  showNearestShelterButton.value = false;
 
   const position = await getUserPosition(map);
   if (position) {
     userLat = position.lat;
     userLon = position.lon;
     await locateAndShowShelters(position.lat, position.lon);
+    showNearestShelterButton.value = false;
   } else {
     handleNoPosition();
     showNearestShelterButton.value = true;
