@@ -6,6 +6,8 @@ import type { EventResponseDTO } from "@/types/Event";
 import { getEventColor } from "@/utils/geoService";
 import { type Ref } from "vue";
 
+let userPositionMarker: L.Marker | null = null;
+
 export const userIcon = L.icon({
   iconUrl: userMarkerIcon,
   iconSize: [35, 35],
@@ -79,6 +81,21 @@ export function clearEventLayers(eventLayers: L.Circle[], map: L.Map) {
   eventLayers.length = 0;
 }
 
+export function setUserPositionMarker(map: L.Map, lat: number, lon: number) {
+  if (userPositionMarker) {
+    map.removeLayer(userPositionMarker);
+  }
+  userPositionMarker = L.marker([lat, lon], { icon: userIcon }).addTo(map);
+  return userPositionMarker;
+}
+
+export function removeUserPositionMarker(map: L.Map) {
+  if (userPositionMarker) {
+    map.removeLayer(userPositionMarker);
+    userPositionMarker = null;
+  }
+}
+
 export function createRoutingControl(
   map: L.Map,
   startLat: number,
@@ -86,6 +103,8 @@ export function createRoutingControl(
   endLat: number,
   endLon: number
 ) {
+  removeUserPositionMarker(map);
+
   const routingControl = L.Routing.control({
     waypoints: [L.latLng(startLat, startLon), L.latLng(endLat, endLon)],
     routeWhileDragging: false,

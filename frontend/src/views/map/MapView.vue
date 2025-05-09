@@ -57,13 +57,12 @@ import { useUserStore } from "@/stores/userStore.ts";
 import type { PointOfInterest } from "@/types/PointOfInterest";
 import type { EventResponseDTO } from "@/types/Event";
 import { isUserInCrisisArea } from '@/utils/geoService';
-import { addMarkersToMap, addEventsToMap, clearEventLayers, createRoutingControl, clearRoutingControl, userIcon } from '@/services/MapService'; 
+import { addMarkersToMap, addEventsToMap, clearEventLayers, createRoutingControl, clearRoutingControl, setUserPositionMarker } from '@/services/MapService'; 
 import { storeToRefs } from "pinia";
 import { onUnmounted, onMounted, ref, watch } from 'vue';
 import { useEventStore } from '@/stores/eventStore'; 
 import { useToast } from 'vue-toast-notification';
 import { useRouter } from 'vue-router'
-
 
 const router = useRouter()
 const $toast = useToast();
@@ -93,6 +92,7 @@ let map: L.Map;
 let temporaryMarker: L.Marker | null = null;
 let markers: L.Marker[] = [];
 let eventLayers: L.Circle[] = [];
+let userMarker: L.Marker | null = null;
 let userLat: number | null = null;
 let userLon: number | null = null;
 
@@ -243,9 +243,7 @@ function getUserPosition(callback: (lat: number, lon: number) => void, force: bo
       userLon = pos.coords.longitude;
       userLocationFetched.value = true;
       callback(userLat, userLon);
-
-      L.marker([userLat, userLon], { icon: userIcon })
-        .addTo(map)
+      userMarker = setUserPositionMarker(map, userLat, userLon);
       map.setView([userLat, userLon], 13);
     },
     (err) => console.error("Error getting location: ", err)
