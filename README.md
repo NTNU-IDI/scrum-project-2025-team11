@@ -16,7 +16,6 @@ Dette prosjektet består av det endelige resultatet til scrum-team 11 i IDATT210
     - [Kjøre prosjektet](#kjøre-prosjektet)
       - [Installere npm](#installere-npm)
       - [Kjøre frontend](#kjøre-vue-frontend)
-      - [Kompilere backend](#kompilere-backend)
       - [Kjøre backend](#kjøre-backend)
     - [Systemets arkitektur og verktøy](#systemets-arkitektur-og-verktøy)
        - [Backend](#backend)
@@ -45,10 +44,6 @@ npm install
 ### Kjøre vue frontend
 ```
 npm run dev
-```
-### Kompilere backend
-```
-mvn clean install
 ```
 ### Kjøre backend
 ```
