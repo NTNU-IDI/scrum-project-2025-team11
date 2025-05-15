@@ -5,3 +5,25 @@
 [![Java Version](https://img.shields.io/badge/Java-21-blue.svg)](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html)
 [![Spring Boot](https://img.shields.io/badge/SpringBoot-3.4.4-blue.svg)](https://spring.io/projects/spring-boot)
 [![Vue](https://img.shields.io/badge/Vue-3.5.13-green.svg)](https://vuejs.org)
+
+# Systemets arkitektur og verktøy
+- Backend
+    - Språk: Java 21
+    - Rammeverk: Spring boot 3.4.4
+    - Sikkerhet:
+    - Database: H2 filbasert
+    - API: REST
+    - ORM: JPA
+    - Build tool: Maven
+    
+- Frontend
+    - Rammeverk: Vue 3.5.13
+    - Build tool: Vite
+    - Ruting: Vue router
+    - State: Pinia, Pinia-plugin-persistedstate
+    - Eksterne biblioteker:
+        - axios
+        - leaflet
+        - leaflet-routing-machine
+        - vue-recaptcha-v3
+        - vue-toast-notification
