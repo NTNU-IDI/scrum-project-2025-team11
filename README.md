@@ -39,14 +39,17 @@ Før prosjektet kjøres er det viktig å ha følgende lastet ned på pcen:
 # Kjøre prosjektet
 ### Installere npm
 ```
+cd frontend
 npm install
 ```
-### Kjøre vue frontend
+### Kjøre vue frontend (gitt man ikke er i frontend-mappen)
 ```
+cd frontend
 npm run dev
 ```
 ### Kjøre backend
 ```
+cd backend
 mvn spring-boot:run
 ```
 # Systemets arkitektur og verktøy
