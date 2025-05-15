@@ -56,19 +56,19 @@ mvn spring-boot:run
 ```
 # Systemets arkitektur og verktøy
 - ## Backend
-    - Språk: Java 21
-    - Rammeverk: Spring boot 3.4.4
-    - Sikkerhet:
-    - Database: H2 filbasert
-    - API: REST
-    - ORM: JPA
-    - Build tool: Maven
+    - **Språk:** Java 21
+    - **Rammeverk:** Spring boot 3.4.4
+    - **Sikkerhet:** JWT
+    - **Database:** H2 filbasert
+    - **API:** REST
+    - **ORM:** JPA
+    - **Build tool:** Maven
 - ## Frontend
-    - Rammeverk: Vue 3.5.13
-    - Build tool: Vite
-    - Ruting: Vue router
-    - State: Pinia, Pinia-plugin-persistedstate
-    - Eksterne biblioteker:
+    - **Rammeverk:** Vue 3.5.13
+    - **Build tool:** Vite
+    - **Ruting:** Vue router
+    - **State:** Pinia, Pinia-plugin-persistedstate
+    - **Eksterne biblioteker:**
         - axios
         - leaflet
         - leaflet-routing-machine
