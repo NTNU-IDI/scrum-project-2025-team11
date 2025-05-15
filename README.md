@@ -6,6 +6,34 @@
 [![Spring Boot](https://img.shields.io/badge/SpringBoot-3.4.4-blue.svg)](https://spring.io/projects/spring-boot)
 [![Vue](https://img.shields.io/badge/Vue-3.5.13-green.svg)](https://vuejs.org)
 
+# Klone prosjektet
+```
+https://github.com/NTNU-IDI/scrum-project-2025-team11.git
+```
+# Forutsetninger
+Før prosjektet kjøres er det viktig å ha følgende lastet ned på pcen:
+- Java 21
+- Vue
+- Maven
+- NPM
+
+# Kjøre prosjektet
+Installere npm
+```
+npm install
+```
+Kjøre vue frontend
+```
+npm run dev
+```
+Kompilere backend
+```
+mvn clean install
+```
+Kjøre backend
+```
+mvn spring-boot:run
+```
 # Systemets arkitektur og verktøy
 - Backend
     - Språk: Java 21
@@ -27,3 +55,19 @@
         - leaflet-routing-machine
         - vue-recaptcha-v3
         - vue-toast-notification
+# Testing
+Se testcoverage for backend
+```
+cd backend
+mvn clean verify
+```
+Kjøre frontend tester
+```
+cd frontend
+npx vitest
+```
+Se testcoverage for frontend
+```
+cd frontend
+npm run coverage
+```
