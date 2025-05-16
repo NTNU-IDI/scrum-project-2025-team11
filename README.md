@@ -43,6 +43,7 @@ cd frontend
 npm install
 ```
 ### Kjøre vue frontend (gitt man ikke er i frontend-mappen)
+Grunnet at det ikke var mulig å endre kode etter den 09.05.2025 har det sneket seg inn en import som ikke er i bruk. Derfor kan det være gunstig å måtte kjøre frontend to ganger, da første gang vil man bli møtt med en feilmelding.
 ```
 cd frontend
 npm run dev
